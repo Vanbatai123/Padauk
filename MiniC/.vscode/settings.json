@@ -1,0 +1,9 @@
+{
+	"files.associations": {
+		"PMS150_W2812_t.C": "cpp",
+		"PMS150_W2812.C": "cpp",
+		"PMS150_W2812_IR.C": "cpp",
+		"PMS150_W2812_IR_2.C": "cpp",
+		"PMS150_IR.C": "cpp"
+	}
+}

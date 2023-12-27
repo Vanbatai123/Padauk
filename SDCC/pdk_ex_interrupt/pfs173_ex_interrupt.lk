@@ -1,0 +1,9 @@
+-muwx
+-i pfs173_ex_interrupt.ihx
+-b HOME = 0x0022
+-b DATA = 0x0002
+-k C:\PROGRA~1\SDCC\bin\..\lib\pdk15
+-l pdk15
+pfs173_ex_interrupt.rel
+
+-e

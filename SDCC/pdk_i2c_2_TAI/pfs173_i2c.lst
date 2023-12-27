@@ -1,0 +1,713 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.0 #11528 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pfs173_i2c
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _interrupt
+                                     17 	.globl _main
+                                     18 	.globl _setTime
+                                     19 	.globl _digitalClockDisplay
+                                     20 	.globl _readDS1307
+                                     21 	.globl _dec2bcd
+                                     22 	.globl _bcd2dec
+                                     23 	.globl __sdcc_external_startup
+                                     24 	.globl _I2C_read
+                                     25 	.globl _I2C_requestFrom
+                                     26 	.globl _I2C_endTransmission
+                                     27 	.globl _I2C_write2
+                                     28 	.globl _I2C_beginTransmission
+                                     29 	.globl _UART_printNum
+                                     30 	.globl _PB5_interrupt
+                                     31 	.globl _TIM2_interrupt
+                                     32 	.globl _UART_print
+                                     33 	.globl _UART_rx_off
+                                     34 	.globl _UART_IO_config
+                                     35 	.globl _UART_begin
+                                     36 	.globl __delay_loop_32
+                                     37 	.globl __t16c
+                                     38 	.globl __rop
+                                     39 	.globl __bgtr
+                                     40 	.globl __ilrcr
+                                     41 	.globl __pwmg2dtl
+                                     42 	.globl __pwmg2dth
+                                     43 	.globl __pwmg2c
+                                     44 	.globl __pwmg1dtl
+                                     45 	.globl __pwmg1dth
+                                     46 	.globl __pwmg1c
+                                     47 	.globl __pwmgcubl
+                                     48 	.globl __pwmgcubh
+                                     49 	.globl __pwmg0dtl
+                                     50 	.globl __pwmg0dth
+                                     51 	.globl __pwmgclk
+                                     52 	.globl __pwmg0c
+                                     53 	.globl __tm3b
+                                     54 	.globl __tm3s
+                                     55 	.globl __tm3ct
+                                     56 	.globl __tm3c
+                                     57 	.globl __tm2b
+                                     58 	.globl __tm2s
+                                     59 	.globl __tm2ct
+                                     60 	.globl __tm2c
+                                     61 	.globl __gpcs
+                                     62 	.globl __gpcc
+                                     63 	.globl __misclvr
+                                     64 	.globl __misc2
+                                     65 	.globl __misc
+                                     66 	.globl __adcrgc
+                                     67 	.globl __adcr
+                                     68 	.globl __adcm
+                                     69 	.globl __adcc
+                                     70 	.globl __pcpl
+                                     71 	.globl __pbpl
+                                     72 	.globl __pcph
+                                     73 	.globl __pcc
+                                     74 	.globl __pc
+                                     75 	.globl __pbph
+                                     76 	.globl __pbc
+                                     77 	.globl __pb
+                                     78 	.globl __paph
+                                     79 	.globl __pac
+                                     80 	.globl __pa
+                                     81 	.globl __pcdier
+                                     82 	.globl __pbdier
+                                     83 	.globl __padier
+                                     84 	.globl __integs
+                                     85 	.globl __ihrcr
+                                     86 	.globl __eoscr
+                                     87 	.globl __t16m
+                                     88 	.globl __intrq
+                                     89 	.globl __inten
+                                     90 	.globl __clkmd
+                                     91 	.globl __sp
+                                     92 	.globl __flag
+                                     93 	.globl _setTime_PARM_7
+                                     94 	.globl _setTime_PARM_6
+                                     95 	.globl _setTime_PARM_5
+                                     96 	.globl _setTime_PARM_4
+                                     97 	.globl _setTime_PARM_3
+                                     98 	.globl _setTime_PARM_2
+                                     99 	.globl _setTime_PARM_1
+                                    100 	.globl _dec2bcd_PARM_1
+                                    101 	.globl _bcd2dec_PARM_1
+                                    102 	.globl _year
+                                    103 	.globl _month
+                                    104 	.globl _wday
+                                    105 	.globl _day2
+                                    106 	.globl _hour
+                                    107 	.globl _minute
+                                    108 	.globl _second
+                                    109 	.globl _aaa
+                                    110 	.globl _i
+                                    111 ;--------------------------------------------------------
+                                    112 ; special function registers
+                                    113 ;--------------------------------------------------------
+                                    114 	.area RSEG (ABS)
+      000000                        115 	.org 0x0000
+                           000000   116 __flag	=	0x0000
+                           000002   117 __sp	=	0x0002
+                           000003   118 __clkmd	=	0x0003
+                           000004   119 __inten	=	0x0004
+                           000005   120 __intrq	=	0x0005
+                           000006   121 __t16m	=	0x0006
+                           00000A   122 __eoscr	=	0x000a
+                           00000B   123 __ihrcr	=	0x000b
+                           00000C   124 __integs	=	0x000c
+                           00000D   125 __padier	=	0x000d
+                           00000E   126 __pbdier	=	0x000e
+                           00000F   127 __pcdier	=	0x000f
+                           000010   128 __pa	=	0x0010
+                           000011   129 __pac	=	0x0011
+                           000012   130 __paph	=	0x0012
+                           000013   131 __pb	=	0x0013
+                           000014   132 __pbc	=	0x0014
+                           000015   133 __pbph	=	0x0015
+                           000016   134 __pc	=	0x0016
+                           000017   135 __pcc	=	0x0017
+                           000018   136 __pcph	=	0x0018
+                           000019   137 __pbpl	=	0x0019
+                           00001A   138 __pcpl	=	0x001a
+                           000020   139 __adcc	=	0x0020
+                           000021   140 __adcm	=	0x0021
+                           000022   141 __adcr	=	0x0022
+                           000024   142 __adcrgc	=	0x0024
+                           000026   143 __misc	=	0x0026
+                           000027   144 __misc2	=	0x0027
+                           000028   145 __misclvr	=	0x0028
+                           00002B   146 __gpcc	=	0x002b
+                           00002C   147 __gpcs	=	0x002c
+                           000030   148 __tm2c	=	0x0030
+                           000031   149 __tm2ct	=	0x0031
+                           000032   150 __tm2s	=	0x0032
+                           000033   151 __tm2b	=	0x0033
+                           000034   152 __tm3c	=	0x0034
+                           000035   153 __tm3ct	=	0x0035
+                           000036   154 __tm3s	=	0x0036
+                           000037   155 __tm3b	=	0x0037
+                           000040   156 __pwmg0c	=	0x0040
+                           000041   157 __pwmgclk	=	0x0041
+                           000042   158 __pwmg0dth	=	0x0042
+                           000043   159 __pwmg0dtl	=	0x0043
+                           000044   160 __pwmgcubh	=	0x0044
+                           000045   161 __pwmgcubl	=	0x0045
+                           000046   162 __pwmg1c	=	0x0046
+                           000048   163 __pwmg1dth	=	0x0048
+                           000049   164 __pwmg1dtl	=	0x0049
+                           00004C   165 __pwmg2c	=	0x004c
+                           00004E   166 __pwmg2dth	=	0x004e
+                           00004F   167 __pwmg2dtl	=	0x004f
+                           000062   168 __ilrcr	=	0x0062
+                           000063   169 __bgtr	=	0x0063
+                           000067   170 __rop	=	0x0067
+      000000                        171 __t16c::
+      000000                        172 	.ds 2
+                                    173 ;--------------------------------------------------------
+                                    174 ; ram data
+                                    175 ;--------------------------------------------------------
+                                    176 	.area DATA
+      000000                        177 _i::
+      000000                        178 	.ds 1
+      000001                        179 _aaa::
+      000001                        180 	.ds 1
+      000002                        181 _second::
+      000002                        182 	.ds 1
+      000003                        183 _minute::
+      000003                        184 	.ds 1
+      000004                        185 _hour::
+      000004                        186 	.ds 1
+      000005                        187 _day2::
+      000005                        188 	.ds 1
+      000006                        189 _wday::
+      000006                        190 	.ds 1
+      000007                        191 _month::
+      000007                        192 	.ds 1
+      000008                        193 _year::
+      000008                        194 	.ds 2
+      00000A                        195 _bcd2dec_PARM_1:
+      00000A                        196 	.ds 1
+      00000B                        197 _bcd2dec_sloc0_1_0:
+      00000B                        198 	.ds 2
+      00000D                        199 _bcd2dec_sloc1_1_0:
+      00000D                        200 	.ds 1
+      00000E                        201 _dec2bcd_PARM_1:
+      00000E                        202 	.ds 1
+      00000F                        203 _dec2bcd_sloc2_1_0:
+      00000F                        204 	.ds 2
+      000011                        205 _dec2bcd_sloc3_1_0:
+      000011                        206 	.ds 1
+      000012                        207 _setTime_PARM_1:
+      000012                        208 	.ds 1
+      000013                        209 _setTime_PARM_2:
+      000013                        210 	.ds 1
+      000014                        211 _setTime_PARM_3:
+      000014                        212 	.ds 1
+      000015                        213 _setTime_PARM_4:
+      000015                        214 	.ds 1
+      000016                        215 _setTime_PARM_5:
+      000016                        216 	.ds 1
+      000017                        217 _setTime_PARM_6:
+      000017                        218 	.ds 1
+      000018                        219 _setTime_PARM_7:
+      000018                        220 	.ds 1
+                                    221 ;--------------------------------------------------------
+                                    222 ; overlayable items in ram 
+                                    223 ;--------------------------------------------------------
+                                    224 ;--------------------------------------------------------
+                                    225 ; Stack segment in internal ram 
+                                    226 ;--------------------------------------------------------
+                                    227 	.area	SSEG
+      000000                        228 __start__stack:
+      000000                        229 	.ds	1
+                                    230 
+                                    231 ;--------------------------------------------------------
+                                    232 ; absolute external ram data
+                                    233 ;--------------------------------------------------------
+                                    234 	.area DABS (ABS)
+                                    235 ;--------------------------------------------------------
+                                    236 ; interrupt vector 
+                                    237 ;--------------------------------------------------------
+                                    238 	.area HOME
+      000000                        239 __interrupt_vect:
+                                    240 	.area	HEADER (ABS)
+      000020                        241 	.org	 0x0020
+      000020r14r62                  242 	goto	_interrupt
+                                    243 ;--------------------------------------------------------
+                                    244 ; global & static initialisations
+                                    245 ;--------------------------------------------------------
+                                    246 	.area HOME
+                                    247 	.area GSINIT
+                                    248 	.area GSFINAL
+                                    249 	.area GSINIT
+                                    250 	.area	PREG (ABS)
+      000000                        251 	.org 0x00
+      000000                        252 p::
+      000000                        253 	.ds 2
+                                    254 	.area	HEADER (ABS)
+      000000                        255 	.org 0x0000
+      000000 00 00                  256 	nop
+      000002r01r26                  257 	clear	p+1
+      000004r00r57                  258 	mov	a, #s_OSEG
+      000006r01r50                  259 	add	a, #l_OSEG + 1
+      000008 FE 54                  260 	and	a, #0xfe
+      00000A 02 01                  261 	mov	sp, a
+      00000Cr00r70                  262 	call	__sdcc_external_startup
+      00000Er00r60                  263 	goto	__sdcc_gs_init_startup
+                                    264 	.area GSINIT
+      000000                        265 __sdcc_gs_init_startup:
+      000000                        266 __sdcc_init_data:
+      000000r00r57                  267 	mov	a, #s_DATA
+      000002r00r17                  268 	mov	p, a
+      000004r0Er60                  269 	goto	00002$
+      000006                        270 00001$:
+      000006 00 57                  271 	mov	a, #0x00
+      000008r00r07                  272 	idxm	p, a
+      00000Ar00r24                  273 	inc	p
+      00000Cr00r57                  274 	mov	a, #s_DATA
+      00000E                        275 00002$:
+      00000Er00r50                  276 	add	a, #l_DATA
+      000010r00r2E                  277 	ceqsn	a, p
+      000012r06r60                  278 	goto	00001$
+                                    279 ;	pfs173_i2c.c: 17: uint8_t i = 0;
+      000014r00r26                  280 	clear	_i+0
+                                    281 ;	pfs173_i2c.c: 18: uint8_t aaa = 0;
+      000016r01r26                  282 	clear	_aaa+0
+                                    283 	.area GSFINAL
+      000000r00r60                  284 	goto	__sdcc_program_startup
+                                    285 ;--------------------------------------------------------
+                                    286 ; Home
+                                    287 ;--------------------------------------------------------
+                                    288 	.area HOME
+                                    289 	.area HOME
+      000000                        290 __sdcc_program_startup:
+      000000rA4r61                  291 	goto	_main
+                                    292 ;	return from main will return to caller
+                                    293 ;--------------------------------------------------------
+                                    294 ; code
+                                    295 ;--------------------------------------------------------
+                                    296 	.area CODE
+                                    297 ;	pfs173_i2c.c: 22: uint8_t _sdcc_external_startup(void)
+                                    298 ;	-----------------------------------------
+                                    299 ;	 function _sdcc_external_startup
+                                    300 ;	-----------------------------------------
+      000000                        301 __sdcc_external_startup:
+                                    302 ;	pfs173_i2c.c: 24: EASY_PDK_INIT_SYSCLOCK_8MHZ();		  //use 8MHz sysclock
+      000000 34 57                  303 	mov	a, #0x34
+      000002 03 01                  304 	mov	__clkmd, a
+                                    305 ;	pfs173_i2c.c: 25: EASY_PDK_CALIBRATE_IHRC(F_CPU, 5000); //tune SYSCLK to 8MHz @ 4.000V
+      000004 52 54                  306 	and	a, #'R'                        
+      000006 43 54                  307 	and	a, #'C'                        
+      000008 01 54                  308 	and	a, #((1))          
+      00000A 00 54                  309 	and	a, #((8000000))     
+      00000C 12 54                  310 	and	a, #((8000000)>>8)  
+      00000E 7A 54                  311 	and	a, #((8000000)>>16) 
+      000010 00 54                  312 	and	a, #((8000000)>>24) 
+      000012 88 54                  313 	and	a, #((5000))     
+      000014 13 54                  314 	and	a, #((5000)>>8)  
+      000016 0B 54                  315 	and	a, #((0x0B))           
+                                    316 ;	pfs173_i2c.c: 26: return 0;							  //perform normal initialization
+                                    317 ;	pfs173_i2c.c: 27: }
+      000018 00 02                  318 	ret	#0x00
+                                    319 ;	pfs173_i2c.c: 30: uint8_t bcd2dec(uint8_t num)
+                                    320 ;	-----------------------------------------
+                                    321 ;	 function bcd2dec
+                                    322 ;	-----------------------------------------
+      00001A                        323 _bcd2dec:
+                                    324 ;	pfs173_i2c.c: 32: return ((num / 16 * 10) + (num % 16));
+      00001Ar0Ar1F                  325 	mov	a, _bcd2dec_PARM_1+0
+      00001Cr0Br17                  326 	mov	_bcd2dec_sloc0_1_0+0, a
+      00001Er0Cr26                  327 	clear	_bcd2dec_sloc0_1_0+1
+      000020r0Br1F                  328 	mov	a, _bcd2dec_sloc0_1_0+0
+      000022r00r17                  329 	mov	__divsint_PARM_1+0, a
+      000024r0Cr1F                  330 	mov	a, _bcd2dec_sloc0_1_0+1
+      000026r01r17                  331 	mov	__divsint_PARM_1+1, a
+      000028 10 57                  332 	mov	a, #0x10
+      00002Ar00r17                  333 	mov	__divsint_PARM_2+0, a
+      00002Cr01r26                  334 	clear	__divsint_PARM_2+1
+      00002Er00r70                  335 	call	__divsint
+      000030r00r17                  336 	mov	p, a
+      000032 6B 00                  337 	sl	a
+      000034 6B 00                  338 	sl	a
+      000036r00r18                  339 	add	a, p
+      000038 6B 00                  340 	sl	a
+      00003Ar0Dr17                  341 	mov	_bcd2dec_sloc1_1_0+0, a
+      00003Cr0Br1F                  342 	mov	a, _bcd2dec_sloc0_1_0+0
+      00003E 0F 54                  343 	and	a, #0x0f
+      000040r0Dr18                  344 	add	a, _bcd2dec_sloc1_1_0+0
+                                    345 ;	pfs173_i2c.c: 33: }
+      000042 7A 00                  346 	ret
+                                    347 ;	pfs173_i2c.c: 35: uint8_t dec2bcd(uint8_t num)
+                                    348 ;	-----------------------------------------
+                                    349 ;	 function dec2bcd
+                                    350 ;	-----------------------------------------
+      000044                        351 _dec2bcd:
+                                    352 ;	pfs173_i2c.c: 37: return ((num / 10 * 16) + (num % 10));
+      000044r0Er1F                  353 	mov	a, _dec2bcd_PARM_1+0
+      000046r0Fr17                  354 	mov	_dec2bcd_sloc2_1_0+0, a
+      000048r10r26                  355 	clear	_dec2bcd_sloc2_1_0+1
+      00004Ar0Fr1F                  356 	mov	a, _dec2bcd_sloc2_1_0+0
+      00004Cr00r17                  357 	mov	__divsint_PARM_1+0, a
+      00004Er10r1F                  358 	mov	a, _dec2bcd_sloc2_1_0+1
+      000050r01r17                  359 	mov	__divsint_PARM_1+1, a
+      000052 0A 57                  360 	mov	a, #0x0a
+      000054r00r17                  361 	mov	__divsint_PARM_2+0, a
+      000056r01r26                  362 	clear	__divsint_PARM_2+1
+      000058r00r70                  363 	call	__divsint
+      00005Ar11r17                  364 	mov	_dec2bcd_sloc3_1_0+0, a
+      00005Cr11r2B                  365 	sl	_dec2bcd_sloc3_1_0+0
+      00005Er11r2B                  366 	sl	_dec2bcd_sloc3_1_0+0
+      000060r11r2B                  367 	sl	_dec2bcd_sloc3_1_0+0
+      000062r11r2B                  368 	sl	_dec2bcd_sloc3_1_0+0
+      000064r0Fr1F                  369 	mov	a, _dec2bcd_sloc2_1_0+0
+      000066r00r17                  370 	mov	__modsint_PARM_1+0, a
+      000068r10r1F                  371 	mov	a, _dec2bcd_sloc2_1_0+1
+      00006Ar01r17                  372 	mov	__modsint_PARM_1+1, a
+      00006C 0A 57                  373 	mov	a, #0x0a
+      00006Er00r17                  374 	mov	__modsint_PARM_2+0, a
+      000070r01r26                  375 	clear	__modsint_PARM_2+1
+      000072r00r70                  376 	call	__modsint
+      000074r11r18                  377 	add	a, _dec2bcd_sloc3_1_0+0
+                                    378 ;	pfs173_i2c.c: 38: }
+      000076 7A 00                  379 	ret
+                                    380 ;	pfs173_i2c.c: 39: void readDS1307()
+                                    381 ;	-----------------------------------------
+                                    382 ;	 function readDS1307
+                                    383 ;	-----------------------------------------
+      000078                        384 _readDS1307:
+                                    385 ;	pfs173_i2c.c: 41: I2C_beginTransmission(DS1307);
+      000078 68 57                  386 	mov	a, #0x68
+      00007Ar00r17                  387 	mov	_I2C_beginTransmission_PARM_1+0, a
+      00007Cr00r70                  388 	call	_I2C_beginTransmission
+                                    389 ;	pfs173_i2c.c: 42: I2C_write2(0x00);
+      00007Er00r26                  390 	clear	_I2C_write2_PARM_1+0
+      000080r00r70                  391 	call	_I2C_write2
+                                    392 ;	pfs173_i2c.c: 43: I2C_endTransmission();
+      000082r00r70                  393 	call	_I2C_endTransmission
+                                    394 ;	pfs173_i2c.c: 44: I2C_requestFrom(DS1307, NumberOfFields);
+      000084 68 57                  395 	mov	a, #0x68
+      000086r00r17                  396 	mov	_I2C_requestFrom_PARM_1+0, a
+      000088 07 57                  397 	mov	a, #0x07
+      00008Ar00r17                  398 	mov	_I2C_requestFrom_PARM_2+0, a
+      00008Cr00r70                  399 	call	_I2C_requestFrom
+                                    400 ;	pfs173_i2c.c: 45: second = bcd2dec(I2C_read() & 0x7f);
+      00008Er00r70                  401 	call	_I2C_read
+      000090 7F 54                  402 	and	a, #0x7f
+      000092r0Ar17                  403 	mov	_bcd2dec_PARM_1+0, a
+      000094r1Ar70                  404 	call	_bcd2dec
+      000096r02r17                  405 	mov	_second+0, a
+                                    406 ;	pfs173_i2c.c: 46: minute = bcd2dec(I2C_read());
+      000098r00r70                  407 	call	_I2C_read
+      00009Ar0Ar17                  408 	mov	_bcd2dec_PARM_1+0, a
+      00009Cr1Ar70                  409 	call	_bcd2dec
+      00009Er03r17                  410 	mov	_minute+0, a
+                                    411 ;	pfs173_i2c.c: 47: hour = bcd2dec(I2C_read() & 0x3f); // chế độ 24h.
+      0000A0r00r70                  412 	call	_I2C_read
+      0000A2 3F 54                  413 	and	a, #0x3f
+      0000A4r0Ar17                  414 	mov	_bcd2dec_PARM_1+0, a
+      0000A6r1Ar70                  415 	call	_bcd2dec
+      0000A8r04r17                  416 	mov	_hour+0, a
+                                    417 ;	pfs173_i2c.c: 48: wday = bcd2dec(I2C_read());
+      0000AAr00r70                  418 	call	_I2C_read
+      0000ACr0Ar17                  419 	mov	_bcd2dec_PARM_1+0, a
+      0000AEr1Ar70                  420 	call	_bcd2dec
+      0000B0r06r17                  421 	mov	_wday+0, a
+                                    422 ;	pfs173_i2c.c: 49: day2 = bcd2dec(I2C_read());
+      0000B2r00r70                  423 	call	_I2C_read
+      0000B4r0Ar17                  424 	mov	_bcd2dec_PARM_1+0, a
+      0000B6r1Ar70                  425 	call	_bcd2dec
+      0000B8r05r17                  426 	mov	_day2+0, a
+                                    427 ;	pfs173_i2c.c: 50: month = bcd2dec(I2C_read());
+      0000BAr00r70                  428 	call	_I2C_read
+      0000BCr0Ar17                  429 	mov	_bcd2dec_PARM_1+0, a
+      0000BEr1Ar70                  430 	call	_bcd2dec
+      0000C0r07r17                  431 	mov	_month+0, a
+                                    432 ;	pfs173_i2c.c: 51: year = bcd2dec(I2C_read());
+      0000C2r00r70                  433 	call	_I2C_read
+      0000C4r0Ar17                  434 	mov	_bcd2dec_PARM_1+0, a
+      0000C6r1Ar70                  435 	call	_bcd2dec
+      0000C8r08r17                  436 	mov	_year+0, a
+      0000CAr09r26                  437 	clear	_year+1
+                                    438 ;	pfs173_i2c.c: 52: year += 2000;
+      0000CCr08r1F                  439 	mov	a, _year+0
+      0000CE D0 50                  440 	add	a, #0xd0
+      0000D0r00r17                  441 	mov	p, a
+      0000D2r09r1F                  442 	mov	a, _year+1
+      0000D4 60 00                  443 	addc	a
+      0000D6 07 50                  444 	add	a, #0x07
+      0000D8r09r17                  445 	mov	_year+1, a
+      0000DAr00r1F                  446 	mov	a, p
+      0000DCr08r17                  447 	mov	_year+0, a
+                                    448 ;	pfs173_i2c.c: 53: }
+      0000DE 7A 00                  449 	ret
+                                    450 ;	pfs173_i2c.c: 55: void digitalClockDisplay()
+                                    451 ;	-----------------------------------------
+                                    452 ;	 function digitalClockDisplay
+                                    453 ;	-----------------------------------------
+      0000E0                        454 _digitalClockDisplay:
+                                    455 ;	pfs173_i2c.c: 58: UART_printNum(hour);
+      0000E0r04r1F                  456 	mov	a, _hour+0
+      0000E2r00r17                  457 	mov	_UART_printNum_PARM_1+0, a
+      0000E4r01r26                  458 	clear	_UART_printNum_PARM_1+1
+      0000E6r00r70                  459 	call	_UART_printNum
+                                    460 ;	pfs173_i2c.c: 59: UART_print("-");
+      0000E8r00r57                  461 	mov	a, #<(___str_0 + 0)
+      0000EAr00r17                  462 	mov	_UART_print_PARM_1+0, a
+      0000ECr00r57                  463 	mov	a, #>(___str_0 + 0x8000 + 0)
+      0000EEr01r17                  464 	mov	_UART_print_PARM_1+1, a
+      0000F0r00r70                  465 	call	_UART_print
+                                    466 ;	pfs173_i2c.c: 60: UART_printNum(minute);
+      0000F2r03r1F                  467 	mov	a, _minute+0
+      0000F4r00r17                  468 	mov	_UART_printNum_PARM_1+0, a
+      0000F6r01r26                  469 	clear	_UART_printNum_PARM_1+1
+      0000F8r00r70                  470 	call	_UART_printNum
+                                    471 ;	pfs173_i2c.c: 61: UART_print("-");
+      0000FAr00r57                  472 	mov	a, #<(___str_0 + 0)
+      0000FCr00r17                  473 	mov	_UART_print_PARM_1+0, a
+      0000FEr00r57                  474 	mov	a, #>(___str_0 + 0x8000 + 0)
+      000100r01r17                  475 	mov	_UART_print_PARM_1+1, a
+      000102r00r70                  476 	call	_UART_print
+                                    477 ;	pfs173_i2c.c: 62: UART_printNum(second);
+      000104r02r1F                  478 	mov	a, _second+0
+      000106r00r17                  479 	mov	_UART_printNum_PARM_1+0, a
+      000108r01r26                  480 	clear	_UART_printNum_PARM_1+1
+      00010Ar00r70                  481 	call	_UART_printNum
+                                    482 ;	pfs173_i2c.c: 63: UART_print("-");
+      00010Cr00r57                  483 	mov	a, #<(___str_0 + 0)
+      00010Er00r17                  484 	mov	_UART_print_PARM_1+0, a
+      000110r00r57                  485 	mov	a, #>(___str_0 + 0x8000 + 0)
+      000112r01r17                  486 	mov	_UART_print_PARM_1+1, a
+      000114r00r70                  487 	call	_UART_print
+                                    488 ;	pfs173_i2c.c: 64: UART_printNum(day2);
+      000116r05r1F                  489 	mov	a, _day2+0
+      000118r00r17                  490 	mov	_UART_printNum_PARM_1+0, a
+      00011Ar01r26                  491 	clear	_UART_printNum_PARM_1+1
+      00011Cr00r70                  492 	call	_UART_printNum
+                                    493 ;	pfs173_i2c.c: 65: UART_print("-");
+      00011Er00r57                  494 	mov	a, #<(___str_0 + 0)
+      000120r00r17                  495 	mov	_UART_print_PARM_1+0, a
+      000122r00r57                  496 	mov	a, #>(___str_0 + 0x8000 + 0)
+      000124r01r17                  497 	mov	_UART_print_PARM_1+1, a
+      000126r00r70                  498 	call	_UART_print
+                                    499 ;	pfs173_i2c.c: 66: UART_printNum(month);
+      000128r07r1F                  500 	mov	a, _month+0
+      00012Ar00r17                  501 	mov	_UART_printNum_PARM_1+0, a
+      00012Cr01r26                  502 	clear	_UART_printNum_PARM_1+1
+      00012Er00r70                  503 	call	_UART_printNum
+                                    504 ;	pfs173_i2c.c: 67: UART_print("-");
+      000130r00r57                  505 	mov	a, #<(___str_0 + 0)
+      000132r00r17                  506 	mov	_UART_print_PARM_1+0, a
+      000134r00r57                  507 	mov	a, #>(___str_0 + 0x8000 + 0)
+      000136r01r17                  508 	mov	_UART_print_PARM_1+1, a
+      000138r00r70                  509 	call	_UART_print
+                                    510 ;	pfs173_i2c.c: 68: UART_printNum(year);
+      00013Ar08r1F                  511 	mov	a, _year+0
+      00013Cr00r17                  512 	mov	_UART_printNum_PARM_1+0, a
+      00013Er09r1F                  513 	mov	a, _year+1
+      000140r01r17                  514 	mov	_UART_printNum_PARM_1+1, a
+      000142r00r70                  515 	call	_UART_printNum
+                                    516 ;	pfs173_i2c.c: 69: UART_print("\r");
+      000144r04r57                  517 	mov	a, #<(___str_1 + 0)
+      000146r00r17                  518 	mov	_UART_print_PARM_1+0, a
+      000148r04r57                  519 	mov	a, #>(___str_1 + 0x8000 + 0)
+      00014Ar01r17                  520 	mov	_UART_print_PARM_1+1, a
+      00014Cr00r60                  521 	goto	_UART_print
+                                    522 ;	pfs173_i2c.c: 70: }
+      00014E 7A 00                  523 	ret
+                                    524 ;	pfs173_i2c.c: 73: void setTime(uint8_t hr, uint8_t min, uint8_t sec, uint8_t wd, uint8_t d, uint8_t mth, uint8_t yr)
+                                    525 ;	-----------------------------------------
+                                    526 ;	 function setTime
+                                    527 ;	-----------------------------------------
+      000150                        528 _setTime:
+                                    529 ;	pfs173_i2c.c: 75: I2C_beginTransmission(DS1307);
+      000150 68 57                  530 	mov	a, #0x68
+      000152r00r17                  531 	mov	_I2C_beginTransmission_PARM_1+0, a
+      000154r00r70                  532 	call	_I2C_beginTransmission
+                                    533 ;	pfs173_i2c.c: 76: I2C_write2(0x00); // đặt lại pointer
+      000156r00r26                  534 	clear	_I2C_write2_PARM_1+0
+      000158r00r70                  535 	call	_I2C_write2
+                                    536 ;	pfs173_i2c.c: 77: I2C_write2(dec2bcd(sec));
+      00015Ar14r1F                  537 	mov	a, _setTime_PARM_3+0
+      00015Cr0Er17                  538 	mov	_dec2bcd_PARM_1+0, a
+      00015Er44r70                  539 	call	_dec2bcd
+      000160r00r17                  540 	mov	_I2C_write2_PARM_1+0, a
+      000162r00r70                  541 	call	_I2C_write2
+                                    542 ;	pfs173_i2c.c: 78: I2C_write2(dec2bcd(min));
+      000164r13r1F                  543 	mov	a, _setTime_PARM_2+0
+      000166r0Er17                  544 	mov	_dec2bcd_PARM_1+0, a
+      000168r44r70                  545 	call	_dec2bcd
+      00016Ar00r17                  546 	mov	_I2C_write2_PARM_1+0, a
+      00016Cr00r70                  547 	call	_I2C_write2
+                                    548 ;	pfs173_i2c.c: 79: I2C_write2(dec2bcd(hr));
+      00016Er12r1F                  549 	mov	a, _setTime_PARM_1+0
+      000170r0Er17                  550 	mov	_dec2bcd_PARM_1+0, a
+      000172r44r70                  551 	call	_dec2bcd
+      000174r00r17                  552 	mov	_I2C_write2_PARM_1+0, a
+      000176r00r70                  553 	call	_I2C_write2
+                                    554 ;	pfs173_i2c.c: 80: I2C_write2(dec2bcd(wd)); // day2 of week: Sunday2 = 1, Saturday2 = 7
+      000178r15r1F                  555 	mov	a, _setTime_PARM_4+0
+      00017Ar0Er17                  556 	mov	_dec2bcd_PARM_1+0, a
+      00017Cr44r70                  557 	call	_dec2bcd
+      00017Er00r17                  558 	mov	_I2C_write2_PARM_1+0, a
+      000180r00r70                  559 	call	_I2C_write2
+                                    560 ;	pfs173_i2c.c: 81: I2C_write2(dec2bcd(d));
+      000182r16r1F                  561 	mov	a, _setTime_PARM_5+0
+      000184r0Er17                  562 	mov	_dec2bcd_PARM_1+0, a
+      000186r44r70                  563 	call	_dec2bcd
+      000188r00r17                  564 	mov	_I2C_write2_PARM_1+0, a
+      00018Ar00r70                  565 	call	_I2C_write2
+                                    566 ;	pfs173_i2c.c: 82: I2C_write2(dec2bcd(mth));
+      00018Cr17r1F                  567 	mov	a, _setTime_PARM_6+0
+      00018Er0Er17                  568 	mov	_dec2bcd_PARM_1+0, a
+      000190r44r70                  569 	call	_dec2bcd
+      000192r00r17                  570 	mov	_I2C_write2_PARM_1+0, a
+      000194r00r70                  571 	call	_I2C_write2
+                                    572 ;	pfs173_i2c.c: 83: I2C_write2(dec2bcd(yr));
+      000196r18r1F                  573 	mov	a, _setTime_PARM_7+0
+      000198r0Er17                  574 	mov	_dec2bcd_PARM_1+0, a
+      00019Ar44r70                  575 	call	_dec2bcd
+      00019Cr00r17                  576 	mov	_I2C_write2_PARM_1+0, a
+      00019Er00r70                  577 	call	_I2C_write2
+                                    578 ;	pfs173_i2c.c: 84: I2C_endTransmission();
+      0001A0r00r60                  579 	goto	_I2C_endTransmission
+                                    580 ;	pfs173_i2c.c: 85: }
+      0001A2 7A 00                  581 	ret
+                                    582 ;	pfs173_i2c.c: 87: int main(void)
+                                    583 ;	-----------------------------------------
+                                    584 ;	 function main
+                                    585 ;	-----------------------------------------
+      0001A4                        586 _main:
+                                    587 ;	pfs173_i2c.c: 89: UART_IO_config();
+      0001A4r00r70                  588 	call	_UART_IO_config
+                                    589 ;	pfs173_i2c.c: 90: UART_begin();
+      0001A6r00r70                  590 	call	_UART_begin
+                                    591 ;	pfs173_i2c.c: 91: INTRQ = 0;
+      0001A8 00 57                  592 	mov	a, #0x00
+      0001AA 05 01                  593 	mov	__intrq, a
+                                    594 ;	pfs173_i2c.c: 92: sei();
+      0001AC 78 00                  595 	engint
+                                    596 ;	pfs173_i2c.c: 93: UART_rx_off();
+      0001AEr00r70                  597 	call	_UART_rx_off
+                                    598 ;	pfs173_i2c.c: 94: UART_print("\rOK\r");
+      0001B0r08r57                  599 	mov	a, #<(___str_2 + 0)
+      0001B2r00r17                  600 	mov	_UART_print_PARM_1+0, a
+      0001B4r08r57                  601 	mov	a, #>(___str_2 + 0x8000 + 0)
+      0001B6r01r17                  602 	mov	_UART_print_PARM_1+1, a
+      0001B8r00r70                  603 	call	_UART_print
+                                    604 ;	pfs173_i2c.c: 96: PBC |= (1 << SDA);
+      0001BA 14 3F                  605 	set1	__pbc, #6
+                                    606 ;	pfs173_i2c.c: 97: PBC |= (1 << SCL);
+      0001BC 94 3F                  607 	set1	__pbc, #7
+                                    608 ;	pfs173_i2c.c: 99: setTime(12, 30, 45, 1, 8, 2, 15); // 12:30:45 CN 08-02-2015
+      0001BE 0C 57                  609 	mov	a, #0x0c
+      0001C0r12r17                  610 	mov	_setTime_PARM_1+0, a
+      0001C2 1E 57                  611 	mov	a, #0x1e
+      0001C4r13r17                  612 	mov	_setTime_PARM_2+0, a
+      0001C6 2D 57                  613 	mov	a, #0x2d
+      0001C8r14r17                  614 	mov	_setTime_PARM_3+0, a
+      0001CA 01 57                  615 	mov	a, #0x01
+      0001CCr15r17                  616 	mov	_setTime_PARM_4+0, a
+      0001CE 08 57                  617 	mov	a, #0x08
+      0001D0r16r17                  618 	mov	_setTime_PARM_5+0, a
+      0001D2 02 57                  619 	mov	a, #0x02
+      0001D4r17r17                  620 	mov	_setTime_PARM_6+0, a
+      0001D6 0F 57                  621 	mov	a, #0x0f
+      0001D8r18r17                  622 	mov	_setTime_PARM_7+0, a
+      0001DAr50r71                  623 	call	_setTime
+                                    624 ;	pfs173_i2c.c: 101: while (1)
+      0001DC                        625 00102$:
+                                    626 ;	pfs173_i2c.c: 104: readDS1307();
+      0001DCr78r70                  627 	call	_readDS1307
+                                    628 ;	pfs173_i2c.c: 107: digitalClockDisplay();
+      0001DErE0r70                  629 	call	_digitalClockDisplay
+                                    630 ;	pfs173_i2c.c: 109: _delay_ms(900);
+      0001E0 BE 57                  631 	mov	a, #0xbe
+      0001E2r00r17                  632 	mov	__delay_loop_32_PARM_1+0, a
+      0001E4 27 57                  633 	mov	a, #0x27
+      0001E6r01r17                  634 	mov	__delay_loop_32_PARM_1+1, a
+      0001E8 09 57                  635 	mov	a, #0x09
+      0001EAr02r17                  636 	mov	__delay_loop_32_PARM_1+2, a
+      0001ECr03r26                  637 	clear	__delay_loop_32_PARM_1+3
+      0001EEr00r70                  638 	call	__delay_loop_32
+                                    639 ;	pfs173_i2c.c: 110: _delay_ms(900);
+      0001F0 BE 57                  640 	mov	a, #0xbe
+      0001F2r00r17                  641 	mov	__delay_loop_32_PARM_1+0, a
+      0001F4 27 57                  642 	mov	a, #0x27
+      0001F6r01r17                  643 	mov	__delay_loop_32_PARM_1+1, a
+      0001F8 09 57                  644 	mov	a, #0x09
+      0001FAr02r17                  645 	mov	__delay_loop_32_PARM_1+2, a
+      0001FCr03r26                  646 	clear	__delay_loop_32_PARM_1+3
+      0001FEr00r70                  647 	call	__delay_loop_32
+                                    648 ;	pfs173_i2c.c: 111: _delay_ms(900);
+      000200 BE 57                  649 	mov	a, #0xbe
+      000202r00r17                  650 	mov	__delay_loop_32_PARM_1+0, a
+      000204 27 57                  651 	mov	a, #0x27
+      000206r01r17                  652 	mov	__delay_loop_32_PARM_1+1, a
+      000208 09 57                  653 	mov	a, #0x09
+      00020Ar02r17                  654 	mov	__delay_loop_32_PARM_1+2, a
+      00020Cr03r26                  655 	clear	__delay_loop_32_PARM_1+3
+      00020Er00r70                  656 	call	__delay_loop_32
+      000210rDCr61                  657 	goto	00102$
+                                    658 ;	pfs173_i2c.c: 113: }
+      000212 7A 00                  659 	ret
+                                    660 ;	pfs173_i2c.c: 116: void interrupt(void) __interrupt(0)
+                                    661 ;	-----------------------------------------
+                                    662 ;	 function interrupt
+                                    663 ;	-----------------------------------------
+      000214                        664 _interrupt:
+      000214 72 00                  665 	push	af
+      000216r00r1F                  666 	mov	a, p
+      000218 72 00                  667 	push	af
+                                    668 ;	pfs173_i2c.c: 119: if (INTRQ & INTRQ_TM2)
+      00021A 85 01                  669 	mov	a, __intrq
+      00021C 40 54                  670 	and	a, #0x40
+      00021E 00 53                  671 	cneqsn	a, #0x00
+      000220r26r62                  672 	goto	00102$
+                                    673 ;	pfs173_i2c.c: 121: INTRQ &= ~INTRQ_TM2; // Mark TM2 interrupt request processed
+      000222 05 3B                  674 	set0	__intrq, #6
+                                    675 ;	pfs173_i2c.c: 122: TIM2_interrupt();
+      000224r00r70                  676 	call	_TIM2_interrupt
+      000226                        677 00102$:
+                                    678 ;	pfs173_i2c.c: 125: if (INTRQ & INTRQ_PB5)
+      000226 85 01                  679 	mov	a, __intrq
+      000228 01 54                  680 	and	a, #0x01
+      00022A 00 53                  681 	cneqsn	a, #0x00
+      00022Cr32r62                  682 	goto	00105$
+                                    683 ;	pfs173_i2c.c: 127: INTRQ &= ~INTRQ_PB5; // Mark TM2 interrupt request processed
+      00022E 05 38                  684 	set0	__intrq, #0
+                                    685 ;	pfs173_i2c.c: 128: PB5_interrupt();
+      000230r00r70                  686 	call	_PB5_interrupt
+      000232                        687 00105$:
+                                    688 ;	pfs173_i2c.c: 130: }
+      000232 73 00                  689 	pop	af
+      000234r00r17                  690 	mov	p, a
+      000236 73 00                  691 	pop	af
+      000238 7B 00                  692 	reti
+                                    693 	.area CODE
+                                    694 	.area CONST
+                                    695 	.area CONST
+      000000                        696 ___str_0:
+      000000 2D 02                  697 	ret #0x2d	; -
+      000002 00 02                  698 	ret #0x00
+                                    699 	.area CODE
+                                    700 	.area CONST
+      000004                        701 ___str_1:
+      000004 0D 02                  702 	ret #0x0d
+      000006 00 02                  703 	ret #0x00
+                                    704 	.area CODE
+                                    705 	.area CONST
+      000008                        706 ___str_2:
+      000008 0D 02                  707 	ret #0x0d
+      00000A 4F 02                  708 	ret #0x4f	; O
+      00000C 4B 02                  709 	ret #0x4b	; K
+      00000E 0D 02                  710 	ret #0x0d
+      000010 00 02                  711 	ret #0x00
+                                    712 	.area CODE
+                                    713 	.area CABS (ABS)

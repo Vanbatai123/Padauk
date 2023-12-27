@@ -1,0 +1,732 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pfs173_uart_TIM
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl __sdcc_external_startup
+                                     17 	.globl _interrupt
+                                     18 	.globl _main
+                                     19 	.globl _print_string
+                                     20 	.globl __delay_loop_32
+                                     21 	.globl __delay_loop_16
+                                     22 	.globl __delay_loop_8
+                                     23 	.globl __t16c
+                                     24 	.globl __rop
+                                     25 	.globl __bgtr
+                                     26 	.globl __ilrcr
+                                     27 	.globl __pwmg2dtl
+                                     28 	.globl __pwmg2dth
+                                     29 	.globl __pwmg2c
+                                     30 	.globl __pwmg1dtl
+                                     31 	.globl __pwmg1dth
+                                     32 	.globl __pwmg1c
+                                     33 	.globl __pwmgcubl
+                                     34 	.globl __pwmgcubh
+                                     35 	.globl __pwmg0dtl
+                                     36 	.globl __pwmg0dth
+                                     37 	.globl __pwmgclk
+                                     38 	.globl __pwmg0c
+                                     39 	.globl __tm3b
+                                     40 	.globl __tm3s
+                                     41 	.globl __tm3ct
+                                     42 	.globl __tm3c
+                                     43 	.globl __tm2b
+                                     44 	.globl __tm2s
+                                     45 	.globl __tm2ct
+                                     46 	.globl __tm2c
+                                     47 	.globl __gpcs
+                                     48 	.globl __gpcc
+                                     49 	.globl __misclvr
+                                     50 	.globl __misc2
+                                     51 	.globl __misc
+                                     52 	.globl __adcrgc
+                                     53 	.globl __adcr
+                                     54 	.globl __adcm
+                                     55 	.globl __adcc
+                                     56 	.globl __pcpl
+                                     57 	.globl __pbpl
+                                     58 	.globl __pcph
+                                     59 	.globl __pcc
+                                     60 	.globl __pc
+                                     61 	.globl __pbph
+                                     62 	.globl __pbc
+                                     63 	.globl __pb
+                                     64 	.globl __paph
+                                     65 	.globl __pac
+                                     66 	.globl __pa
+                                     67 	.globl __pcdier
+                                     68 	.globl __pbdier
+                                     69 	.globl __padier
+                                     70 	.globl __integs
+                                     71 	.globl __ihrcr
+                                     72 	.globl __eoscr
+                                     73 	.globl __t16m
+                                     74 	.globl __intrq
+                                     75 	.globl __inten
+                                     76 	.globl __clkmd
+                                     77 	.globl __sp
+                                     78 	.globl __flag
+                                     79 	.globl _print_string_PARM_1
+                                     80 	.globl _SW_UART_Transmit_PARM_1
+                                     81 	.globl _SW_UART_status
+                                     82 	.globl _SW_UART_FRAME_ERROR
+                                     83 	.globl _SW_UART_RX_BUFFER_OVERFLOW
+                                     84 	.globl _SW_UART_RX_BUFFER_FULL
+                                     85 	.globl _SW_UART_TX_BUFFER_FULL
+                                     86 	.globl _RX_data
+                                     87 	.globl _TX_data
+                                     88 	.globl _last_bit_sent
+                                     89 	.globl _state
+                                     90 	.globl _bit_out
+                                     91 	.globl _counter2
+                                     92 	.globl _counter
+                                     93 	.globl __delay_loop_32_PARM_1
+                                     94 	.globl __delay_loop_16_PARM_1
+                                     95 	.globl __delay_loop_8_PARM_1
+                                     96 	.globl _SW_UART_Enable
+                                     97 	.globl _SW_UART_Transmit
+                                     98 ;--------------------------------------------------------
+                                     99 ; special function registers
+                                    100 ;--------------------------------------------------------
+                                    101 	.area RSEG (ABS)
+      000000                        102 	.org 0x0000
+                           000000   103 __flag	=	0x0000
+                           000002   104 __sp	=	0x0002
+                           000003   105 __clkmd	=	0x0003
+                           000004   106 __inten	=	0x0004
+                           000005   107 __intrq	=	0x0005
+                           000006   108 __t16m	=	0x0006
+                           00000A   109 __eoscr	=	0x000a
+                           00000B   110 __ihrcr	=	0x000b
+                           00000C   111 __integs	=	0x000c
+                           00000D   112 __padier	=	0x000d
+                           00000E   113 __pbdier	=	0x000e
+                           00000F   114 __pcdier	=	0x000f
+                           000010   115 __pa	=	0x0010
+                           000011   116 __pac	=	0x0011
+                           000012   117 __paph	=	0x0012
+                           000013   118 __pb	=	0x0013
+                           000014   119 __pbc	=	0x0014
+                           000015   120 __pbph	=	0x0015
+                           000016   121 __pc	=	0x0016
+                           000017   122 __pcc	=	0x0017
+                           000018   123 __pcph	=	0x0018
+                           000019   124 __pbpl	=	0x0019
+                           00001A   125 __pcpl	=	0x001a
+                           000020   126 __adcc	=	0x0020
+                           000021   127 __adcm	=	0x0021
+                           000022   128 __adcr	=	0x0022
+                           000024   129 __adcrgc	=	0x0024
+                           000026   130 __misc	=	0x0026
+                           000027   131 __misc2	=	0x0027
+                           000028   132 __misclvr	=	0x0028
+                           00002B   133 __gpcc	=	0x002b
+                           00002C   134 __gpcs	=	0x002c
+                           000030   135 __tm2c	=	0x0030
+                           000031   136 __tm2ct	=	0x0031
+                           000032   137 __tm2s	=	0x0032
+                           000033   138 __tm2b	=	0x0033
+                           000034   139 __tm3c	=	0x0034
+                           000035   140 __tm3ct	=	0x0035
+                           000036   141 __tm3s	=	0x0036
+                           000037   142 __tm3b	=	0x0037
+                           000040   143 __pwmg0c	=	0x0040
+                           000041   144 __pwmgclk	=	0x0041
+                           000042   145 __pwmg0dth	=	0x0042
+                           000043   146 __pwmg0dtl	=	0x0043
+                           000044   147 __pwmgcubh	=	0x0044
+                           000045   148 __pwmgcubl	=	0x0045
+                           000046   149 __pwmg1c	=	0x0046
+                           000048   150 __pwmg1dth	=	0x0048
+                           000049   151 __pwmg1dtl	=	0x0049
+                           00004C   152 __pwmg2c	=	0x004c
+                           00004E   153 __pwmg2dth	=	0x004e
+                           00004F   154 __pwmg2dtl	=	0x004f
+                           000062   155 __ilrcr	=	0x0062
+                           000063   156 __bgtr	=	0x0063
+                           000067   157 __rop	=	0x0067
+      000000                        158 __t16c::
+      000000                        159 	.ds 2
+                                    160 ;--------------------------------------------------------
+                                    161 ; ram data
+                                    162 ;--------------------------------------------------------
+                                    163 	.area DATA
+      000000                        164 __delay_loop_8_PARM_1:
+      000000                        165 	.ds 1
+      000001                        166 __delay_loop_16_PARM_1:
+      000001                        167 	.ds 2
+      000003                        168 __delay_loop_32_PARM_1:
+      000003                        169 	.ds 4
+      000007                        170 _counter::
+      000007                        171 	.ds 1
+      000008                        172 _counter2::
+      000008                        173 	.ds 1
+      000009                        174 _bit_out::
+      000009                        175 	.ds 1
+      00000A                        176 _state::
+      00000A                        177 	.ds 1
+      00000B                        178 _last_bit_sent::
+      00000B                        179 	.ds 1
+      00000C                        180 _TX_data::
+      00000C                        181 	.ds 1
+      00000D                        182 _RX_data::
+      00000D                        183 	.ds 1
+      00000E                        184 _SW_UART_TX_BUFFER_FULL::
+      00000E                        185 	.ds 1
+      00000F                        186 _SW_UART_RX_BUFFER_FULL::
+      00000F                        187 	.ds 1
+      000010                        188 _SW_UART_RX_BUFFER_OVERFLOW::
+      000010                        189 	.ds 1
+      000011                        190 _SW_UART_FRAME_ERROR::
+      000011                        191 	.ds 1
+      000012                        192 _SW_UART_status::
+      000012                        193 	.ds 1
+      000013                        194 _SW_UART_Transmit_PARM_1:
+      000013                        195 	.ds 1
+      000014                        196 _print_string_PARM_1:
+      000014                        197 	.ds 2
+      000016                        198 _print_string_sloc0_1_0:
+      000016                        199 	.ds 2
+                                    200 ;--------------------------------------------------------
+                                    201 ; overlayable items in ram
+                                    202 ;--------------------------------------------------------
+                                    203 ;--------------------------------------------------------
+                                    204 ; Stack segment in internal ram
+                                    205 ;--------------------------------------------------------
+                                    206 	.area	SSEG
+      000000                        207 __start__stack:
+      000000                        208 	.ds	1
+                                    209 
+                                    210 ;--------------------------------------------------------
+                                    211 ; absolute external ram data
+                                    212 ;--------------------------------------------------------
+                                    213 	.area DABS (ABS)
+                                    214 ;--------------------------------------------------------
+                                    215 ; interrupt vector
+                                    216 ;--------------------------------------------------------
+                                    217 	.area HOME
+      000000                        218 __interrupt_vect:
+                                    219 	.area	HEADER (ABS)
+      000020                        220 	.org	 0x0020
+      000020rF6r60                  221 	goto	_interrupt
+                                    222 ;--------------------------------------------------------
+                                    223 ; global & static initialisations
+                                    224 ;--------------------------------------------------------
+                                    225 	.area HOME
+                                    226 	.area GSINIT
+                                    227 	.area GSFINAL
+                                    228 	.area GSINIT
+                                    229 	.area	PREG (ABS)
+      000000                        230 	.org 0x00
+      000000                        231 p::
+      000000                        232 	.ds 2
+                                    233 	.area	HEADER (ABS)
+      000000                        234 	.org 0x0000
+      000000 00 00                  235 	nop
+      000002r01r26                  236 	clear	p+1
+      000004r00r57                  237 	mov	a, #s_OSEG
+      000006r01r50                  238 	add	a, #l_OSEG + 1
+      000008 FE 54                  239 	and	a, #0xfe
+      00000A 02 01                  240 	mov.io	sp, a
+      00000Cr9Er71                  241 	call	__sdcc_external_startup
+      00000Er00r60                  242 	goto	s_GSINIT
+                                    243 	.area GSINIT
+      000000                        244 __sdcc_init_data:
+      000000r00r57                  245 	mov	a, #s_DATA
+      000002r00r17                  246 	mov	p, a
+      000004r0Er60                  247 	goto	00002$
+      000006                        248 00001$:
+      000006 00 57                  249 	mov	a, #0x00
+      000008r00r07                  250 	idxm	p, a
+      00000Ar00r24                  251 	inc	p
+      00000Cr00r57                  252 	mov	a, #s_DATA
+      00000E                        253 00002$:
+      00000Er00r50                  254 	add	a, #l_DATA
+      000010r00r2E                  255 	ceqsn	a, p
+      000012r06r60                  256 	goto	00001$
+                                    257 ;	pfs173_uart_TIM.c: 22: unsigned char counter = 0;	   //even 2,4,6 when TRANSMIT
+      000014r07r26                  258 	clear	_counter+0
+                                    259 ;	pfs173_uart_TIM.c: 23: unsigned char counter2 = 0;	   //even 2,4,6 when TRANSMIT
+      000016r08r26                  260 	clear	_counter2+0
+                                    261 ;	pfs173_uart_TIM.c: 24: unsigned char bit_out = 0;	   //
+      000018r09r26                  262 	clear	_bit_out+0
+                                    263 ;	pfs173_uart_TIM.c: 25: unsigned char state = 0;		   //
+      00001Ar0Ar26                  264 	clear	_state+0
+                                    265 ;	pfs173_uart_TIM.c: 26: unsigned char last_bit_sent = 0; //
+      00001Cr0Br26                  266 	clear	_last_bit_sent+0
+                                    267 ;	pfs173_uart_TIM.c: 27: unsigned char TX_data = 0;	   //
+      00001Er0Cr26                  268 	clear	_TX_data+0
+                                    269 ;	pfs173_uart_TIM.c: 28: unsigned char RX_data = 0;	   //
+      000020r0Dr26                  270 	clear	_RX_data+0
+                                    271 	.area GSFINAL
+      000000r00r60                  272 	goto	__sdcc_program_startup
+                                    273 ;--------------------------------------------------------
+                                    274 ; Home
+                                    275 ;--------------------------------------------------------
+                                    276 	.area HOME
+                                    277 	.area HOME
+      000000                        278 __sdcc_program_startup:
+      000000r9Ar60                  279 	goto	_main
+                                    280 ;	return from main will return to caller
+                                    281 ;--------------------------------------------------------
+                                    282 ; code
+                                    283 ;--------------------------------------------------------
+                                    284 	.area CODE
+                                    285 ;	delay.h: 34: void _delay_loop_8(uint8_t loop_ctr) {
+                                    286 ;	-----------------------------------------
+                                    287 ;	 function _delay_loop_8
+                                    288 ;	-----------------------------------------
+      000000                        289 __delay_loop_8:
+                                    290 ;	delay.h: 44: __endasm;
+      000000                        291 	00001$:
+                                    292 ; 4 cycles per loop
+      000000r00r23                  293 	dzsn	__delay_loop_8_PARM_1 ; 1 cycle + 1 cycle for final skip
+      000002r00r60                  294 	goto	00001$ ; 2 cycles
+      000004                        295 00101$:
+                                    296 ;	delay.h: 45: }
+      000004 7A 00                  297 	ret
+                                    298 ;	delay.h: 48: void _delay_loop_16(uint16_t loop_ctr) {
+                                    299 ;	-----------------------------------------
+                                    300 ;	 function _delay_loop_16
+                                    301 ;	-----------------------------------------
+      000006                        302 __delay_loop_16:
+                                    303 ;	delay.h: 65: __endasm;
+      000006                        304 	00001$:
+                                    305 ; 8 cycles per loop
+      000006 00 00                  306 	nop	; 1 cycle
+      000008r01r25                  307 	dec	__delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Ar02r21                  308 	subc	__delay_loop_16_PARM_1+1 ; 1 cycle
+      00000Cr01r1F                  309 	mov	a, __delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Er02r1D                  310 	or	a, __delay_loop_16_PARM_1+1 ; 1 cycle
+      000010 00 34                  311 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      000012r06r60                  312 	goto	00001$ ; 2 cycles
+      000014                        313 00101$:
+                                    314 ;	delay.h: 66: }
+      000014 7A 00                  315 	ret
+                                    316 ;	delay.h: 69: void _delay_loop_32(uint32_t loop_ctr) {
+                                    317 ;	-----------------------------------------
+                                    318 ;	 function _delay_loop_32
+                                    319 ;	-----------------------------------------
+      000016                        320 __delay_loop_32:
+                                    321 ;	delay.h: 94: __endasm;
+      000016                        322 	00001$:
+                                    323 ; 12 cycles per loop
+      000016 00 00                  324 	nop	; 1 cycle
+      000018r03r25                  325 	dec	__delay_loop_32_PARM_1+0 ; 1 cycle
+      00001Ar04r21                  326 	subc	__delay_loop_32_PARM_1+1 ; 1 cycle
+      00001Cr05r21                  327 	subc	__delay_loop_32_PARM_1+2 ; 1 cycle
+      00001Er06r21                  328 	subc	__delay_loop_32_PARM_1+3 ; 1 cycle
+      000020r03r1F                  329 	mov	a, __delay_loop_32_PARM_1+0 ; 1 cycle
+      000022r04r1D                  330 	or	a, __delay_loop_32_PARM_1+1 ; 1 cycle
+      000024r05r1D                  331 	or	a, __delay_loop_32_PARM_1+2 ; 1 cycle
+      000026r06r1D                  332 	or	a, __delay_loop_32_PARM_1+3 ; 1 cycle
+      000028 00 34                  333 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      00002Ar16r60                  334 	goto	00001$ ; 2 cycles
+      00002C                        335 00101$:
+                                    336 ;	delay.h: 95: }
+      00002C 7A 00                  337 	ret
+                                    338 ;	pfs173_uart_TIM.c: 39: void SW_UART_Enable(void)
+                                    339 ;	-----------------------------------------
+                                    340 ;	 function SW_UART_Enable
+                                    341 ;	-----------------------------------------
+      00002E                        342 _SW_UART_Enable:
+                                    343 ;	pfs173_uart_TIM.c: 42: setb(PBC, 7);
+      00002E 94 3F                  344 	set1.io	__pbc, #7
+                                    345 ;	pfs173_uart_TIM.c: 43: setb(PB, 7);
+      000030 93 3F                  346 	set1.io	__pb, #7
+                                    347 ;	pfs173_uart_TIM.c: 46: setb(PBDIER, 5);
+      000032 8E 3E                  348 	set1.io	__pbdier, #5
+                                    349 ;	pfs173_uart_TIM.c: 47: setb(PBPH, 5);
+      000034 95 3E                  350 	set1.io	__pbph, #5
+                                    351 ;	pfs173_uart_TIM.c: 49: INTEGS = INTEGS_PB5_FALLING;
+      000036 02 57                  352 	mov	a, #0x02
+      000038 0C 01                  353 	mov.io	__integs, a
+                                    354 ;	pfs173_uart_TIM.c: 52: INTEN &= ~INTEN_TM2;
+      00003A 04 3B                  355 	set0.io	__inten, #6
+                                    356 ;	pfs173_uart_TIM.c: 55: TM2C = TM2C_CLK_IHRC;						  // Use IHRC -> 16 Mhz
+      00003C 20 57                  357 	mov	a, #0x20
+      00003E 30 01                  358 	mov.io	__tm2c, a
+                                    359 ;	pfs173_uart_TIM.c: 56: TM2S = TM2S_PRESCALE_NONE | TM2S_SCALE_DIV16; // No prescale, scale 2 ~> 8MHz
+      000040 0F 57                  360 	mov	a, #0x0f
+      000042 32 01                  361 	mov.io	__tm2s, a
+                                    362 ;	pfs173_uart_TIM.c: 57: TM2B = 103;
+      000044 67 57                  363 	mov	a, #0x67
+      000046 33 01                  364 	mov.io	__tm2b, a
+                                    365 ;	pfs173_uart_TIM.c: 59: INTEN |= INTEN_PB5;
+      000048 04 3C                  366 	set1.io	__inten, #0
+                                    367 ;	pfs173_uart_TIM.c: 61: state = IDLE;
+      00004Ar0Ar26                  368 	clear	_state+0
+                                    369 ;	pfs173_uart_TIM.c: 62: INTRQ = 0;
+      00004C 00 57                  370 	mov	a, #0x00
+      00004E 05 01                  371 	mov.io	__intrq, a
+                                    372 ;	pfs173_uart_TIM.c: 63: }
+      000050 7A 00                  373 	ret
+                                    374 ;	pfs173_uart_TIM.c: 65: void SW_UART_Transmit(unsigned char byte)
+                                    375 ;	-----------------------------------------
+                                    376 ;	 function SW_UART_Transmit
+                                    377 ;	-----------------------------------------
+      000052                        378 _SW_UART_Transmit:
+                                    379 ;	pfs173_uart_TIM.c: 68: while (state != IDLE)
+      000052                        380 00101$:
+      000052r0Ar1F                  381 	mov	a, _state+0
+      000054 00 52                  382 	ceqsn	a, #0x00
+      000056r52r60                  383 	goto	00101$
+                                    384 ;	pfs173_uart_TIM.c: 73: state = TRANSMIT;
+      000058 01 57                  385 	mov	a, #0x01
+      00005Ar0Ar17                  386 	mov	_state+0, a
+                                    387 ;	pfs173_uart_TIM.c: 75: TX_data = byte; //copy data to tx buffer
+      00005Cr13r1F                  388 	mov	a, _SW_UART_Transmit_PARM_1+0
+      00005Er0Cr17                  389 	mov	_TX_data+0, a
+                                    390 ;	pfs173_uart_TIM.c: 76: counter = 0;
+      000060r07r26                  391 	clear	_counter+0
+                                    392 ;	pfs173_uart_TIM.c: 78: clrb(PB, 7); //send start bit
+      000062 93 3B                  393 	set0.io	__pb, #7
+                                    394 ;	pfs173_uart_TIM.c: 79: clrb(PB, 7); //send start bit
+      000064 93 3B                  395 	set0.io	__pb, #7
+                                    396 ;	pfs173_uart_TIM.c: 81: INTRQ = 0;
+      000066 00 57                  397 	mov	a, #0x00
+      000068 05 01                  398 	mov.io	__intrq, a
+                                    399 ;	pfs173_uart_TIM.c: 82: INTEN |= INTEN_TM2;
+      00006A 04 3F                  400 	set1.io	__inten, #6
+                                    401 ;	pfs173_uart_TIM.c: 83: }
+      00006C 7A 00                  402 	ret
+                                    403 ;	pfs173_uart_TIM.c: 85: void print_string(char *str)
+                                    404 ;	-----------------------------------------
+                                    405 ;	 function print_string
+                                    406 ;	-----------------------------------------
+      00006E                        407 _print_string:
+                                    408 ;	pfs173_uart_TIM.c: 88: while (str[i] != '\0')
+      00006Er16r26                  409 	clear	_print_string_sloc0_1_0+0
+      000070r17r26                  410 	clear	_print_string_sloc0_1_0+1
+      000072                        411 00101$:
+      000072r14r1F                  412 	mov	a, _print_string_PARM_1+0
+      000074r16r18                  413 	add	a, _print_string_sloc0_1_0+0
+      000076r00r17                  414 	mov	p, a
+      000078r15r1F                  415 	mov	a, _print_string_PARM_1+1
+      00007Ar17r1A                  416 	addc	a, _print_string_sloc0_1_0+1
+      00007Cr00r70                  417 	call	__gptrget
+      00007E 00 53                  418 	cneqsn	a, #0x00
+      000080r98r60                  419 	goto	00104$
+                                    420 ;	pfs173_uart_TIM.c: 89: SW_UART_Transmit(str[i++]);
+      000082r14r1F                  421 	mov	a, _print_string_PARM_1+0
+      000084r16r18                  422 	add	a, _print_string_sloc0_1_0+0
+      000086r00r17                  423 	mov	p, a
+      000088r15r1F                  424 	mov	a, _print_string_PARM_1+1
+      00008Ar17r1A                  425 	addc	a, _print_string_sloc0_1_0+1
+      00008Cr16r24                  426 	inc	_print_string_sloc0_1_0+0
+      00008Er17r20                  427 	addc	_print_string_sloc0_1_0+1
+      000090r00r70                  428 	call	__gptrget
+      000092r13r17                  429 	mov	_SW_UART_Transmit_PARM_1+0, a
+      000094r52r70                  430 	call	_SW_UART_Transmit
+      000096r72r60                  431 	goto	00101$
+      000098                        432 00104$:
+                                    433 ;	pfs173_uart_TIM.c: 90: }
+      000098 7A 00                  434 	ret
+                                    435 ;	pfs173_uart_TIM.c: 92: void main(void)
+                                    436 ;	-----------------------------------------
+                                    437 ;	 function main
+                                    438 ;	-----------------------------------------
+      00009A                        439 _main:
+                                    440 ;	pfs173_uart_TIM.c: 94: SW_UART_Enable();
+      00009Ar2Er70                  441 	call	_SW_UART_Enable
+                                    442 ;	pfs173_uart_TIM.c: 95: sei();
+      00009C 78 00                  443 	engint
+                                    444 ;	pfs173_uart_TIM.c: 96: SW_UART_Transmit('A');
+      00009E 41 57                  445 	mov	a, #0x41
+      0000A0r13r17                  446 	mov	_SW_UART_Transmit_PARM_1+0, a
+      0000A2r52r70                  447 	call	_SW_UART_Transmit
+                                    448 ;	pfs173_uart_TIM.c: 97: SW_UART_Transmit('V');
+      0000A4 56 57                  449 	mov	a, #0x56
+      0000A6r13r17                  450 	mov	_SW_UART_Transmit_PARM_1+0, a
+      0000A8r52r70                  451 	call	_SW_UART_Transmit
+                                    452 ;	pfs173_uart_TIM.c: 98: SW_UART_Transmit('R');
+      0000AA 52 57                  453 	mov	a, #0x52
+      0000ACr13r17                  454 	mov	_SW_UART_Transmit_PARM_1+0, a
+      0000AEr52r70                  455 	call	_SW_UART_Transmit
+                                    456 ;	pfs173_uart_TIM.c: 99: SW_UART_Transmit('\r');
+      0000B0 0D 57                  457 	mov	a, #0x0d
+      0000B2r13r17                  458 	mov	_SW_UART_Transmit_PARM_1+0, a
+      0000B4r52r70                  459 	call	_SW_UART_Transmit
+                                    460 ;	pfs173_uart_TIM.c: 100: while (1)
+      0000B6                        461 00108$:
+                                    462 ;	pfs173_uart_TIM.c: 102: if (state == DATA_PENDING)
+      0000B6r0Ar1F                  463 	mov	a, _state+0
+      0000B8 05 52                  464 	ceqsn	a, #0x05
+      0000BArB6r60                  465 	goto	00108$
+                                    466 ;	pfs173_uart_TIM.c: 104: state = IDLE;
+      0000BCr0Ar26                  467 	clear	_state+0
+                                    468 ;	pfs173_uart_TIM.c: 106: SW_UART_Transmit(RX_data);
+      0000BEr0Dr1F                  469 	mov	a, _RX_data+0
+      0000C0r13r17                  470 	mov	_SW_UART_Transmit_PARM_1+0, a
+      0000C2r52r70                  471 	call	_SW_UART_Transmit
+                                    472 ;	pfs173_uart_TIM.c: 107: switch (RX_data)
+      0000C4r0Dr1F                  473 	mov	a, _RX_data+0
+      0000C6 41 53                  474 	cneqsn	a, #0x41
+      0000C8rDCr60                  475 	goto	00102$
+      0000CA                        476 00128$:
+      0000CAr0Dr1F                  477 	mov	a, _RX_data+0
+      0000CC 61 52                  478 	ceqsn	a, #0x61
+      0000CErE8r60                  479 	goto	00103$
+                                    480 ;	pfs173_uart_TIM.c: 111: print_string("atmel avr\r");
+      0000D0r00r57                  481 	mov	a, #<(___str_0 + 0)
+      0000D2r14r17                  482 	mov	_print_string_PARM_1+0, a
+      0000D4r00r57                  483 	mov	a, #>(___str_0 + 0x8000 + 0)
+      0000D6r15r17                  484 	mov	_print_string_PARM_1+1, a
+      0000D8r6Er70                  485 	call	_print_string
+                                    486 ;	pfs173_uart_TIM.c: 112: break;
+      0000DArB6r60                  487 	goto	00108$
+                                    488 ;	pfs173_uart_TIM.c: 114: case 'A':
+      0000DC                        489 00102$:
+                                    490 ;	pfs173_uart_TIM.c: 115: print_string("Atmel AVR\r");
+      0000DCr16r57                  491 	mov	a, #<(___str_1 + 0)
+      0000DEr14r17                  492 	mov	_print_string_PARM_1+0, a
+      0000E0r16r57                  493 	mov	a, #>(___str_1 + 0x8000 + 0)
+      0000E2r15r17                  494 	mov	_print_string_PARM_1+1, a
+      0000E4r6Er70                  495 	call	_print_string
+                                    496 ;	pfs173_uart_TIM.c: 116: break;
+      0000E6rB6r60                  497 	goto	00108$
+                                    498 ;	pfs173_uart_TIM.c: 118: default:
+      0000E8                        499 00103$:
+                                    500 ;	pfs173_uart_TIM.c: 119: print_string("Unknown command\r");
+      0000E8r2Cr57                  501 	mov	a, #<(___str_2 + 0)
+      0000EAr14r17                  502 	mov	_print_string_PARM_1+0, a
+      0000ECr2Cr57                  503 	mov	a, #>(___str_2 + 0x8000 + 0)
+      0000EEr15r17                  504 	mov	_print_string_PARM_1+1, a
+      0000F0r6Er70                  505 	call	_print_string
+                                    506 ;	pfs173_uart_TIM.c: 121: }
+      0000F2rB6r60                  507 	goto	00108$
+                                    508 ;	pfs173_uart_TIM.c: 124: }
+      0000F4 7A 00                  509 	ret
+                                    510 ;	pfs173_uart_TIM.c: 127: void interrupt(void) __interrupt(0)
+                                    511 ;	-----------------------------------------
+                                    512 ;	 function interrupt
+                                    513 ;	-----------------------------------------
+      0000F6                        514 _interrupt:
+      0000F6 72 00                  515 	push	af
+      0000F8r00r1F                  516 	mov	a, p
+      0000FA 72 00                  517 	push	af
+                                    518 ;	pfs173_uart_TIM.c: 130: if (INTRQ & INTRQ_TM2)
+      0000FC 85 01                  519 	mov.io	a, __intrq
+      0000FE 40 54                  520 	and	a, #0x40
+      000100 00 53                  521 	cneqsn	a, #0x00
+      000102r72r61                  522 	goto	00118$
+                                    523 ;	pfs173_uart_TIM.c: 132: INTRQ &= ~INTRQ_TM2; // Mark TM2 interrupt request processed
+      000104 05 3B                  524 	set0.io	__intrq, #6
+                                    525 ;	pfs173_uart_TIM.c: 133: switch (state)
+      000106r0Ar1F                  526 	mov	a, _state+0
+      000108 01 53                  527 	cneqsn	a, #0x01
+      00010Ar1Ar61                  528 	goto	00101$
+      00010C                        529 00159$:
+      00010Cr0Ar1F                  530 	mov	a, _state+0
+      00010E 02 53                  531 	cneqsn	a, #0x02
+      000110r46r61                  532 	goto	00109$
+      000112                        533 00160$:
+      000112r0Ar1F                  534 	mov	a, _state+0
+      000114 04 53                  535 	cneqsn	a, #0x04
+      000116r3Er61                  536 	goto	00108$
+      000118                        537 00161$:
+      000118r70r61                  538 	goto	00115$
+                                    539 ;	pfs173_uart_TIM.c: 136: case TRANSMIT:
+      00011A                        540 00101$:
+                                    541 ;	pfs173_uart_TIM.c: 138: if (counter < 8)
+      00011Ar07r1F                  542 	mov	a, _counter+0
+      00011C 08 51                  543 	sub	a, #0x08
+      00011E 80 34                  544 	t1sn.io	f, c
+      000120r36r61                  545 	goto	00106$
+                                    546 ;	pfs173_uart_TIM.c: 140: if (TX_data & 0x01)
+      000122r0Cr1F                  547 	mov	a, _TX_data+0
+      000124 01 54                  548 	and	a, #0x01
+      000126 00 53                  549 	cneqsn	a, #0x00
+      000128r2Er61                  550 	goto	00103$
+                                    551 ;	pfs173_uart_TIM.c: 142: setb(PB, 7); // Send a logic 1 on the TX_PIN.
+      00012A 93 3F                  552 	set1.io	__pb, #7
+      00012Cr30r61                  553 	goto	00104$
+      00012E                        554 00103$:
+                                    555 ;	pfs173_uart_TIM.c: 146: clrb(PB, 7); // Send a logic 0 on the TX_PIN.
+      00012E 93 3B                  556 	set0.io	__pb, #7
+      000130                        557 00104$:
+                                    558 ;	pfs173_uart_TIM.c: 148: TX_data = TX_data >> 1; // Bitshift the TX buffer and
+      000130r0Cr2A                  559 	sr	_TX_data+0
+                                    560 ;	pfs173_uart_TIM.c: 149: counter++;				// increment TX bit counter.
+      000132r07r24                  561 	inc	_counter+0
+      000134r72r61                  562 	goto	00118$
+      000136                        563 00106$:
+                                    564 ;	pfs173_uart_TIM.c: 155: setb(PB, 7); // Output a logic 1.
+      000136 93 3F                  565 	set1.io	__pb, #7
+                                    566 ;	pfs173_uart_TIM.c: 156: state = TRANSMIT_STOP_BIT;
+      000138 04 57                  567 	mov	a, #0x04
+      00013Ar0Ar17                  568 	mov	_state+0, a
+                                    569 ;	pfs173_uart_TIM.c: 158: break;
+      00013Cr72r61                  570 	goto	00118$
+                                    571 ;	pfs173_uart_TIM.c: 161: case TRANSMIT_STOP_BIT:
+      00013E                        572 00108$:
+                                    573 ;	pfs173_uart_TIM.c: 162: INTEN &= ~INTEN_TM2; // Stop the timer interrupts.
+      00013E 04 3B                  574 	set0.io	__inten, #6
+                                    575 ;	pfs173_uart_TIM.c: 163: state = IDLE;		 // Go back to idle.
+      000140r0Ar26                  576 	clear	_state+0
+                                    577 ;	pfs173_uart_TIM.c: 164: INTEN |= INTEN_PB5;	 // Enable reception again.
+      000142 04 3C                  578 	set1.io	__inten, #0
+                                    579 ;	pfs173_uart_TIM.c: 165: break;
+      000144r72r61                  580 	goto	00118$
+                                    581 ;	pfs173_uart_TIM.c: 168: case RECEIVE:
+      000146                        582 00109$:
+                                    583 ;	pfs173_uart_TIM.c: 169: TM2B = 103; // Count one period after the falling edge is trigged.
+      000146 67 57                  584 	mov	a, #0x67
+      000148 33 01                  585 	mov.io	__tm2b, a
+                                    586 ;	pfs173_uart_TIM.c: 171: if (counter2 < 8)
+      00014Ar08r1F                  587 	mov	a, _counter2+0
+      00014C 08 51                  588 	sub	a, #0x08
+      00014E 80 34                  589 	t1sn.io	f, c
+      000150r64r61                  590 	goto	00113$
+                                    591 ;	pfs173_uart_TIM.c: 173: counter2++;
+      000152r08r24                  592 	inc	_counter2+0
+                                    593 ;	pfs173_uart_TIM.c: 174: RX_data = (RX_data >> 1); // Shift due to receiving LSB first.
+      000154r0Dr2A                  594 	sr	_RX_data+0
+                                    595 ;	pfs173_uart_TIM.c: 175: if ((PB & (1 << 5)) != 0)
+      000156 93 01                  596 	mov.io	a, __pb
+      000158 20 54                  597 	and	a, #0x20
+      00015A 00 53                  598 	cneqsn	a, #0x00
+      00015Cr72r61                  599 	goto	00118$
+                                    600 ;	pfs173_uart_TIM.c: 177: RX_data |= 0x80; // If a logical 1 is read, let the data mirror this.
+      00015E 80 57                  601 	mov	a, #0x80
+      000160r0Dr15                  602 	or	_RX_data+0, a
+      000162r72r61                  603 	goto	00118$
+      000164                        604 00113$:
+                                    605 ;	pfs173_uart_TIM.c: 184: state = DATA_PENDING; // Enter DATA_PENDING when one byte is received.
+      000164 05 57                  606 	mov	a, #0x05
+      000166r0Ar17                  607 	mov	_state+0, a
+                                    608 ;	pfs173_uart_TIM.c: 185: INTEN &= ~INTEN_TM2;  // Disable this interrupt.
+      000168 04 3B                  609 	set0.io	__inten, #6
+                                    610 ;	pfs173_uart_TIM.c: 186: INTRQ &= ~INTRQ_PB5;  // Reset flag not to enter the ISR one extra time.
+      00016A 05 38                  611 	set0.io	__intrq, #0
+                                    612 ;	pfs173_uart_TIM.c: 187: INTEN |= INTEN_PB5;	  // Enable interrupt to receive more bytes.
+      00016C 04 3C                  613 	set1.io	__inten, #0
+                                    614 ;	pfs173_uart_TIM.c: 189: break;
+      00016Er72r61                  615 	goto	00118$
+                                    616 ;	pfs173_uart_TIM.c: 192: default:
+      000170                        617 00115$:
+                                    618 ;	pfs173_uart_TIM.c: 193: state = IDLE; // Error, should not occur. Going to a safe state.
+      000170r0Ar26                  619 	clear	_state+0
+                                    620 ;	pfs173_uart_TIM.c: 194: }
+      000172                        621 00118$:
+                                    622 ;	pfs173_uart_TIM.c: 197: if (INTRQ & INTRQ_PB5)
+      000172 85 01                  623 	mov.io	a, __intrq
+      000174 01 54                  624 	and	a, #0x01
+      000176 00 53                  625 	cneqsn	a, #0x00
+      000178r96r61                  626 	goto	00121$
+                                    627 ;	pfs173_uart_TIM.c: 200: INTRQ &= ~INTRQ_PB5; // Ma
+      00017A 05 38                  628 	set0.io	__intrq, #0
+                                    629 ;	pfs173_uart_TIM.c: 202: state = RECEIVE;
+      00017C 02 57                  630 	mov	a, #0x02
+      00017Er0Ar17                  631 	mov	_state+0, a
+                                    632 ;	pfs173_uart_TIM.c: 203: INTEN &= ~INTEN_PB5;
+      000180 04 38                  633 	set0.io	__inten, #0
+                                    634 ;	pfs173_uart_TIM.c: 204: INTEN &= ~INTEN_TM2;
+      000182 04 3B                  635 	set0.io	__inten, #6
+                                    636 ;	pfs173_uart_TIM.c: 205: TM2CT = 9;
+      000184 09 57                  637 	mov	a, #0x09
+      000186 31 01                  638 	mov.io	__tm2ct, a
+                                    639 ;	pfs173_uart_TIM.c: 206: TM2S = TM2S_PRESCALE_NONE | TM2S_SCALE_DIV16; // No prescale, scale 2 ~> 8MHz
+      000188 0F 57                  640 	mov	a, #0x0f
+      00018A 32 01                  641 	mov.io	__tm2s, a
+                                    642 ;	pfs173_uart_TIM.c: 207: TM2B = 155;
+      00018C 9B 57                  643 	mov	a, #0x9b
+      00018E 33 01                  644 	mov.io	__tm2b, a
+                                    645 ;	pfs173_uart_TIM.c: 208: counter2 = 0;
+      000190r08r26                  646 	clear	_counter2+0
+                                    647 ;	pfs173_uart_TIM.c: 209: INTRQ &= ~INTRQ_TM2; // Ma
+      000192 05 3B                  648 	set0.io	__intrq, #6
+                                    649 ;	pfs173_uart_TIM.c: 210: INTEN |= INTEN_TM2;
+      000194 04 3F                  650 	set1.io	__inten, #6
+      000196                        651 00121$:
+                                    652 ;	pfs173_uart_TIM.c: 212: }
+      000196 73 00                  653 	pop	af
+      000198r00r17                  654 	mov	p, a
+      00019A 73 00                  655 	pop	af
+      00019C 7B 00                  656 	reti
+                                    657 ;	pfs173_uart_TIM.c: 214: unsigned char _sdcc_external_startup(void)
+                                    658 ;	-----------------------------------------
+                                    659 ;	 function _sdcc_external_startup
+                                    660 ;	-----------------------------------------
+      00019E                        661 __sdcc_external_startup:
+                                    662 ;	pfs173_uart_TIM.c: 216: ROP = ROP_INT_SRC_PB5;
+      00019E 02 57                  663 	mov	a, #0x02
+      0001A0 67 01                  664 	mov.io	__rop, a
+                                    665 ;	pfs173_uart_TIM.c: 217: EASY_PDK_INIT_SYSCLOCK_8MHZ();		  //use 8MHz sysclock
+      0001A2 34 57                  666 	mov	a, #0x34
+      0001A4 03 01                  667 	mov.io	__clkmd, a
+                                    668 ;	pfs173_uart_TIM.c: 218: EASY_PDK_CALIBRATE_IHRC(F_CPU, 4000); //tune SYSCLK to 8MHz @ 4.000V
+      0001A6 52 54                  669 	and	a, #'R'                        
+      0001A8 43 54                  670 	and	a, #'C'                        
+      0001AA 01 54                  671 	and	a, #((1))          
+      0001AC 00 54                  672 	and	a, #((8000000))     
+      0001AE 12 54                  673 	and	a, #((8000000)>>8)  
+      0001B0 7A 54                  674 	and	a, #((8000000)>>16) 
+      0001B2 00 54                  675 	and	a, #((8000000)>>24) 
+      0001B4 A0 54                  676 	and	a, #((4000))     
+      0001B6 0F 54                  677 	and	a, #((4000)>>8)  
+      0001B8 0B 54                  678 	and	a, #((0x0B))           
+                                    679 ;	pfs173_uart_TIM.c: 219: return 0;							  //perform normal initialization
+                                    680 ;	pfs173_uart_TIM.c: 220: }
+      0001BA 00 02                  681 	ret	#0x00
+                                    682 	.area CODE
+                                    683 	.area CONST
+                                    684 	.area CONST
+      000000                        685 ___str_0:
+      000000 61 02                  686 	ret #0x61	; a
+      000002 74 02                  687 	ret #0x74	; t
+      000004 6D 02                  688 	ret #0x6d	; m
+      000006 65 02                  689 	ret #0x65	; e
+      000008 6C 02                  690 	ret #0x6c	; l
+      00000A 20 02                  691 	ret #0x20	;  
+      00000C 61 02                  692 	ret #0x61	; a
+      00000E 76 02                  693 	ret #0x76	; v
+      000010 72 02                  694 	ret #0x72	; r
+      000012 0D 02                  695 	ret #0x0d
+      000014 00 02                  696 	ret #0x00
+                                    697 	.area CODE
+                                    698 	.area CONST
+      000016                        699 ___str_1:
+      000016 41 02                  700 	ret #0x41	; A
+      000018 74 02                  701 	ret #0x74	; t
+      00001A 6D 02                  702 	ret #0x6d	; m
+      00001C 65 02                  703 	ret #0x65	; e
+      00001E 6C 02                  704 	ret #0x6c	; l
+      000020 20 02                  705 	ret #0x20	;  
+      000022 41 02                  706 	ret #0x41	; A
+      000024 56 02                  707 	ret #0x56	; V
+      000026 52 02                  708 	ret #0x52	; R
+      000028 0D 02                  709 	ret #0x0d
+      00002A 00 02                  710 	ret #0x00
+                                    711 	.area CODE
+                                    712 	.area CONST
+      00002C                        713 ___str_2:
+      00002C 55 02                  714 	ret #0x55	; U
+      00002E 6E 02                  715 	ret #0x6e	; n
+      000030 6B 02                  716 	ret #0x6b	; k
+      000032 6E 02                  717 	ret #0x6e	; n
+      000034 6F 02                  718 	ret #0x6f	; o
+      000036 77 02                  719 	ret #0x77	; w
+      000038 6E 02                  720 	ret #0x6e	; n
+      00003A 20 02                  721 	ret #0x20	;  
+      00003C 63 02                  722 	ret #0x63	; c
+      00003E 6F 02                  723 	ret #0x6f	; o
+      000040 6D 02                  724 	ret #0x6d	; m
+      000042 6D 02                  725 	ret #0x6d	; m
+      000044 61 02                  726 	ret #0x61	; a
+      000046 6E 02                  727 	ret #0x6e	; n
+      000048 64 02                  728 	ret #0x64	; d
+      00004A 0D 02                  729 	ret #0x0d
+      00004C 00 02                  730 	ret #0x00
+                                    731 	.area CODE
+                                    732 	.area CABS (ABS)

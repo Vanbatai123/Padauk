@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.html": "css",
+        "pdk_irremote.h": "c",
+        "include.h": "c",
+        "pdk_uart.h": "c"
+    }
+}

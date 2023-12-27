@@ -1,0 +1,11 @@
+[INI]
+PROJECT=PRE_FILE
+[LINKS]
+~Array.C
+[HEAD]
+~extern.h
+[DEPEND]
+~Array.PRE
+[PRE]
+~Array.PRJ
+~Array.PRE

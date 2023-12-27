@@ -1,0 +1,10 @@
+-muwx
+-i pdk_Led_Ty_Gia.ihx
+-b HOME = 0x0022
+-b DATA = 0x0002
+-k C:\PROGRA~1\SDCC\bin\..\lib\pdk15
+-l pdk15
+pdk_Led_Ty_Gia.rel
+pdk_uart.rel
+
+-e

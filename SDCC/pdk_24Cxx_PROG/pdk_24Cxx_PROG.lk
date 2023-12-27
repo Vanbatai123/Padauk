@@ -1,0 +1,15 @@
+-muwx
+-i pdk_24Cxx_PROG.ihx
+-Y
+-b HOME = 0x0022
+-b DATA = 0x0002
+-b SSEG = 0xffffffff
+-k c:\Program Files\SDCC\bin\..\lib\pdk15
+-l pdk15
+pdk_24Cxx_PROG.rel
+pdk_uart.rel
+pdk_i2c.rel
+delay.rel
+pdk_24c.rel
+
+-e

@@ -1,0 +1,13 @@
+-muwx
+-i pfs173_24Cxx.ihx
+-b HOME = 0x0022
+-b DATA = 0x0002
+-k C:\PROGRA~1\SDCC\bin\..\lib\pdk15
+-l pdk15
+pfs173_24Cxx.rel
+pdk_uart.rel
+pdk_i2c.rel
+delay.rel
+pdk_24c.rel
+
+-e

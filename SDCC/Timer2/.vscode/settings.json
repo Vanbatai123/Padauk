@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "pfs173.h": "c",
+        "auto_sysclock.h": "c",
+        "device.h": "c",
+        "include.h": "c"
+    }
+}

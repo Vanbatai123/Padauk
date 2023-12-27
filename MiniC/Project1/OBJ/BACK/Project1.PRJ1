@@ -1,0 +1,11 @@
+[INI]
+PROJECT=PRE_FILE
+[LINKS]
+~Project1.C
+[HEAD]
+~extern.h
+[DEPEND]
+~Project1.PRE
+[PRE]
+~Project1.PRJ
+~Project1.PRE

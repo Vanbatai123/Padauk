@@ -1,0 +1,229 @@
+﻿/*
+ * pfs173_uart.c
+ * Created: 2021/06/12
+ * Author: taivb
+ */
+
+#include	"extern.h"
+
+#define uint8_t		int
+#define uint16_t	WORD
+#define uint24_t	EWORD
+#define uint32_t	DWORD
+
+#define _delay_ms(x) .delay x*F_CPU/1000
+#define _delay_us(x) .delay x*F_CPU/1000000
+
+// Port definitions
+#define Px 		PA
+#define PxC 	PAC
+#define PxPH 	PAPH
+#define PxDIER 	PADIER
+// Pin definitions
+#define NEO_Px 		PA.3	 	// Pin for neopixels
+#define IR_Px 		PA.4	 	// Pin for IR receiver
+#define BUTTON_Px 	PA.6 		// Pin for button
+
+#define NEO_PxC		PAC.3	 	// Pin for neopixels
+#define IR_PxC 		PAC.4	 	// Pin for IR receiver
+#define BUTTON_PxC 	PAC.6 		// Pin for button
+
+#define NEO_PxPH		PAPH.3	 	// Pin for neopixels
+#define IR_PxPH 		PAPH.4	 	// Pin for IR receiver
+#define BUTTON_PxPH 	PAPH.6 		// Pin for button
+
+#define NEO_PxDIER		PADIER.3	 	// Pin for neopixels
+#define IR_PxDIER 		PADIER.4	 	// Pin for IR receiver
+#define BUTTON_PxDIER 	PADIER.6 		// Pin for button
+
+// NeoPixel parameter
+#define NEO_GRB		  	// type of pixel: NEO_GRB, NEO_RGB or NEO_RGBW
+#define NEO_PIXELS 	10 	// number of pixels in the string (max 255)
+
+// IR codes
+#define IR_ADDR 	0x00 // IR device address
+
+// #define IR_SPEED      0x03    // IR code for animation speed
+#define IR_FAIL 	0xF1 // IR fail code
+
+// ===================================================================================
+// Neopixel Implementation for 8 MHz MCU Clock and 800 kHz Pixels
+// ===================================================================================
+
+// NeoPixel parameter and macros
+#define NEO_init() NEO_PxC = 1 // set pixel DATA pin as output
+
+void BUTTON_init(void)
+{
+	BUTTON_Px = 1;//setb(Px, BUTTON_PIN); // pullup on IR pin
+	BUTTON_PxC = 0;//clrb(PxC, BUTTON_PIN);
+	BUTTON_PxPH = 1;//setb(PxPH, BUTTON_PIN);	  // set BUTTON pin as input
+	//mov PADIER.3 =  1;//setb(PxDIER, BUTTON_PIN); // set BUTTON pin as input
+}
+
+// #define NEO_latch()   _delay_us(281)           // delay to show shifted colors
+#ifdef DEBUG
+void pr(uint8_t ir)
+{
+	putChar(ir / 100 + 48);
+	putChar((ir / 10) % 10 + 48);
+	putChar(ir % 10 + 48);
+}
+#endif
+// Send a byte to the pixels string
+
+
+void LED__SendZero_()
+{
+	NEO_Px = 1;
+	nop;
+	nop;
+	NEO_Px = 0;
+	nop;
+	nop;
+	nop;
+	nop;
+}
+void LED__SendOne_()
+{
+	NEO_Px = 1;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	NEO_Px = 0;
+}
+void NEO_sendByte(uint8_t dat)
+{
+	if (dat & 0x80)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x40)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x20)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x10)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x08)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x04)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x02)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x01)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+}
+
+// Write color to a single pixel
+void NEO_writeColor(uint8_t r, uint8_t g, uint8_t b)
+{
+#if defined(NEO_GRB)
+	NEO_sendByte(g);
+	NEO_sendByte(r);
+	NEO_sendByte(b);
+#elif defined(NEO_RGB)
+	NEO_sendByte(r);
+	NEO_sendByte(g);
+	NEO_sendByte(b);
+#elif defined(NEO_RGBW)
+	NEO_sendByte(r);
+	NEO_sendByte(g);
+	NEO_sendByte(b);
+	NEO_sendByte(0);
+#else
+#error Wrong or missing NeoPixel type definition!
+#endif
+}
+
+void changeColor(int r, int g, int b)
+{
+//	cli();
+	uint8_t i = 0;
+	while(i<NEO_PIXELS)
+	{
+		i = i + 1;
+		NEO_writeColor(r, g, b);
+	}
+//	sei();
+}
+
+// ===================================================================================
+// Main Function
+// ===================================================================================
+void	FPPA0 (void)
+{
+	.ADJUST_IC	SYSCLK=IHRC/2		//	SYSCLK=IHRC/4
+	
+#ifdef DEBUG
+#endif
+	// Setup
+	NEO_init();	   // init Neopixels
+	uint16_t i = 0;
+	while(i<300)
+	{
+		i = i + 1;
+		NEO_writeColor(0,0, 0);
+	}
+	// Loop
+	while (1)
+	{
+		i = 0;
+
+		while(i<255)
+		{
+			i = i + 1;
+			changeColor(i,0, 0);
+			_delay_us(1000);
+		}
+	}
+	while (1)
+	{
+		changeColor(255,0,0);
+		_delay_ms(1000);
+		changeColor(0,255,0);
+		_delay_ms(1000);
+		changeColor(0,0,255);
+		_delay_ms(1000);
+		changeColor(255,255,0);
+		_delay_ms(1000);
+		changeColor(0,255,255);
+		_delay_ms(1000);
+		changeColor(255,0,255);
+		_delay_ms(1000);
+		changeColor(255,255,255);
+		_delay_ms(1000);
+	}
+}
+
+
+void	Interrupt (void)
+{
+	pushaf;
+
+	if (Intrq.T16)
+	{	//	T16 Trig
+		//	User can add code
+		Intrq.T16	=	0;
+		//...
+	}
+
+	popaf;
+}

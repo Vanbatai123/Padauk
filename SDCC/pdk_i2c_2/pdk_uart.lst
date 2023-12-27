@@ -1,0 +1,765 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_uart
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl __t16c
+                                     17 	.globl __rop
+                                     18 	.globl __bgtr
+                                     19 	.globl __ilrcr
+                                     20 	.globl __pwmg2dtl
+                                     21 	.globl __pwmg2dth
+                                     22 	.globl __pwmg2c
+                                     23 	.globl __pwmg1dtl
+                                     24 	.globl __pwmg1dth
+                                     25 	.globl __pwmg1c
+                                     26 	.globl __pwmgcubl
+                                     27 	.globl __pwmgcubh
+                                     28 	.globl __pwmg0dtl
+                                     29 	.globl __pwmg0dth
+                                     30 	.globl __pwmgclk
+                                     31 	.globl __pwmg0c
+                                     32 	.globl __tm3b
+                                     33 	.globl __tm3s
+                                     34 	.globl __tm3ct
+                                     35 	.globl __tm3c
+                                     36 	.globl __tm2b
+                                     37 	.globl __tm2s
+                                     38 	.globl __tm2ct
+                                     39 	.globl __tm2c
+                                     40 	.globl __gpcs
+                                     41 	.globl __gpcc
+                                     42 	.globl __misclvr
+                                     43 	.globl __misc2
+                                     44 	.globl __misc
+                                     45 	.globl __adcrgc
+                                     46 	.globl __adcr
+                                     47 	.globl __adcm
+                                     48 	.globl __adcc
+                                     49 	.globl __pcpl
+                                     50 	.globl __pbpl
+                                     51 	.globl __pcph
+                                     52 	.globl __pcc
+                                     53 	.globl __pc
+                                     54 	.globl __pbph
+                                     55 	.globl __pbc
+                                     56 	.globl __pb
+                                     57 	.globl __paph
+                                     58 	.globl __pac
+                                     59 	.globl __pa
+                                     60 	.globl __pcdier
+                                     61 	.globl __pbdier
+                                     62 	.globl __padier
+                                     63 	.globl __integs
+                                     64 	.globl __ihrcr
+                                     65 	.globl __eoscr
+                                     66 	.globl __t16m
+                                     67 	.globl __intrq
+                                     68 	.globl __inten
+                                     69 	.globl __clkmd
+                                     70 	.globl __sp
+                                     71 	.globl __flag
+                                     72 	.globl _UART_printNum_PARM_1
+                                     73 	.globl _UART_print_PARM_1
+                                     74 	.globl _UART_putC_PARM_1
+                                     75 	.globl _internal_tx_buffer
+                                     76 	.globl _bits_left_in_tx
+                                     77 	.globl _flag_tx_busy
+                                     78 	.globl _flag_rx_ready
+                                     79 	.globl _flag_rx_off
+                                     80 	.globl _qout
+                                     81 	.globl _start_bit
+                                     82 	.globl _qin
+                                     83 	.globl _UART_IO_config
+                                     84 	.globl _UART_begin
+                                     85 	.globl _UART_rx_on
+                                     86 	.globl _UART_rx_off
+                                     87 	.globl _UART_getchar
+                                     88 	.globl _UART_kbhit
+                                     89 	.globl _UART_flush_input_buffer
+                                     90 	.globl _UART_transmit_busy
+                                     91 	.globl _UART_putC
+                                     92 	.globl _UART_print
+                                     93 	.globl _UART_printNum
+                                     94 	.globl _TIM2_interrupt
+                                     95 	.globl _PB5_interrupt
+                                     96 ;--------------------------------------------------------
+                                     97 ; special function registers
+                                     98 ;--------------------------------------------------------
+                                     99 	.area RSEG (ABS)
+      000000                        100 	.org 0x0000
+                           000000   101 __flag	=	0x0000
+                           000002   102 __sp	=	0x0002
+                           000003   103 __clkmd	=	0x0003
+                           000004   104 __inten	=	0x0004
+                           000005   105 __intrq	=	0x0005
+                           000006   106 __t16m	=	0x0006
+                           00000A   107 __eoscr	=	0x000a
+                           00000B   108 __ihrcr	=	0x000b
+                           00000C   109 __integs	=	0x000c
+                           00000D   110 __padier	=	0x000d
+                           00000E   111 __pbdier	=	0x000e
+                           00000F   112 __pcdier	=	0x000f
+                           000010   113 __pa	=	0x0010
+                           000011   114 __pac	=	0x0011
+                           000012   115 __paph	=	0x0012
+                           000013   116 __pb	=	0x0013
+                           000014   117 __pbc	=	0x0014
+                           000015   118 __pbph	=	0x0015
+                           000016   119 __pc	=	0x0016
+                           000017   120 __pcc	=	0x0017
+                           000018   121 __pcph	=	0x0018
+                           000019   122 __pbpl	=	0x0019
+                           00001A   123 __pcpl	=	0x001a
+                           000020   124 __adcc	=	0x0020
+                           000021   125 __adcm	=	0x0021
+                           000022   126 __adcr	=	0x0022
+                           000024   127 __adcrgc	=	0x0024
+                           000026   128 __misc	=	0x0026
+                           000027   129 __misc2	=	0x0027
+                           000028   130 __misclvr	=	0x0028
+                           00002B   131 __gpcc	=	0x002b
+                           00002C   132 __gpcs	=	0x002c
+                           000030   133 __tm2c	=	0x0030
+                           000031   134 __tm2ct	=	0x0031
+                           000032   135 __tm2s	=	0x0032
+                           000033   136 __tm2b	=	0x0033
+                           000034   137 __tm3c	=	0x0034
+                           000035   138 __tm3ct	=	0x0035
+                           000036   139 __tm3s	=	0x0036
+                           000037   140 __tm3b	=	0x0037
+                           000040   141 __pwmg0c	=	0x0040
+                           000041   142 __pwmgclk	=	0x0041
+                           000042   143 __pwmg0dth	=	0x0042
+                           000043   144 __pwmg0dtl	=	0x0043
+                           000044   145 __pwmgcubh	=	0x0044
+                           000045   146 __pwmgcubl	=	0x0045
+                           000046   147 __pwmg1c	=	0x0046
+                           000048   148 __pwmg1dth	=	0x0048
+                           000049   149 __pwmg1dtl	=	0x0049
+                           00004C   150 __pwmg2c	=	0x004c
+                           00004E   151 __pwmg2dth	=	0x004e
+                           00004F   152 __pwmg2dtl	=	0x004f
+                           000062   153 __ilrcr	=	0x0062
+                           000063   154 __bgtr	=	0x0063
+                           000067   155 __rop	=	0x0067
+      000000                        156 __t16c::
+      000000                        157 	.ds 2
+                                    158 ;--------------------------------------------------------
+                                    159 ; ram data
+                                    160 ;--------------------------------------------------------
+                                    161 	.area DATA
+      000000                        162 _inbuf:
+      000000                        163 	.ds 32
+      000020                        164 _qin::
+      000020                        165 	.ds 1
+      000021                        166 _start_bit::
+      000021                        167 	.ds 1
+      000022                        168 _qout::
+      000022                        169 	.ds 1
+      000023                        170 _flag_rx_off::
+      000023                        171 	.ds 1
+      000024                        172 _flag_rx_ready::
+      000024                        173 	.ds 1
+      000025                        174 _flag_tx_busy::
+      000025                        175 	.ds 1
+      000026                        176 _bits_left_in_tx::
+      000026                        177 	.ds 1
+      000027                        178 _internal_tx_buffer::
+      000027                        179 	.ds 2
+      000029                        180 _UART_putC_PARM_1:
+      000029                        181 	.ds 1
+      00002A                        182 _UART_print_PARM_1:
+      00002A                        183 	.ds 2
+      00002C                        184 _UART_print_sloc0_1_0:
+      00002C                        185 	.ds 2
+      00002E                        186 _UART_printNum_PARM_1:
+      00002E                        187 	.ds 2
+      000030                        188 _UART_printNum_dis_65536_53:
+      000030                        189 	.ds 5
+      000035                        190 _TIM2_interrupt_flag_rx_waiting_for_stop_bit_65536_59:
+      000035                        191 	.ds 1
+      000036                        192 _TIM2_interrupt_rx_mask_65536_59:
+      000036                        193 	.ds 1
+      000037                        194 _TIM2_interrupt_bits_left_in_rx_65536_59:
+      000037                        195 	.ds 1
+      000038                        196 _TIM2_interrupt_internal_rx_buffer_65536_59:
+      000038                        197 	.ds 1
+                                    198 ;--------------------------------------------------------
+                                    199 ; overlayable items in ram
+                                    200 ;--------------------------------------------------------
+                                    201 ;--------------------------------------------------------
+                                    202 ; absolute external ram data
+                                    203 ;--------------------------------------------------------
+                                    204 	.area DABS (ABS)
+                                    205 ;--------------------------------------------------------
+                                    206 ; global & static initialisations
+                                    207 ;--------------------------------------------------------
+                                    208 	.area HOME
+                                    209 	.area GSINIT
+                                    210 	.area GSFINAL
+                                    211 	.area GSINIT
+                                    212 ;	pdk_uart.c: 174: static uint8_t flag_rx_waiting_for_stop_bit = SU_FALSE;
+      000000r35r26                  213 	clear	_TIM2_interrupt_flag_rx_waiting_for_stop_bit_65536_59+0
+                                    214 ;	pdk_uart.c: 26: volatile uint8_t qin, start_bit = 1;
+      000002 01 57                  215 	mov	a, #0x01
+      000004r21r17                  216 	mov	_start_bit+0, a
+                                    217 ;--------------------------------------------------------
+                                    218 ; Home
+                                    219 ;--------------------------------------------------------
+                                    220 	.area HOME
+                                    221 	.area HOME
+                                    222 ;--------------------------------------------------------
+                                    223 ; code
+                                    224 ;--------------------------------------------------------
+                                    225 	.area CODE
+                                    226 ;	pdk_uart.c: 35: void UART_IO_config(void)
+                                    227 ;	-----------------------------------------
+                                    228 ;	 function UART_IO_config
+                                    229 ;	-----------------------------------------
+      000000                        230 _UART_IO_config:
+                                    231 ;	pdk_uart.c: 37: ROP = ROP_INT_SRC_PB5;
+      000000 02 57                  232 	mov	a, #0x02
+      000002 67 01                  233 	mov.io	__rop, a
+                                    234 ;	pdk_uart.c: 39: setb(UART_PxC, UART_TX);
+      000004 14 3E                  235 	set1.io	__pbc, #4
+                                    236 ;	pdk_uart.c: 41: setb(UART_PxDIER, UART_RX);
+      000006 8E 3E                  237 	set1.io	__pbdier, #5
+                                    238 ;	pdk_uart.c: 42: setb(UART_PxPH, UART_RX);
+      000008 95 3E                  239 	set1.io	__pbph, #5
+                                    240 ;	pdk_uart.c: 44: INTEGS = INTEGS_PB5_FALLING;
+      00000A 02 57                  241 	mov	a, #0x02
+      00000C 0C 01                  242 	mov.io	__integs, a
+                                    243 ;	pdk_uart.c: 45: INTEN |= INTEN_PB5;
+      00000E 04 3C                  244 	set1.io	__inten, #0
+                                    245 ;	pdk_uart.c: 46: }
+      000010 7A 00                  246 	ret
+                                    247 ;	pdk_uart.c: 48: static void TIM2_Config(void)
+                                    248 ;	-----------------------------------------
+                                    249 ;	 function TIM2_Config
+                                    250 ;	-----------------------------------------
+      000012                        251 _TIM2_Config:
+                                    252 ;	pdk_uart.c: 51: TM2C = TM2C_CLK_IHRC;						  // Use IHRC -> 16 Mhz
+      000012 20 57                  253 	mov	a, #0x20
+      000014 30 01                  254 	mov.io	__tm2c, a
+                                    255 ;	pdk_uart.c: 52: TM2S = TM2S_PRESCALE_NONE | TM2S_SCALE_DIV16; // No prescale, scale 2 ~> 8MHz
+      000016 0F 57                  256 	mov	a, #0x0f
+      000018 32 01                  257 	mov.io	__tm2s, a
+                                    258 ;	pdk_uart.c: 53: TM2B = 103;									  // Divide by 69 ~> 115942 Hz (apx. 115200)
+      00001A 67 57                  259 	mov	a, #0x67
+      00001C 33 01                  260 	mov.io	__tm2b, a
+                                    261 ;	pdk_uart.c: 58: }
+      00001E 7A 00                  262 	ret
+                                    263 ;	pdk_uart.c: 60: void UART_begin(void)
+                                    264 ;	-----------------------------------------
+                                    265 ;	 function UART_begin
+                                    266 ;	-----------------------------------------
+      000020                        267 _UART_begin:
+                                    268 ;	pdk_uart.c: 62: flag_tx_busy = SU_FALSE;
+      000020r25r26                  269 	clear	_flag_tx_busy+0
+                                    270 ;	pdk_uart.c: 63: flag_rx_ready = SU_FALSE;
+      000022r24r26                  271 	clear	_flag_rx_ready+0
+                                    272 ;	pdk_uart.c: 64: flag_rx_off = SU_TRUE;
+      000024 01 57                  273 	mov	a, #0x01
+      000026r23r17                  274 	mov	_flag_rx_off+0, a
+                                    275 ;	pdk_uart.c: 65: setb(UART_Px, UART_TX); /* mt: set to high to avoid garbage on init */
+      000028 13 3E                  276 	set1.io	__pb, #4
+                                    277 ;	pdk_uart.c: 67: TIM2_Config();
+      00002Ar12r70                  278 	call	_TIM2_Config
+                                    279 ;	pdk_uart.c: 68: UART_rx_on();
+      00002Cr32r60                  280 	goto	_UART_rx_on
+                                    281 ;	pdk_uart.c: 69: }
+      00002E 7A 00                  282 	ret
+                                    283 ;	pdk_uart.c: 71: static void idle(void)
+                                    284 ;	-----------------------------------------
+                                    285 ;	 function idle
+                                    286 ;	-----------------------------------------
+      000030                        287 _idle:
+                                    288 ;	pdk_uart.c: 76: }
+      000030 7A 00                  289 	ret
+                                    290 ;	pdk_uart.c: 78: void UART_rx_on(void)
+                                    291 ;	-----------------------------------------
+                                    292 ;	 function UART_rx_on
+                                    293 ;	-----------------------------------------
+      000032                        294 _UART_rx_on:
+                                    295 ;	pdk_uart.c: 80: flag_rx_off = SU_FALSE;
+      000032r23r26                  296 	clear	_flag_rx_off+0
+                                    297 ;	pdk_uart.c: 81: }
+      000034 7A 00                  298 	ret
+                                    299 ;	pdk_uart.c: 83: void UART_rx_off(void)
+                                    300 ;	-----------------------------------------
+                                    301 ;	 function UART_rx_off
+                                    302 ;	-----------------------------------------
+      000036                        303 _UART_rx_off:
+                                    304 ;	pdk_uart.c: 85: flag_rx_off = SU_TRUE;
+      000036 01 57                  305 	mov	a, #0x01
+      000038r23r17                  306 	mov	_flag_rx_off+0, a
+                                    307 ;	pdk_uart.c: 86: }
+      00003A 7A 00                  308 	ret
+                                    309 ;	pdk_uart.c: 88: char UART_getchar(void)
+                                    310 ;	-----------------------------------------
+                                    311 ;	 function UART_getchar
+                                    312 ;	-----------------------------------------
+      00003C                        313 _UART_getchar:
+                                    314 ;	pdk_uart.c: 91: while (qout == qin)
+      00003C                        315 00101$:
+      00003Cr22r1F                  316 	mov	a, _qout+0
+      00003Er20r2F                  317 	cneqsn	a, _qin+0
+      000040r3Cr60                  318 	goto	00101$
+      000042                        319 00120$:
+                                    320 ;	pdk_uart.c: 94: ch = inbuf[qout];
+      000042r00r57                  321 	mov	a, #(_inbuf + 0)
+      000044r22r18                  322 	add	a, _qout+0
+      000046r00r17                  323 	mov	p, a
+      000048r01r07                  324 	idxm	a, p
+      00004Ar00r17                  325 	mov	p, a
+                                    326 ;	pdk_uart.c: 95: if (++qout >= UART_IN_BUF_SIZE)
+      00004Cr22r24                  327 	inc	_qout+0
+      00004Er22r1F                  328 	mov	a, _qout+0
+      000050 20 51                  329 	sub	a, #0x20
+      000052 80 30                  330 	t0sn.io	f, c
+      000054r58r60                  331 	goto	00105$
+                                    332 ;	pdk_uart.c: 97: qout = 0;
+      000056r22r26                  333 	clear	_qout+0
+      000058                        334 00105$:
+                                    335 ;	pdk_uart.c: 100: return (ch);
+      000058r00r1F                  336 	mov	a, p
+                                    337 ;	pdk_uart.c: 101: }
+      00005A 7A 00                  338 	ret
+                                    339 ;	pdk_uart.c: 103: uint8_t UART_kbhit(void)
+                                    340 ;	-----------------------------------------
+                                    341 ;	 function UART_kbhit
+                                    342 ;	-----------------------------------------
+      00005C                        343 _UART_kbhit:
+                                    344 ;	pdk_uart.c: 105: return (qin != qout); // 0 neu giong 1 neu khac
+      00005Cr20r1F                  345 	mov	a, _qin+0
+      00005Er22r2E                  346 	ceqsn	a, _qout+0
+      000060r66r60                  347 	goto	00103$
+      000062 01 57                  348 	mov	a, #0x01
+      000064r68r60                  349 	goto	00104$
+      000066                        350 00103$:
+      000066 00 57                  351 	mov	a, #0x00
+      000068                        352 00104$:
+      000068 01 56                  353 	xor	a, #0x01
+                                    354 ;	pdk_uart.c: 106: }
+      00006A 7A 00                  355 	ret
+                                    356 ;	pdk_uart.c: 108: void UART_flush_input_buffer(void)
+                                    357 ;	-----------------------------------------
+                                    358 ;	 function UART_flush_input_buffer
+                                    359 ;	-----------------------------------------
+      00006C                        360 _UART_flush_input_buffer:
+                                    361 ;	pdk_uart.c: 110: qin = 0;
+      00006Cr20r26                  362 	clear	_qin+0
+                                    363 ;	pdk_uart.c: 111: qout = 0;
+      00006Er22r26                  364 	clear	_qout+0
+                                    365 ;	pdk_uart.c: 112: }
+      000070 7A 00                  366 	ret
+                                    367 ;	pdk_uart.c: 114: uint8_t UART_transmit_busy(void)
+                                    368 ;	-----------------------------------------
+                                    369 ;	 function UART_transmit_busy
+                                    370 ;	-----------------------------------------
+      000072                        371 _UART_transmit_busy:
+                                    372 ;	pdk_uart.c: 116: return (flag_tx_busy == SU_TRUE) ? 1 : 0;
+      000072r25r1F                  373 	mov	a, _flag_tx_busy+0
+      000074 01 52                  374 	ceqsn	a, #0x01
+      000076r7Er60                  375 	goto	00103$
+      000078 01 57                  376 	mov	a, #0x01
+      00007Ar00r26                  377 	clear	p
+      00007Cr80r60                  378 	goto	00104$
+      00007E                        379 00103$:
+      00007E 00 57                  380 	mov	a, #0x00
+      000080                        381 00104$:
+                                    382 ;	pdk_uart.c: 117: }
+      000080 7A 00                  383 	ret
+                                    384 ;	pdk_uart.c: 119: void UART_putC(const char ch)
+                                    385 ;	-----------------------------------------
+                                    386 ;	 function UART_putC
+                                    387 ;	-----------------------------------------
+      000082                        388 _UART_putC:
+                                    389 ;	pdk_uart.c: 121: while (flag_tx_busy == SU_TRUE)
+      000082                        390 00101$:
+      000082r25r1F                  391 	mov	a, _flag_tx_busy+0
+      000084 01 53                  392 	cneqsn	a, #0x01
+      000086r82r60                  393 	goto	00101$
+      000088                        394 00114$:
+                                    395 ;	pdk_uart.c: 126: bits_left_in_tx = TX_NUM_OF_BITS;
+      000088 0A 57                  396 	mov	a, #0x0a
+      00008Ar26r17                  397 	mov	_bits_left_in_tx+0, a
+                                    398 ;	pdk_uart.c: 127: TIMER_ON;
+      00008C 04 3F                  399 	set1.io	__inten, #6
+                                    400 ;	pdk_uart.c: 128: internal_tx_buffer = (ch << 1) | 0x200;
+      00008Er00r26                  401 	clear	p
+      000090r29r1F                  402 	mov	a, _UART_putC_PARM_1+0
+      000092 6B 00                  403 	sl	a
+      000094r00r2D                  404 	slc	p
+      000096r80r4C                  405 	set1	p, #1
+      000098r27r17                  406 	mov	_internal_tx_buffer+0, a
+      00009Ar00r1F                  407 	mov	a, p
+      00009Cr28r17                  408 	mov	_internal_tx_buffer+1, a
+                                    409 ;	pdk_uart.c: 129: flag_tx_busy = SU_TRUE;
+      00009E 01 57                  410 	mov	a, #0x01
+      0000A0r25r17                  411 	mov	_flag_tx_busy+0, a
+                                    412 ;	pdk_uart.c: 130: }
+      0000A2 7A 00                  413 	ret
+                                    414 ;	pdk_uart.c: 132: void UART_print(char *str)
+                                    415 ;	-----------------------------------------
+                                    416 ;	 function UART_print
+                                    417 ;	-----------------------------------------
+      0000A4                        418 _UART_print:
+                                    419 ;	pdk_uart.c: 135: while (str[i] != '\0')
+      0000A4r2Cr26                  420 	clear	_UART_print_sloc0_1_0+0
+      0000A6r2Dr26                  421 	clear	_UART_print_sloc0_1_0+1
+      0000A8                        422 00101$:
+      0000A8r2Ar1F                  423 	mov	a, _UART_print_PARM_1+0
+      0000AAr2Cr18                  424 	add	a, _UART_print_sloc0_1_0+0
+      0000ACr00r17                  425 	mov	p, a
+      0000AEr2Br1F                  426 	mov	a, _UART_print_PARM_1+1
+      0000B0r2Dr1A                  427 	addc	a, _UART_print_sloc0_1_0+1
+      0000B2r00r70                  428 	call	__gptrget
+      0000B4 00 53                  429 	cneqsn	a, #0x00
+      0000B6rCEr60                  430 	goto	00104$
+                                    431 ;	pdk_uart.c: 136: UART_putC(str[i++]);
+      0000B8r2Ar1F                  432 	mov	a, _UART_print_PARM_1+0
+      0000BAr2Cr18                  433 	add	a, _UART_print_sloc0_1_0+0
+      0000BCr00r17                  434 	mov	p, a
+      0000BEr2Br1F                  435 	mov	a, _UART_print_PARM_1+1
+      0000C0r2Dr1A                  436 	addc	a, _UART_print_sloc0_1_0+1
+      0000C2r2Cr24                  437 	inc	_UART_print_sloc0_1_0+0
+      0000C4r2Dr20                  438 	addc	_UART_print_sloc0_1_0+1
+      0000C6r00r70                  439 	call	__gptrget
+      0000C8r29r17                  440 	mov	_UART_putC_PARM_1+0, a
+      0000CAr82r70                  441 	call	_UART_putC
+      0000CCrA8r60                  442 	goto	00101$
+      0000CE                        443 00104$:
+                                    444 ;	pdk_uart.c: 137: }
+      0000CE 7A 00                  445 	ret
+                                    446 ;	pdk_uart.c: 139: void UART_printNum(int num)
+                                    447 ;	-----------------------------------------
+                                    448 ;	 function UART_printNum
+                                    449 ;	-----------------------------------------
+      0000D0                        450 _UART_printNum:
+                                    451 ;	pdk_uart.c: 142: if (num > 999)
+      0000D0 E7 57                  452 	mov	a, #0xe7
+      0000D2r2Er19                  453 	sub	a, _UART_printNum_PARM_1+0
+      0000D4 03 57                  454 	mov	a, #0x03
+      0000D6r2Fr1B                  455 	subc	a, _UART_printNum_PARM_1+1
+      0000D8 80 31                  456 	t0sn.io	f, ov
+      0000DA 80 56                  457 	xor	a, #0x80
+      0000DC 6B 00                  458 	sl	a
+      0000DE 80 34                  459 	t1sn.io	f, c
+      0000E0r54r61                  460 	goto	00108$
+                                    461 ;	pdk_uart.c: 144: dis[0] = num / 1000 + 48;
+      0000E2r2Er1F                  462 	mov	a, _UART_printNum_PARM_1+0
+      0000E4r00r17                  463 	mov	__divsint_PARM_1+0, a
+      0000E6r2Fr1F                  464 	mov	a, _UART_printNum_PARM_1+1
+      0000E8r01r17                  465 	mov	__divsint_PARM_1+1, a
+      0000EA E8 57                  466 	mov	a, #0xe8
+      0000ECr00r17                  467 	mov	__divsint_PARM_2+0, a
+      0000EE 03 57                  468 	mov	a, #0x03
+      0000F0r01r17                  469 	mov	__divsint_PARM_2+1, a
+      0000F2r00r70                  470 	call	__divsint
+      0000F4 30 50                  471 	add	a, #0x30
+      0000F6r30r17                  472 	mov	_UART_printNum_dis_65536_53+0, a
+                                    473 ;	pdk_uart.c: 145: dis[1] = (num / 100) % 10 + 48;
+      0000F8r2Er1F                  474 	mov	a, _UART_printNum_PARM_1+0
+      0000FAr00r17                  475 	mov	__divsint_PARM_1+0, a
+      0000FCr2Fr1F                  476 	mov	a, _UART_printNum_PARM_1+1
+      0000FEr01r17                  477 	mov	__divsint_PARM_1+1, a
+      000100 64 57                  478 	mov	a, #0x64
+      000102r00r17                  479 	mov	__divsint_PARM_2+0, a
+      000104r01r26                  480 	clear	__divsint_PARM_2+1
+      000106r00r70                  481 	call	__divsint
+      000108r00r17                  482 	mov	__modsint_PARM_1+0, a
+      00010Ar00r1F                  483 	mov	a, p
+      00010Cr01r17                  484 	mov	__modsint_PARM_1+1, a
+      00010E 0A 57                  485 	mov	a, #0x0a
+      000110r00r17                  486 	mov	__modsint_PARM_2+0, a
+      000112r01r26                  487 	clear	__modsint_PARM_2+1
+      000114r00r70                  488 	call	__modsint
+      000116 30 50                  489 	add	a, #0x30
+      000118r31r17                  490 	mov	_UART_printNum_dis_65536_53+1, a
+                                    491 ;	pdk_uart.c: 146: dis[2] = (num / 10) % 10 + 48;
+      00011Ar2Er1F                  492 	mov	a, _UART_printNum_PARM_1+0
+      00011Cr00r17                  493 	mov	__divsint_PARM_1+0, a
+      00011Er2Fr1F                  494 	mov	a, _UART_printNum_PARM_1+1
+      000120r01r17                  495 	mov	__divsint_PARM_1+1, a
+      000122 0A 57                  496 	mov	a, #0x0a
+      000124r00r17                  497 	mov	__divsint_PARM_2+0, a
+      000126r01r26                  498 	clear	__divsint_PARM_2+1
+      000128r00r70                  499 	call	__divsint
+      00012Ar00r17                  500 	mov	__modsint_PARM_1+0, a
+      00012Cr00r1F                  501 	mov	a, p
+      00012Er01r17                  502 	mov	__modsint_PARM_1+1, a
+      000130 0A 57                  503 	mov	a, #0x0a
+      000132r00r17                  504 	mov	__modsint_PARM_2+0, a
+      000134r01r26                  505 	clear	__modsint_PARM_2+1
+      000136r00r70                  506 	call	__modsint
+      000138 30 50                  507 	add	a, #0x30
+      00013Ar32r17                  508 	mov	_UART_printNum_dis_65536_53+2, a
+                                    509 ;	pdk_uart.c: 147: dis[3] = num % 10 + 48;
+      00013Cr2Er1F                  510 	mov	a, _UART_printNum_PARM_1+0
+      00013Er00r17                  511 	mov	__modsint_PARM_1+0, a
+      000140r2Fr1F                  512 	mov	a, _UART_printNum_PARM_1+1
+      000142r01r17                  513 	mov	__modsint_PARM_1+1, a
+      000144 0A 57                  514 	mov	a, #0x0a
+      000146r00r17                  515 	mov	__modsint_PARM_2+0, a
+      000148r01r26                  516 	clear	__modsint_PARM_2+1
+      00014Ar00r70                  517 	call	__modsint
+      00014C 30 50                  518 	add	a, #0x30
+      00014Er33r17                  519 	mov	_UART_printNum_dis_65536_53+3, a
+                                    520 ;	pdk_uart.c: 148: dis[4] = '\0';
+      000150r34r26                  521 	clear	_UART_printNum_dis_65536_53+4
+      000152rFAr61                  522 	goto	00109$
+      000154                        523 00108$:
+                                    524 ;	pdk_uart.c: 150: else if (num > 99)
+      000154 63 57                  525 	mov	a, #0x63
+      000156r2Er19                  526 	sub	a, _UART_printNum_PARM_1+0
+      000158 00 57                  527 	mov	a, #0x00
+      00015Ar2Fr1B                  528 	subc	a, _UART_printNum_PARM_1+1
+      00015C 80 31                  529 	t0sn.io	f, ov
+      00015E 80 56                  530 	xor	a, #0x80
+      000160 6B 00                  531 	sl	a
+      000162 80 34                  532 	t1sn.io	f, c
+      000164rB4r61                  533 	goto	00105$
+                                    534 ;	pdk_uart.c: 152: dis[0] = num / 100 + 48;
+      000166r2Er1F                  535 	mov	a, _UART_printNum_PARM_1+0
+      000168r00r17                  536 	mov	__divsint_PARM_1+0, a
+      00016Ar2Fr1F                  537 	mov	a, _UART_printNum_PARM_1+1
+      00016Cr01r17                  538 	mov	__divsint_PARM_1+1, a
+      00016E 64 57                  539 	mov	a, #0x64
+      000170r00r17                  540 	mov	__divsint_PARM_2+0, a
+      000172r01r26                  541 	clear	__divsint_PARM_2+1
+      000174r00r70                  542 	call	__divsint
+      000176 30 50                  543 	add	a, #0x30
+      000178r30r17                  544 	mov	_UART_printNum_dis_65536_53+0, a
+                                    545 ;	pdk_uart.c: 153: dis[1] = (num / 10) % 10 + 48;
+      00017Ar2Er1F                  546 	mov	a, _UART_printNum_PARM_1+0
+      00017Cr00r17                  547 	mov	__divsint_PARM_1+0, a
+      00017Er2Fr1F                  548 	mov	a, _UART_printNum_PARM_1+1
+      000180r01r17                  549 	mov	__divsint_PARM_1+1, a
+      000182 0A 57                  550 	mov	a, #0x0a
+      000184r00r17                  551 	mov	__divsint_PARM_2+0, a
+      000186r01r26                  552 	clear	__divsint_PARM_2+1
+      000188r00r70                  553 	call	__divsint
+      00018Ar00r17                  554 	mov	__modsint_PARM_1+0, a
+      00018Cr00r1F                  555 	mov	a, p
+      00018Er01r17                  556 	mov	__modsint_PARM_1+1, a
+      000190 0A 57                  557 	mov	a, #0x0a
+      000192r00r17                  558 	mov	__modsint_PARM_2+0, a
+      000194r01r26                  559 	clear	__modsint_PARM_2+1
+      000196r00r70                  560 	call	__modsint
+      000198 30 50                  561 	add	a, #0x30
+      00019Ar31r17                  562 	mov	_UART_printNum_dis_65536_53+1, a
+                                    563 ;	pdk_uart.c: 154: dis[2] = num % 10 + 48;
+      00019Cr2Er1F                  564 	mov	a, _UART_printNum_PARM_1+0
+      00019Er00r17                  565 	mov	__modsint_PARM_1+0, a
+      0001A0r2Fr1F                  566 	mov	a, _UART_printNum_PARM_1+1
+      0001A2r01r17                  567 	mov	__modsint_PARM_1+1, a
+      0001A4 0A 57                  568 	mov	a, #0x0a
+      0001A6r00r17                  569 	mov	__modsint_PARM_2+0, a
+      0001A8r01r26                  570 	clear	__modsint_PARM_2+1
+      0001AAr00r70                  571 	call	__modsint
+      0001AC 30 50                  572 	add	a, #0x30
+      0001AEr32r17                  573 	mov	_UART_printNum_dis_65536_53+2, a
+                                    574 ;	pdk_uart.c: 155: dis[3] = '\0';
+      0001B0r33r26                  575 	clear	_UART_printNum_dis_65536_53+3
+      0001B2rFAr61                  576 	goto	00109$
+      0001B4                        577 00105$:
+                                    578 ;	pdk_uart.c: 157: else if (num > 9)
+      0001B4 09 57                  579 	mov	a, #0x09
+      0001B6r2Er19                  580 	sub	a, _UART_printNum_PARM_1+0
+      0001B8 00 57                  581 	mov	a, #0x00
+      0001BAr2Fr1B                  582 	subc	a, _UART_printNum_PARM_1+1
+      0001BC 80 31                  583 	t0sn.io	f, ov
+      0001BE 80 56                  584 	xor	a, #0x80
+      0001C0 6B 00                  585 	sl	a
+      0001C2 80 34                  586 	t1sn.io	f, c
+      0001C4rF2r61                  587 	goto	00102$
+                                    588 ;	pdk_uart.c: 159: dis[0] = num / 10 + 48;
+      0001C6r2Er1F                  589 	mov	a, _UART_printNum_PARM_1+0
+      0001C8r00r17                  590 	mov	__divsint_PARM_1+0, a
+      0001CAr2Fr1F                  591 	mov	a, _UART_printNum_PARM_1+1
+      0001CCr01r17                  592 	mov	__divsint_PARM_1+1, a
+      0001CE 0A 57                  593 	mov	a, #0x0a
+      0001D0r00r17                  594 	mov	__divsint_PARM_2+0, a
+      0001D2r01r26                  595 	clear	__divsint_PARM_2+1
+      0001D4r00r70                  596 	call	__divsint
+      0001D6 30 50                  597 	add	a, #0x30
+      0001D8r30r17                  598 	mov	_UART_printNum_dis_65536_53+0, a
+                                    599 ;	pdk_uart.c: 160: dis[1] = num % 10 + 48;
+      0001DAr2Er1F                  600 	mov	a, _UART_printNum_PARM_1+0
+      0001DCr00r17                  601 	mov	__modsint_PARM_1+0, a
+      0001DEr2Fr1F                  602 	mov	a, _UART_printNum_PARM_1+1
+      0001E0r01r17                  603 	mov	__modsint_PARM_1+1, a
+      0001E2 0A 57                  604 	mov	a, #0x0a
+      0001E4r00r17                  605 	mov	__modsint_PARM_2+0, a
+      0001E6r01r26                  606 	clear	__modsint_PARM_2+1
+      0001E8r00r70                  607 	call	__modsint
+      0001EA 30 50                  608 	add	a, #0x30
+      0001ECr31r17                  609 	mov	_UART_printNum_dis_65536_53+1, a
+                                    610 ;	pdk_uart.c: 161: dis[2] = '\0';
+      0001EEr32r26                  611 	clear	_UART_printNum_dis_65536_53+2
+      0001F0rFAr61                  612 	goto	00109$
+      0001F2                        613 00102$:
+                                    614 ;	pdk_uart.c: 165: dis[0] = num + 48;
+      0001F2r2Er1F                  615 	mov	a, _UART_printNum_PARM_1+0
+      0001F4 30 50                  616 	add	a, #0x30
+      0001F6r30r17                  617 	mov	_UART_printNum_dis_65536_53+0, a
+                                    618 ;	pdk_uart.c: 166: dis[1] = '\0';
+      0001F8r31r26                  619 	clear	_UART_printNum_dis_65536_53+1
+      0001FA                        620 00109$:
+                                    621 ;	pdk_uart.c: 168: UART_print(dis);
+      0001FAr30r57                  622 	mov	a, #(_UART_printNum_dis_65536_53 + 0)
+      0001FCr2Ar17                  623 	mov	_UART_print_PARM_1+0, a
+      0001FEr2Br26                  624 	clear	_UART_print_PARM_1+1
+      000200rA4r60                  625 	goto	_UART_print
+                                    626 ;	pdk_uart.c: 169: }
+      000202 7A 00                  627 	ret
+                                    628 ;	pdk_uart.c: 172: void TIM2_interrupt(void)
+                                    629 ;	-----------------------------------------
+                                    630 ;	 function TIM2_interrupt
+                                    631 ;	-----------------------------------------
+      000204                        632 _TIM2_interrupt:
+                                    633 ;	pdk_uart.c: 181: if (flag_tx_busy == SU_TRUE)
+      000204r25r1F                  634 	mov	a, _flag_tx_busy+0
+      000206 01 52                  635 	ceqsn	a, #0x01
+      000208r30r62                  636 	goto	00107$
+                                    637 ;	pdk_uart.c: 183: if (internal_tx_buffer & 0x01)
+      00020Ar28r1F                  638 	mov	a, _internal_tx_buffer+1
+      00020Cr00r17                  639 	mov	p, a
+      00020Er27r1F                  640 	mov	a, _internal_tx_buffer+0
+      000210 01 54                  641 	and	a, #0x01
+      000212 00 53                  642 	cneqsn	a, #0x00
+      000214r1Ar62                  643 	goto	00102$
+                                    644 ;	pdk_uart.c: 185: setb(UART_Px, UART_TX);
+      000216 13 3E                  645 	set1.io	__pb, #4
+      000218r1Cr62                  646 	goto	00103$
+      00021A                        647 00102$:
+                                    648 ;	pdk_uart.c: 189: clrb(UART_Px, UART_TX);
+      00021A 13 3A                  649 	set0.io	__pb, #4
+      00021C                        650 00103$:
+                                    651 ;	pdk_uart.c: 191: internal_tx_buffer >>= 1;
+      00021Cr28r2A                  652 	sr	_internal_tx_buffer+1
+      00021Er27r2C                  653 	src	_internal_tx_buffer+0
+                                    654 ;	pdk_uart.c: 192: if (--bits_left_in_tx == 0)
+      000220r26r1F                  655 	mov	a, _bits_left_in_tx+0
+      000222 01 51                  656 	sub	a, #0x01
+      000224r26r17                  657 	mov	_bits_left_in_tx+0, a
+      000226 00 52                  658 	ceqsn	a, #0x00
+      000228r30r62                  659 	goto	00107$
+                                    660 ;	pdk_uart.c: 194: flag_tx_busy = SU_FALSE;
+      00022Ar25r26                  661 	clear	_flag_tx_busy+0
+                                    662 ;	pdk_uart.c: 195: TIMER_OFF;
+      00022C 04 3B                  663 	set0.io	__inten, #6
+                                    664 ;	pdk_uart.c: 196: EXTERNAL_ON;
+      00022E 04 3C                  665 	set1.io	__inten, #0
+      000230                        666 00107$:
+                                    667 ;	pdk_uart.c: 201: if (flag_rx_off == SU_FALSE)
+      000230r23r1F                  668 	mov	a, _flag_rx_off+0
+      000232 00 52                  669 	ceqsn	a, #0x00
+      000234r94r62                  670 	goto	00124$
+                                    671 ;	pdk_uart.c: 203: if (flag_rx_waiting_for_stop_bit)
+      000236r35r1F                  672 	mov	a, _TIM2_interrupt_flag_rx_waiting_for_stop_bit_65536_59+0
+      000238 00 53                  673 	cneqsn	a, #0x00
+      00023Ar62r62                  674 	goto	00120$
+                                    675 ;	pdk_uart.c: 205: start_bit = 1;
+      00023C 01 57                  676 	mov	a, #0x01
+      00023Er21r17                  677 	mov	_start_bit+0, a
+                                    678 ;	pdk_uart.c: 206: EXTERNAL_ON;
+      000240 04 3C                  679 	set1.io	__inten, #0
+                                    680 ;	pdk_uart.c: 207: flag_rx_waiting_for_stop_bit = SU_FALSE;
+      000242r35r26                  681 	clear	_TIM2_interrupt_flag_rx_waiting_for_stop_bit_65536_59+0
+                                    682 ;	pdk_uart.c: 208: flag_rx_ready = SU_FALSE;
+      000244r24r26                  683 	clear	_flag_rx_ready+0
+                                    684 ;	pdk_uart.c: 209: inbuf[qin] = internal_rx_buffer;
+      000246r00r57                  685 	mov	a, #(_inbuf + 0)
+      000248r20r18                  686 	add	a, _qin+0
+      00024Ar00r17                  687 	mov	p, a
+      00024Cr38r1F                  688 	mov	a, _TIM2_interrupt_internal_rx_buffer_65536_59+0
+      00024Er00r07                  689 	idxm	p, a
+                                    690 ;	pdk_uart.c: 210: if (++qin >= UART_IN_BUF_SIZE)
+      000250r20r1F                  691 	mov	a, _qin+0
+      000252 01 50                  692 	add	a, #0x01
+      000254r20r17                  693 	mov	_qin+0, a
+      000256 20 52                  694 	ceqsn	a, #0x20
+      000258 00 00                  695 	nop
+      00025A 80 30                  696 	t0sn.io	f, c
+      00025Cr94r62                  697 	goto	00124$
+                                    698 ;	pdk_uart.c: 212: qin = 0; // overflow - reset inbuf-index
+      00025Er20r26                  699 	clear	_qin+0
+      000260r94r62                  700 	goto	00124$
+      000262                        701 00120$:
+                                    702 ;	pdk_uart.c: 217: if (flag_rx_ready == SU_FALSE)
+      000262r24r1F                  703 	mov	a, _flag_rx_ready+0
+      000264 00 52                  704 	ceqsn	a, #0x00
+      000266r7Er62                  705 	goto	00117$
+                                    706 ;	pdk_uart.c: 219: if (start_bit == 0)
+      000268r21r1F                  707 	mov	a, _start_bit+0
+      00026A 00 52                  708 	ceqsn	a, #0x00
+      00026Cr94r62                  709 	goto	00124$
+                                    710 ;	pdk_uart.c: 221: flag_rx_ready = SU_TRUE;
+      00026E 01 57                  711 	mov	a, #0x01
+      000270r24r17                  712 	mov	_flag_rx_ready+0, a
+                                    713 ;	pdk_uart.c: 222: internal_rx_buffer = 0;
+      000272r38r26                  714 	clear	_TIM2_interrupt_internal_rx_buffer_65536_59+0
+                                    715 ;	pdk_uart.c: 223: bits_left_in_rx = RX_NUM_OF_BITS;
+      000274 08 57                  716 	mov	a, #0x08
+      000276r37r17                  717 	mov	_TIM2_interrupt_bits_left_in_rx_65536_59+0, a
+                                    718 ;	pdk_uart.c: 224: rx_mask = 1;
+      000278 01 57                  719 	mov	a, #0x01
+      00027Ar36r17                  720 	mov	_TIM2_interrupt_rx_mask_65536_59+0, a
+      00027Cr94r62                  721 	goto	00124$
+      00027E                        722 00117$:
+                                    723 ;	pdk_uart.c: 230: if (UART_Px & (0x20))
+      00027E 93 01                  724 	mov.io	a, __pb
+      000280 20 54                  725 	and	a, #0x20
+      000282 00 53                  726 	cneqsn	a, #0x00
+      000284r8Ar62                  727 	goto	00113$
+                                    728 ;	pdk_uart.c: 232: internal_rx_buffer |= rx_mask;
+      000286r36r1F                  729 	mov	a, _TIM2_interrupt_rx_mask_65536_59+0
+      000288r38r15                  730 	or	_TIM2_interrupt_internal_rx_buffer_65536_59+0, a
+      00028A                        731 00113$:
+                                    732 ;	pdk_uart.c: 234: rx_mask <<= 1;
+      00028Ar36r2B                  733 	sl	_TIM2_interrupt_rx_mask_65536_59+0
+                                    734 ;	pdk_uart.c: 235: if (--bits_left_in_rx == 0)
+      00028Cr37r23                  735 	dzsn	_TIM2_interrupt_bits_left_in_rx_65536_59+0
+      00028Er94r62                  736 	goto	00124$
+                                    737 ;	pdk_uart.c: 237: flag_rx_waiting_for_stop_bit = SU_TRUE;
+      000290 01 57                  738 	mov	a, #0x01
+      000292r35r17                  739 	mov	_TIM2_interrupt_flag_rx_waiting_for_stop_bit_65536_59+0, a
+      000294                        740 00124$:
+                                    741 ;	pdk_uart.c: 242: }
+      000294 7A 00                  742 	ret
+                                    743 ;	pdk_uart.c: 245: void PB5_interrupt(void)
+                                    744 ;	-----------------------------------------
+                                    745 ;	 function PB5_interrupt
+                                    746 ;	-----------------------------------------
+      000296                        747 _PB5_interrupt:
+                                    748 ;	pdk_uart.c: 247: TM2CT = 9;
+      000296 09 57                  749 	mov	a, #0x09
+      000298 31 01                  750 	mov.io	__tm2ct, a
+                                    751 ;	pdk_uart.c: 248: TIMER_OFF;
+      00029A 04 3B                  752 	set0.io	__inten, #6
+                                    753 ;	pdk_uart.c: 249: EXTERNAL_OFF;
+      00029C 04 38                  754 	set0.io	__inten, #0
+                                    755 ;	pdk_uart.c: 250: start_bit = 0;
+      00029Er21r26                  756 	clear	_start_bit+0
+                                    757 ;	pdk_uart.c: 252: INTRQ &= ~INTRQ_TM2;
+      0002A0 05 3B                  758 	set0.io	__intrq, #6
+                                    759 ;	pdk_uart.c: 253: TIMER_ON;
+      0002A2 04 3F                  760 	set1.io	__inten, #6
+                                    761 ;	pdk_uart.c: 254: }
+      0002A4 7A 00                  762 	ret
+                                    763 	.area CODE
+                                    764 	.area CONST
+                                    765 	.area CABS (ABS)

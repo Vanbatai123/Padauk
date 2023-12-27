@@ -1,0 +1,116 @@
+﻿
+#include	"extern.h"
+
+#define uint8_t		INT
+#define uint16_t	WORD
+#define uint24_t	EWORD
+#define uint32_t	DWORD
+
+uint16_t count_ms, count_ms1;
+#define IR_FAIL 	0xF1
+#define PIN_IR 		PA.4	 	// Pin for IR receiver
+
+//uint8_t arr[33];
+//uint16_t ptt;
+uint8_t IR_val = 0;
+// IR read data according to NEC protocol
+void IR_read(void)
+{
+	IR_val = IR_FAIL;
+	uint32_t data = 0x00000000; // variable for received data
+	// uint8_t addr = 0x00;		// variable for received address
+	//ptt = arr;
+	count_ms = 0;
+	count_ms1 = 0;
+	uint8_t i = 0;
+	while (i < 33) // receive 32 bits
+	{
+		data = data << 1;
+		while (PA.4 == 0 && count_ms != 100)
+		{};
+		while (PA.4 == 1 && count_ms != 100)
+		{};
+		count_ms1 = count_ms;
+		if (count_ms1 == 100)
+		{
+			return;
+		}
+		if (i == 0 && (count_ms1 < 50 || count_ms1 > 60)) // first bit is not a Start bit
+		{
+			return;
+		}
+		if (i == 1 && (count_ms1 > 50 && count_ms1 < 60)) // first bit is not a Start bit
+		{
+			continue;
+		}
+		else if (7 < count_ms1 && count_ms1 < 11)
+		{
+			data |= 0x00000001;
+		}
+		//arr[i] = count_ms1;
+		//*ptt = count_ms1;
+		//ptt++;
+		count_ms = 0;
+		i++;
+	}
+
+	// uint8_t addr1 = data >> 24; // get first  address byte
+	// uint8_t addr2 = data >> 16; // get second address byte
+	uint8_t cmd1 = data >> 8; // get first  command byte
+	uint8_t check = data + cmd1;	  // get second command byte
+	if (check != 0xFF)
+		return; // if second command byte is not the inverse of the first
+	// if (((uint16_t)addr1 + (uint16_t)addr1) == 255)
+	// 	addr = addr1; // check if it's extended NEC-protocol ...
+	// else
+	// 	addr = data; // ... and get the correct address
+	// if(addr != IR_ADDR) return IR_FAIL;         // wrong address
+	IR_val = cmd1; // return command code
+}
+
+void	FPPA0 (void)
+{
+	.ADJUST_IC	SYSCLK=IHRC/2		//	SYSCLK=IHRC/4
+
+	//	Insert Initial Code
+
+	$  PIN_IR     In, Pull;       //  PA.2 input and Pull High
+
+	$  T16M   SYSCLK, /4, BIT8;
+	$  INTEN T16;
+	INTRQ = 0;
+	ENGINT;
+
+	$  PA.3     Out, High;
+	while (1)
+	{
+		//IR_val = IR_FAIL;
+		IR_read();
+		if(IR_val == 0xA2)
+		{
+			$ PA.3 Toggle;
+			.delay(800000);
+		}
+
+	}
+}
+
+
+void	Interrupt (void)
+{
+	pushaf;
+
+	if (Intrq.T16)
+	{	//	T16 Trig
+		//	User can add code
+		count_ms++;
+		if (count_ms >= 100)
+		{
+			count_ms = 100;
+		}
+		Intrq.T16	=	0;
+		//...
+	}
+
+	popaf;
+}

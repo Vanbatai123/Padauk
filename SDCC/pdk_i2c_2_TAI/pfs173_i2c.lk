@@ -1,0 +1,14 @@
+-muwx
+-i pfs173_i2c.ihx
+-Y
+-b HOME = 0x0022
+-b DATA = 0x0002
+-b SSEG = 0xffffffff
+-k c:\Program Files\SDCC\bin\..\lib\pdk15
+-l pdk15
+pfs173_i2c.rel
+pdk_uart.rel
+pdk_i2c.rel
+delay.rel
+
+-e

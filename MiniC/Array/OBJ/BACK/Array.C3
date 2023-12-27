@@ -1,0 +1,41 @@
+﻿
+#include	"extern.h"
+
+
+
+void	FPPA0 (void)
+{
+	.ADJUST_IC	SYSCLK=IHRC/4		//	SYSCLK=IHRC/4
+
+	//	Insert Initial Code
+	int ar[10];
+	WORD ptt;
+	ptt = ar;
+
+	asd EQU 1;
+
+
+	while (1)
+	{
+		ar +5 = 9;
+		*ptt = 20;
+//		...
+//		wdreset;
+
+	}
+}
+
+
+void	Interrupt (void)
+{
+	pushaf;
+
+	if (Intrq.T16)
+	{	//	T16 Trig
+		//	User can add code
+		Intrq.T16	=	0;
+		//...
+	}
+
+	popaf;
+}

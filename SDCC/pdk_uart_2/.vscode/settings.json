@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.html": "css",
+        "pfs173.h": "c",
+        "auto_sysclock.h": "c",
+        "device.h": "c",
+        "include.h": "c",
+        "pdk_uart.h": "c",
+        "stdio.h": "c",
+        "delay.h": "c"
+    }
+}

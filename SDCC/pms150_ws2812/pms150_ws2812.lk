@@ -1,0 +1,11 @@
+-muwx
+-i pms150_ws2812.ihx
+-I 0x003c
+-b HOME = 0x0022
+-b DATA = 0x0002
+-k C:\PROGRA~1\SDCC\bin\..\lib\pdk13
+-l pdk13
+pms150_ws2812.rel
+delay.rel
+
+-e

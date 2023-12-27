@@ -1,0 +1,130 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Padauk 15), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+  9 _I2C_Ack                                                       000000 GR
+  9 _I2C_NoAck                                                     000020 GR
+  9 _I2C_available                                                 0001E8 GR
+  9 _I2C_begin                                                     0001EE GR
+  9 _I2C_beginTransmission                                         000108 GR
+  1 _I2C_beginTransmission_PARM_1                                  000029 GR
+  9 _I2C_endTransmission                                           00014A GR
+  1 _I2C_endTransmission_sloc4_1_0                                 00002F R
+  9 _I2C_read                                                      0001CC GR
+  9 _I2C_read_t                                                    0000BC GR
+  1 _I2C_read_t_PARM_1                                             000026 GR
+  1 _I2C_read_t_sloc1_1_0                                          000027 R
+  1 _I2C_read_t_sloc2_1_0                                          000028 R
+  9 _I2C_requestFrom                                               000168 GR
+  1 _I2C_requestFrom_PARM_1                                        000030 GR
+  1 _I2C_requestFrom_PARM_2                                        000031 GR
+  1 _I2C_requestFrom_sloc5_1_0                                     000032 R
+  1 _I2C_requestFrom_sloc6_1_0                                     000033 R
+  1 _I2C_requestFrom_sloc7_1_0                                     000035 R
+  9 _I2C_start                                                     000040 GR
+  9 _I2C_stop                                                      00005C GR
+  9 _I2C_write                                                     000118 GR
+  9 _I2C_writeBuffer                                               00012A GR
+  1 _I2C_writeBuffer_PARM_1                                        00002B GR
+  1 _I2C_writeBuffer_PARM_2                                        00002D GR
+  1 _I2C_writeBuffer_sloc3_1_0                                     00002E R
+  1 _I2C_write_PARM_1                                              00002A GR
+  9 _I2C_write_t                                                   000078 GR
+  1 _I2C_write_t_PARM_1                                            000024 GR
+  1 _I2C_write_t_sloc0_1_0                                         000025 R
+    __adcc                                                      =  000020 G
+    __adcm                                                      =  000021 G
+    __adcr                                                      =  000022 G
+    __adcrgc                                                    =  000024 G
+    __bgtr                                                      =  000063 G
+    __clkmd                                                     =  000003 G
+    __delay_loop_8                                                 ****** GX
+    __delay_loop_8_PARM_1                                          ****** GX
+    __eoscr                                                     =  00000A G
+    __flag                                                      =  000000 G
+    __gpcc                                                      =  00002B G
+    __gpcs                                                      =  00002C G
+    __gptrget                                                      ****** GX
+    __ihrcr                                                     =  00000B G
+    __ilrcr                                                     =  000062 G
+    __integs                                                    =  00000C G
+    __inten                                                     =  000004 G
+    __intrq                                                     =  000005 G
+    __misc                                                      =  000026 G
+    __misc2                                                     =  000027 G
+    __misclvr                                                   =  000028 G
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Padauk 15), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    __pa                                                        =  000010 G
+    __pac                                                       =  000011 G
+    __padier                                                    =  00000D G
+    __paph                                                      =  000012 G
+    __pb                                                        =  000013 G
+    __pbc                                                       =  000014 G
+    __pbdier                                                    =  00000E G
+    __pbph                                                      =  000015 G
+    __pbpl                                                      =  000019 G
+    __pc                                                        =  000016 G
+    __pcc                                                       =  000017 G
+    __pcdier                                                    =  00000F G
+    __pcph                                                      =  000018 G
+    __pcpl                                                      =  00001A G
+    __pwmg0c                                                    =  000040 G
+    __pwmg0dth                                                  =  000042 G
+    __pwmg0dtl                                                  =  000043 G
+    __pwmg1c                                                    =  000046 G
+    __pwmg1dth                                                  =  000048 G
+    __pwmg1dtl                                                  =  000049 G
+    __pwmg2c                                                    =  00004C G
+    __pwmg2dth                                                  =  00004E G
+    __pwmg2dtl                                                  =  00004F G
+    __pwmgclk                                                   =  000041 G
+    __pwmgcubh                                                  =  000044 G
+    __pwmgcubl                                                  =  000045 G
+    __rop                                                       =  000067 G
+    __sp                                                        =  000002 G
+  4 __t16c                                                         000000 GR
+    __t16m                                                      =  000006 G
+    __tm2b                                                      =  000033 G
+    __tm2c                                                      =  000030 G
+    __tm2ct                                                     =  000031 G
+    __tm2s                                                      =  000032 G
+    __tm3b                                                      =  000037 G
+    __tm3c                                                      =  000034 G
+    __tm3ct                                                     =  000035 G
+    __tm3s                                                      =  000036 G
+  1 _rxBuffer                                                      000002 GR
+  1 _rxBufferIndex                                                 000000 GR
+  1 _rxBufferLength                                                000001 GR
+  1 _txBuffer                                                      000014 GR
+  1 _txBufferIndex                                                 000012 GR
+  1 _txBufferLength                                                000013 GR
+    p                                                              ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Padauk 15), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 DATA                                       size     36   flags    0
+   2 OSEG                                       size      0   flags    4
+   3 RSEG                                       size      0   flags    8
+   4 RSEG0                                      size      2   flags    8
+   5 DABS                                       size      0   flags    8
+   6 HOME                                       size      0   flags    0
+   7 GSINIT                                     size      0   flags    0
+   8 GSFINAL                                    size      0   flags    0
+   9 CODE                                       size    1F4   flags    0
+   A CONST                                      size      0   flags    0
+   B CABS                                       size      0   flags    8
+

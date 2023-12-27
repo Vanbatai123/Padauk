@@ -1,0 +1,1203 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pms150_ws2812
+                                      6 	.optsdcc -mpdk13
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _bfv
+                                     17 	.globl _gfv
+                                     18 	.globl _rfv
+                                     19 	.globl _bsv
+                                     20 	.globl _gsv
+                                     21 	.globl _rsv
+                                     22 	.globl _bv
+                                     23 	.globl _gv
+                                     24 	.globl _rv
+                                     25 	.globl _mode
+                                     26 	.globl _mode_delay
+                                     27 	.globl _main
+                                     28 	.globl _standby
+                                     29 	.globl _interrupt
+                                     30 	.globl _IR_read
+                                     31 	.globl _IR_init
+                                     32 	.globl _NEO_writeColor
+                                     33 	.globl _NEO_sendByte
+                                     34 	.globl _LED__SendOne_
+                                     35 	.globl _LED__SendZero_
+                                     36 	.globl _BUTTON_init
+                                     37 	.globl __sdcc_external_startup
+                                     38 	.globl __delay_loop_16
+                                     39 	.globl __t16c
+                                     40 	.globl __ilrcr
+                                     41 	.globl __gpcs
+                                     42 	.globl __tm2ct
+                                     43 	.globl __tm2c
+                                     44 	.globl __misc
+                                     45 	.globl __gpcc
+                                     46 	.globl __bgtr
+                                     47 	.globl __tm2s
+                                     48 	.globl __paph
+                                     49 	.globl __pac
+                                     50 	.globl __pa
+                                     51 	.globl __padier
+                                     52 	.globl __integs
+                                     53 	.globl __ihrcr
+                                     54 	.globl __eoscr
+                                     55 	.globl __tm2b
+                                     56 	.globl __t16m
+                                     57 	.globl __intrq
+                                     58 	.globl __inten
+                                     59 	.globl __clkmd
+                                     60 	.globl __sp
+                                     61 	.globl __flag
+                                     62 	.globl _txdata
+                                     63 	.globl _changeColor_PARM_3
+                                     64 	.globl _changeColor_PARM_2
+                                     65 	.globl _changeColor_PARM_1
+                                     66 	.globl _NEO_writeColor_PARM_3
+                                     67 	.globl _NEO_writeColor_PARM_2
+                                     68 	.globl _NEO_writeColor_PARM_1
+                                     69 	.globl _NEO_sendByte_PARM_1
+                                     70 	.globl _count_ms1
+                                     71 	.globl _count_ms
+                                     72 	.globl _lm
+                                     73 	.globl _huef
+                                     74 	.globl _hue1
+                                     75 	.globl _hue
+                                     76 	.globl _mode_counter
+                                     77 	.globl _command
+                                     78 	.globl _light_mode
+                                     79 	.globl _button_press
+                                     80 	.globl _button_flag
+                                     81 	.globl _button_value
+                                     82 	.globl _changeColor
+                                     83 	.globl _switchColor
+                                     84 	.globl _fadeColor
+                                     85 	.globl _my_delay_ms
+                                     86 ;--------------------------------------------------------
+                                     87 ; special function registers
+                                     88 ;--------------------------------------------------------
+                                     89 	.area RSEG (ABS)
+      000000                         90 	.org 0x0000
+                           000000    91 __flag	=	0x0000
+                           000002    92 __sp	=	0x0002
+                           000003    93 __clkmd	=	0x0003
+                           000004    94 __inten	=	0x0004
+                           000005    95 __intrq	=	0x0005
+                           000006    96 __t16m	=	0x0006
+                           000009    97 __tm2b	=	0x0009
+                           00000A    98 __eoscr	=	0x000a
+                           00000B    99 __ihrcr	=	0x000b
+                           00000C   100 __integs	=	0x000c
+                           00000D   101 __padier	=	0x000d
+                           000010   102 __pa	=	0x0010
+                           000011   103 __pac	=	0x0011
+                           000012   104 __paph	=	0x0012
+                           000017   105 __tm2s	=	0x0017
+                           000019   106 __bgtr	=	0x0019
+                           00001A   107 __gpcc	=	0x001a
+                           00001B   108 __misc	=	0x001b
+                           00001C   109 __tm2c	=	0x001c
+                           00001D   110 __tm2ct	=	0x001d
+                           00001E   111 __gpcs	=	0x001e
+                           00001F   112 __ilrcr	=	0x001f
+      000000                        113 __t16c::
+      000000                        114 	.ds 2
+                                    115 ;--------------------------------------------------------
+                                    116 ; ram data
+                                    117 ;--------------------------------------------------------
+                                    118 	.area DATA
+      000002                        119 _button_value::
+      000002                        120 	.ds 1
+      000003                        121 _button_flag::
+      000003                        122 	.ds 1
+      000004                        123 _button_press::
+      000004                        124 	.ds 1
+      000005                        125 _light_mode::
+      000005                        126 	.ds 1
+      000006                        127 _command::
+      000006                        128 	.ds 1
+      000007                        129 _mode_counter::
+      000007                        130 	.ds 1
+      000008                        131 _hue::
+      000008                        132 	.ds 1
+      000009                        133 _hue1::
+      000009                        134 	.ds 1
+      00000A                        135 _huef::
+      00000A                        136 	.ds 1
+      00000B                        137 _lm::
+      00000B                        138 	.ds 1
+      00000C                        139 _count_ms::
+      00000C                        140 	.ds 2
+      00000E                        141 _count_ms1::
+      00000E                        142 	.ds 2
+      000010                        143 _NEO_sendByte_PARM_1:
+      000010                        144 	.ds 1
+      000011                        145 _NEO_sendByte_sloc0_1_0:
+      000011                        146 	.ds 1
+      000012                        147 _NEO_writeColor_PARM_1:
+      000012                        148 	.ds 1
+      000013                        149 _NEO_writeColor_PARM_2:
+      000013                        150 	.ds 1
+      000014                        151 _NEO_writeColor_PARM_3:
+      000014                        152 	.ds 1
+      000015                        153 _changeColor_PARM_1:
+      000015                        154 	.ds 2
+      000017                        155 _changeColor_PARM_2:
+      000017                        156 	.ds 2
+      000019                        157 _changeColor_PARM_3:
+      000019                        158 	.ds 2
+      00001B                        159 _changeColor_sloc6_1_0:
+      00001B                        160 	.ds 1
+      00001C                        161 _my_delay_ms_sloc7_1_0:
+      00001C                        162 	.ds 2
+      00001E                        163 _txdata::
+      00001E                        164 	.ds 2
+      000020                        165 _main_sloc8_1_0:
+      000020                        166 	.ds 1
+                                    167 ;--------------------------------------------------------
+                                    168 ; overlayable items in ram
+                                    169 ;--------------------------------------------------------
+                                    170 	.area	OSEG (OVR,DATA)
+      000028                        171 _IR_read_sloc1_1_0:
+      000028                        172 	.ds 4
+      00002C                        173 _IR_read_sloc2_1_0:
+      00002C                        174 	.ds 1
+      00002D                        175 _IR_read_sloc3_1_0:
+      00002D                        176 	.ds 2
+      00002F                        177 _IR_read_sloc4_1_0:
+      00002F                        178 	.ds 1
+      000030                        179 _IR_read_sloc5_1_0:
+      000030                        180 	.ds 1
+                                    181 ;--------------------------------------------------------
+                                    182 ; Stack segment in internal ram
+                                    183 ;--------------------------------------------------------
+                                    184 	.area	SSEG
+      000031                        185 __start__stack:
+      000031                        186 	.ds	1
+                                    187 
+                                    188 ;--------------------------------------------------------
+                                    189 ; absolute external ram data
+                                    190 ;--------------------------------------------------------
+                                    191 	.area DABS (ABS)
+                                    192 ;--------------------------------------------------------
+                                    193 ; interrupt vector
+                                    194 ;--------------------------------------------------------
+                                    195 	.area HOME
+      000022                        196 __interrupt_vect:
+                                    197 	.area	HEADER (ABS)
+      000020                        198 	.org	 0x0020
+      000020 12 19                  199 	goto	_interrupt
+                                    200 ;--------------------------------------------------------
+                                    201 ; global & static initialisations
+                                    202 ;--------------------------------------------------------
+                                    203 	.area HOME
+                                    204 	.area GSINIT
+                                    205 	.area GSFINAL
+                                    206 	.area GSINIT
+                                    207 	.area	PREG (ABS)
+      000000                        208 	.org 0x00
+      000000                        209 p::
+      000000                        210 	.ds 2
+                                    211 	.area	HEADER (ABS)
+      000000                        212 	.org 0x0000
+      000000 00 00                  213 	nop
+      000002 81 09                  214 	clear	p+1
+      000004 28 17                  215 	mov	a, #s_OSEG
+      000006 0A 10                  216 	add	a, #l_OSEG + 1
+      000008 FE 14                  217 	and	a, #0xfe
+      00000A 82 00                  218 	mov.io	sp, a
+      00000C 25 1C                  219 	call	__sdcc_external_startup
+      00000E 12 18                  220 	goto	s_GSINIT
+                                    221 	.area GSINIT
+      000024                        222 __sdcc_init_data:
+      000024 02 17                  223 	mov	a, #s_DATA
+      000026 C0 05                  224 	mov	p, a
+      000028 19 18                  225 	goto	00002$
+      00002A                        226 00001$:
+      00002A 00 17                  227 	mov	a, #0x00
+      00002C E0 00                  228 	idxm	p, a
+      00002E 00 09                  229 	inc	p
+      000030 02 17                  230 	mov	a, #s_DATA
+      000032                        231 00002$:
+      000032 26 10                  232 	add	a, #l_DATA
+      000034 80 0B                  233 	ceqsn	a, p
+      000036 15 18                  234 	goto	00001$
+                                    235 ;	pms150_ws2812.c: 82: uint8_t button_flag = 0;
+      000038 83 09                  236 	clear	_button_flag+0
+                                    237 ;	pms150_ws2812.c: 83: uint8_t button_press = 0;
+      00003A 84 09                  238 	clear	_button_press+0
+                                    239 ;	pms150_ws2812.c: 85: uint8_t light_mode = 0;
+      00003C 85 09                  240 	clear	_light_mode+0
+                                    241 ;	pms150_ws2812.c: 87: uint8_t mode_counter = 0;
+      00003E 87 09                  242 	clear	_mode_counter+0
+                                    243 ;	pms150_ws2812.c: 102: uint8_t hue = 0;
+      000040 88 09                  244 	clear	_hue+0
+                                    245 ;	pms150_ws2812.c: 103: uint8_t hue1 = 0;
+      000042 89 09                  246 	clear	_hue1+0
+                                    247 ;	pms150_ws2812.c: 104: uint8_t huef = 0;
+      000044 8A 09                  248 	clear	_huef+0
+                                    249 ;	pms150_ws2812.c: 106: uint8_t lm = 0;
+      000046 8B 09                  250 	clear	_lm+0
+                                    251 	.area GSFINAL
+      000048 11 18                  252 	goto	__sdcc_program_startup
+                                    253 ;--------------------------------------------------------
+                                    254 ; Home
+                                    255 ;--------------------------------------------------------
+                                    256 	.area HOME
+                                    257 	.area HOME
+      000022                        258 __sdcc_program_startup:
+      000022 B0 19                  259 	goto	_main
+                                    260 ;	return from main will return to caller
+                                    261 ;--------------------------------------------------------
+                                    262 ; code
+                                    263 ;--------------------------------------------------------
+                                    264 	.area CODE
+                                    265 ;	pms150_ws2812.c: 14: uint8_t _sdcc_external_startup(void)
+                                    266 ;	-----------------------------------------
+                                    267 ;	 function _sdcc_external_startup
+                                    268 ;	-----------------------------------------
+      00004A                        269 __sdcc_external_startup:
+                                    270 ;	pms150_ws2812.c: 16: EASY_PDK_INIT_SYSCLOCK_8MHZ();		  // use 8MHz sysclock
+      00004A 34 17                  271 	mov	a, #0x34
+      00004C 83 00                  272 	mov.io	__clkmd, a
+                                    273 ;	pms150_ws2812.c: 17: EASY_PDK_CALIBRATE_IHRC(F_CPU, 4000); // tune SYSCLK to 8MHz @ 4.000V
+      00004E 52 14                  274 	and	a, #'R'                        
+      000050 43 14                  275 	and	a, #'C'                        
+      000052 01 14                  276 	and	a, #((1))          
+      000054 00 14                  277 	and	a, #((8000000))     
+      000056 12 14                  278 	and	a, #((8000000)>>8)  
+      000058 7A 14                  279 	and	a, #((8000000)>>16) 
+      00005A 00 14                  280 	and	a, #((8000000)>>24) 
+      00005C A0 14                  281 	and	a, #((4000))     
+      00005E 0F 14                  282 	and	a, #((4000)>>8)  
+      000060 0B 14                  283 	and	a, #((0x0B))           
+                                    284 ;	pms150_ws2812.c: 18: return 0;							  // perform normal initialization
+                                    285 ;	pms150_ws2812.c: 19: }
+      000062 00 01                  286 	ret	#0x00
+                                    287 ;	pms150_ws2812.c: 120: void BUTTON_init(void)
+                                    288 ;	-----------------------------------------
+                                    289 ;	 function BUTTON_init
+                                    290 ;	-----------------------------------------
+      000064                        291 _BUTTON_init:
+                                    292 ;	pms150_ws2812.c: 122: setb(Px, BUTTON_PIN); // pullup on IR pin
+      000064 D0 0F                  293 	set1.io	__pa, #6
+                                    294 ;	pms150_ws2812.c: 123: clrb(PxC, BUTTON_PIN);
+      000066 D1 0E                  295 	set0.io	__pac, #6
+                                    296 ;	pms150_ws2812.c: 124: setb(PxPH, BUTTON_PIN);	  // set BUTTON pin as input
+      000068 D2 0F                  297 	set1.io	__paph, #6
+                                    298 ;	pms150_ws2812.c: 125: setb(PxDIER, BUTTON_PIN); // set BUTTON pin as input
+      00006A CD 0F                  299 	set1.io	__padier, #6
+                                    300 ;	pms150_ws2812.c: 126: }
+      00006C 3A 00                  301 	ret
+                                    302 ;	pms150_ws2812.c: 139: void LED__SendZero_()
+                                    303 ;	-----------------------------------------
+                                    304 ;	 function LED__SendZero_
+                                    305 ;	-----------------------------------------
+      00006E                        306 _LED__SendZero_:
+                                    307 ;	pms150_ws2812.c: 141: setb(Px, NEO_PIN);
+      00006E 70 0F                  308 	set1.io	__pa, #3
+                                    309 ;	pms150_ws2812.c: 142: __nop();
+      000070 00 00                  310 	nop
+                                    311 ;	pms150_ws2812.c: 143: __nop();
+      000072 00 00                  312 	nop
+                                    313 ;	pms150_ws2812.c: 144: clrb(Px, NEO_PIN);
+      000074 70 0E                  314 	set0.io	__pa, #3
+                                    315 ;	pms150_ws2812.c: 145: __nop();
+      000076 00 00                  316 	nop
+                                    317 ;	pms150_ws2812.c: 146: __nop();
+      000078 00 00                  318 	nop
+                                    319 ;	pms150_ws2812.c: 147: __nop();
+      00007A 00 00                  320 	nop
+                                    321 ;	pms150_ws2812.c: 148: __nop();
+      00007C 00 00                  322 	nop
+                                    323 ;	pms150_ws2812.c: 149: }
+      00007E 3A 00                  324 	ret
+                                    325 ;	pms150_ws2812.c: 150: void LED__SendOne_()
+                                    326 ;	-----------------------------------------
+                                    327 ;	 function LED__SendOne_
+                                    328 ;	-----------------------------------------
+      000080                        329 _LED__SendOne_:
+                                    330 ;	pms150_ws2812.c: 152: setb(Px, NEO_PIN);
+      000080 70 0F                  331 	set1.io	__pa, #3
+                                    332 ;	pms150_ws2812.c: 153: __nop();
+      000082 00 00                  333 	nop
+                                    334 ;	pms150_ws2812.c: 154: __nop();
+      000084 00 00                  335 	nop
+                                    336 ;	pms150_ws2812.c: 155: __nop();
+      000086 00 00                  337 	nop
+                                    338 ;	pms150_ws2812.c: 156: __nop();
+      000088 00 00                  339 	nop
+                                    340 ;	pms150_ws2812.c: 157: __nop();
+      00008A 00 00                  341 	nop
+                                    342 ;	pms150_ws2812.c: 158: __nop();
+      00008C 00 00                  343 	nop
+                                    344 ;	pms150_ws2812.c: 159: __nop();
+      00008E 00 00                  345 	nop
+                                    346 ;	pms150_ws2812.c: 160: clrb(Px, NEO_PIN);
+      000090 70 0E                  347 	set0.io	__pa, #3
+                                    348 ;	pms150_ws2812.c: 161: }
+      000092 3A 00                  349 	ret
+                                    350 ;	pms150_ws2812.c: 162: void NEO_sendByte(uint8_t dat)
+                                    351 ;	-----------------------------------------
+                                    352 ;	 function NEO_sendByte
+                                    353 ;	-----------------------------------------
+      000094                        354 _NEO_sendByte:
+                                    355 ;	pms150_ws2812.c: 164: if (dat & 0x80)
+      000094 D0 07                  356 	mov	a, _NEO_sendByte_PARM_1+0
+      000096 D1 05                  357 	mov	_NEO_sendByte_sloc0_1_0+0, a
+      000098 80 14                  358 	and	a, #0x80
+      00009A 00 12                  359 	ceqsn	a, #0x00
+      00009C 50 18                  360 	goto	00159$
+      00009E 52 18                  361 	goto	00102$
+      0000A0                        362 00159$:
+                                    363 ;	pms150_ws2812.c: 165: LED__SendOne_();
+      0000A0 40 1C                  364 	call	_LED__SendOne_
+      0000A2 53 18                  365 	goto	00103$
+      0000A4                        366 00102$:
+                                    367 ;	pms150_ws2812.c: 167: LED__SendZero_();
+      0000A4 37 1C                  368 	call	_LED__SendZero_
+      0000A6                        369 00103$:
+                                    370 ;	pms150_ws2812.c: 168: if (dat & 0x40)
+      0000A6 D1 07                  371 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000A8 40 14                  372 	and	a, #0x40
+      0000AA 00 12                  373 	ceqsn	a, #0x00
+      0000AC 58 18                  374 	goto	00160$
+      0000AE 5A 18                  375 	goto	00105$
+      0000B0                        376 00160$:
+                                    377 ;	pms150_ws2812.c: 169: LED__SendOne_();
+      0000B0 40 1C                  378 	call	_LED__SendOne_
+      0000B2 5B 18                  379 	goto	00106$
+      0000B4                        380 00105$:
+                                    381 ;	pms150_ws2812.c: 171: LED__SendZero_();
+      0000B4 37 1C                  382 	call	_LED__SendZero_
+      0000B6                        383 00106$:
+                                    384 ;	pms150_ws2812.c: 172: if (dat & 0x20)
+      0000B6 D1 07                  385 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000B8 20 14                  386 	and	a, #0x20
+      0000BA 00 12                  387 	ceqsn	a, #0x00
+      0000BC 60 18                  388 	goto	00161$
+      0000BE 62 18                  389 	goto	00108$
+      0000C0                        390 00161$:
+                                    391 ;	pms150_ws2812.c: 173: LED__SendOne_();
+      0000C0 40 1C                  392 	call	_LED__SendOne_
+      0000C2 63 18                  393 	goto	00109$
+      0000C4                        394 00108$:
+                                    395 ;	pms150_ws2812.c: 175: LED__SendZero_();
+      0000C4 37 1C                  396 	call	_LED__SendZero_
+      0000C6                        397 00109$:
+                                    398 ;	pms150_ws2812.c: 176: if (dat & 0x10)
+      0000C6 D1 07                  399 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000C8 10 14                  400 	and	a, #0x10
+      0000CA 00 12                  401 	ceqsn	a, #0x00
+      0000CC 68 18                  402 	goto	00162$
+      0000CE 6A 18                  403 	goto	00111$
+      0000D0                        404 00162$:
+                                    405 ;	pms150_ws2812.c: 177: LED__SendOne_();
+      0000D0 40 1C                  406 	call	_LED__SendOne_
+      0000D2 6B 18                  407 	goto	00112$
+      0000D4                        408 00111$:
+                                    409 ;	pms150_ws2812.c: 179: LED__SendZero_();
+      0000D4 37 1C                  410 	call	_LED__SendZero_
+      0000D6                        411 00112$:
+                                    412 ;	pms150_ws2812.c: 180: if (dat & 0x08)
+      0000D6 D1 07                  413 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000D8 08 14                  414 	and	a, #0x08
+      0000DA 00 12                  415 	ceqsn	a, #0x00
+      0000DC 70 18                  416 	goto	00163$
+      0000DE 72 18                  417 	goto	00114$
+      0000E0                        418 00163$:
+                                    419 ;	pms150_ws2812.c: 181: LED__SendOne_();
+      0000E0 40 1C                  420 	call	_LED__SendOne_
+      0000E2 73 18                  421 	goto	00115$
+      0000E4                        422 00114$:
+                                    423 ;	pms150_ws2812.c: 183: LED__SendZero_();
+      0000E4 37 1C                  424 	call	_LED__SendZero_
+      0000E6                        425 00115$:
+                                    426 ;	pms150_ws2812.c: 184: if (dat & 0x04)
+      0000E6 D1 07                  427 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000E8 04 14                  428 	and	a, #0x04
+      0000EA 00 12                  429 	ceqsn	a, #0x00
+      0000EC 78 18                  430 	goto	00164$
+      0000EE 7A 18                  431 	goto	00117$
+      0000F0                        432 00164$:
+                                    433 ;	pms150_ws2812.c: 185: LED__SendOne_();
+      0000F0 40 1C                  434 	call	_LED__SendOne_
+      0000F2 7B 18                  435 	goto	00118$
+      0000F4                        436 00117$:
+                                    437 ;	pms150_ws2812.c: 187: LED__SendZero_();
+      0000F4 37 1C                  438 	call	_LED__SendZero_
+      0000F6                        439 00118$:
+                                    440 ;	pms150_ws2812.c: 188: if (dat & 0x02)
+      0000F6 D1 07                  441 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      0000F8 02 14                  442 	and	a, #0x02
+      0000FA 00 12                  443 	ceqsn	a, #0x00
+      0000FC 80 18                  444 	goto	00165$
+      0000FE 82 18                  445 	goto	00120$
+      000100                        446 00165$:
+                                    447 ;	pms150_ws2812.c: 189: LED__SendOne_();
+      000100 40 1C                  448 	call	_LED__SendOne_
+      000102 83 18                  449 	goto	00121$
+      000104                        450 00120$:
+                                    451 ;	pms150_ws2812.c: 191: LED__SendZero_();
+      000104 37 1C                  452 	call	_LED__SendZero_
+      000106                        453 00121$:
+                                    454 ;	pms150_ws2812.c: 192: if (dat & 0x01)
+      000106 D1 07                  455 	mov	a, _NEO_sendByte_sloc0_1_0+0
+      000108 01 14                  456 	and	a, #0x01
+      00010A 00 12                  457 	ceqsn	a, #0x00
+      00010C 88 18                  458 	goto	00166$
+      00010E 8A 18                  459 	goto	00123$
+      000110                        460 00166$:
+                                    461 ;	pms150_ws2812.c: 193: LED__SendOne_();
+      000110 40 18                  462 	goto	_LED__SendOne_
+      000112 8B 18                  463 	goto	00125$
+      000114                        464 00123$:
+                                    465 ;	pms150_ws2812.c: 195: LED__SendZero_();
+      000114 37 18                  466 	goto	_LED__SendZero_
+      000116                        467 00125$:
+                                    468 ;	pms150_ws2812.c: 196: }
+      000116 3A 00                  469 	ret
+                                    470 ;	pms150_ws2812.c: 199: void NEO_writeColor(uint8_t r, uint8_t g, uint8_t b)
+                                    471 ;	-----------------------------------------
+                                    472 ;	 function NEO_writeColor
+                                    473 ;	-----------------------------------------
+      000118                        474 _NEO_writeColor:
+                                    475 ;	pms150_ws2812.c: 202: NEO_sendByte(g);
+      000118 D3 07                  476 	mov	a, _NEO_writeColor_PARM_2+0
+      00011A D0 05                  477 	mov	_NEO_sendByte_PARM_1+0, a
+      00011C 4A 1C                  478 	call	_NEO_sendByte
+                                    479 ;	pms150_ws2812.c: 203: NEO_sendByte(r);
+      00011E D2 07                  480 	mov	a, _NEO_writeColor_PARM_1+0
+      000120 D0 05                  481 	mov	_NEO_sendByte_PARM_1+0, a
+      000122 4A 1C                  482 	call	_NEO_sendByte
+                                    483 ;	pms150_ws2812.c: 204: NEO_sendByte(b);
+      000124 D4 07                  484 	mov	a, _NEO_writeColor_PARM_3+0
+      000126 D0 05                  485 	mov	_NEO_sendByte_PARM_1+0, a
+      000128 4A 18                  486 	goto	_NEO_sendByte
+                                    487 ;	pms150_ws2812.c: 217: }
+      00012A 3A 00                  488 	ret
+                                    489 ;	pms150_ws2812.c: 254: void IR_init(void)
+                                    490 ;	-----------------------------------------
+                                    491 ;	 function IR_init
+                                    492 ;	-----------------------------------------
+      00012C                        493 _IR_init:
+                                    494 ;	pms150_ws2812.c: 256: setb(Px, IR_PIN);	  // pullup on IR pin
+      00012C 90 0F                  495 	set1.io	__pa, #4
+                                    496 ;	pms150_ws2812.c: 257: clrb(PxC, IR_PIN);	  // set IR pin as input
+      00012E 91 0E                  497 	set0.io	__pac, #4
+                                    498 ;	pms150_ws2812.c: 258: setb(PxPH, IR_PIN);	  // set IR pin pull up
+      000130 92 0F                  499 	set1.io	__paph, #4
+                                    500 ;	pms150_ws2812.c: 259: setb(PxDIER, IR_PIN); // set IR pin as input
+      000132 8D 0F                  501 	set1.io	__padier, #4
+                                    502 ;	pms150_ws2812.c: 267: T16M = T16_CLK_SYSCLK | T16_CLK_DIV4 | T16_INTSRC_8BIT; // timer clock=8MHz/4/2^9 => 0.256ms
+      000134 28 17                  503 	mov	a, #0x28
+      000136 86 00                  504 	mov.io	__t16m, a
+                                    505 ;	pms150_ws2812.c: 268: T16C = 0;
+      000138 80 09                  506 	clear	p
+      00013A C0 00                  507 	stt16	p
+                                    508 ;	pms150_ws2812.c: 269: INTEN |= INTEN_T16; // enable TM16 interrupt
+      00013C 44 0F                  509 	set1.io	__inten, #2
+                                    510 ;	pms150_ws2812.c: 270: INTRQ = 0;
+      00013E 00 17                  511 	mov	a, #0x00
+      000140 85 00                  512 	mov.io	__intrq, a
+                                    513 ;	pms150_ws2812.c: 271: }
+      000142 3A 00                  514 	ret
+                                    515 ;	pms150_ws2812.c: 275: uint8_t IR_read(void)
+                                    516 ;	-----------------------------------------
+                                    517 ;	 function IR_read
+                                    518 ;	-----------------------------------------
+      000144                        519 _IR_read:
+                                    520 ;	pms150_ws2812.c: 277: uint32_t data = 0x00000000; // variable for received data
+      000144 A8 09                  521 	clear	_IR_read_sloc1_1_0+0
+      000146 A9 09                  522 	clear	_IR_read_sloc1_1_0+1
+      000148 AA 09                  523 	clear	_IR_read_sloc1_1_0+2
+      00014A AB 09                  524 	clear	_IR_read_sloc1_1_0+3
+                                    525 ;	pms150_ws2812.c: 280: count_ms = 0;
+      00014C 8C 09                  526 	clear	_count_ms+0
+      00014E 8D 09                  527 	clear	_count_ms+1
+                                    528 ;	pms150_ws2812.c: 282: for (uint8_t i = 0; i < 33; i++) // receive 32 bits
+      000150 AC 09                  529 	clear	_IR_read_sloc2_1_0+0
+      000152                        530 00123$:
+      000152 EC 07                  531 	mov	a, _IR_read_sloc2_1_0+0
+      000154 21 11                  532 	sub	a, #0x21
+      000156 20 0D                  533 	t1sn.io	f, c
+      000158 00 19                  534 	goto	00119$
+                                    535 ;	pms150_ws2812.c: 284: data = data << 1;
+      00015A E8 0A                  536 	sl	_IR_read_sloc1_1_0+0
+      00015C 69 0B                  537 	slc	_IR_read_sloc1_1_0+1
+      00015E 6A 0B                  538 	slc	_IR_read_sloc1_1_0+2
+      000160 6B 0B                  539 	slc	_IR_read_sloc1_1_0+3
+                                    540 ;	pms150_ws2812.c: 285: while (inbit(Px, IR_PIN) == 0 && count_ms != 100)
+      000162                        541 00102$:
+      000162 B0 00                  542 	mov.io	a, __pa
+      000164 10 14                  543 	and	a, #0x10
+      000166 1E 00                  544 	swap	a
+      000168 0F 14                  545 	and	a, #0x0f
+      00016A 00 12                  546 	ceqsn	a, #0x00
+      00016C BF 18                  547 	goto	00106$
+      00016E CD 07                  548 	mov	a, _count_ms+1
+      000170 C0 05                  549 	mov	p, a
+      000172 CC 07                  550 	mov	a, _count_ms+0
+      000174 64 12                  551 	ceqsn	a, #0x64
+      000176 B1 18                  552 	goto	00102$
+      000178 C0 07                  553 	mov	a, p
+      00017A 00 12                  554 	ceqsn	a, #0x00
+      00017C B1 18                  555 	goto	00102$
+                                    556 ;	pms150_ws2812.c: 287: while (inbit(Px, IR_PIN) == 1 && count_ms != 100)
+      00017E                        557 00106$:
+      00017E B0 00                  558 	mov.io	a, __pa
+      000180 10 14                  559 	and	a, #0x10
+      000182 1E 00                  560 	swap	a
+      000184 0F 14                  561 	and	a, #0x0f
+      000186 01 12                  562 	ceqsn	a, #0x01
+      000188 CD 18                  563 	goto	00108$
+      00018A CD 07                  564 	mov	a, _count_ms+1
+      00018C C0 05                  565 	mov	p, a
+      00018E CC 07                  566 	mov	a, _count_ms+0
+      000190 64 12                  567 	ceqsn	a, #0x64
+      000192 BF 18                  568 	goto	00106$
+      000194 C0 07                  569 	mov	a, p
+      000196 00 12                  570 	ceqsn	a, #0x00
+      000198 BF 18                  571 	goto	00106$
+      00019A                        572 00108$:
+                                    573 ;	pms150_ws2812.c: 289: count_ms1 = count_ms;
+      00019A CC 07                  574 	mov	a, _count_ms+0
+      00019C CE 05                  575 	mov	_count_ms1+0, a
+      00019E CD 07                  576 	mov	a, _count_ms+1
+      0001A0 CF 05                  577 	mov	_count_ms1+1, a
+                                    578 ;	pms150_ws2812.c: 290: if (count_ms1 == 100)
+      0001A2 CE 07                  579 	mov	a, _count_ms1+0
+      0001A4 ED 05                  580 	mov	_IR_read_sloc3_1_0+0, a
+      0001A6 CF 07                  581 	mov	a, _count_ms1+1
+      0001A8 EE 05                  582 	mov	_IR_read_sloc3_1_0+1, a
+      0001AA ED 07                  583 	mov	a, _IR_read_sloc3_1_0+0
+      0001AC 64 12                  584 	ceqsn	a, #0x64
+      0001AE DC 18                  585 	goto	00110$
+      0001B0 EE 07                  586 	mov	a, _IR_read_sloc3_1_0+1
+      0001B2 00 12                  587 	ceqsn	a, #0x00
+      0001B4 DC 18                  588 	goto	00110$
+                                    589 ;	pms150_ws2812.c: 293: return IR_FAIL;
+      0001B6 F1 01                  590 	ret	#0xf1
+      0001B8                        591 00110$:
+                                    592 ;	pms150_ws2812.c: 295: if (i == 0 && (count_ms1 < 40 || count_ms1 > 65)) // first bit is not a Start bit
+      0001B8 EC 07                  593 	mov	a, _IR_read_sloc2_1_0+0
+      0001BA 00 12                  594 	ceqsn	a, #0x00
+      0001BC EC 18                  595 	goto	00115$
+      0001BE ED 07                  596 	mov	a, _IR_read_sloc3_1_0+0
+      0001C0 28 11                  597 	sub	a, #0x28
+      0001C2 EE 07                  598 	mov	a, _IR_read_sloc3_1_0+1
+      0001C4 11 00                  599 	subc	a
+      0001C6 20 0C                  600 	t0sn.io	f, c
+      0001C8 EB 18                  601 	goto	00114$
+      0001CA 41 17                  602 	mov	a, #0x41
+      0001CC 6D 06                  603 	sub	a, _IR_read_sloc3_1_0+0
+      0001CE 00 17                  604 	mov	a, #0x00
+      0001D0 EE 06                  605 	subc	a, _IR_read_sloc3_1_0+1
+      0001D2 20 0D                  606 	t1sn.io	f, c
+      0001D4 EC 18                  607 	goto	00115$
+      0001D6                        608 00114$:
+                                    609 ;	pms150_ws2812.c: 297: return IR_FAIL;
+      0001D6 F1 01                  610 	ret	#0xf1
+      0001D8                        611 00115$:
+                                    612 ;	pms150_ws2812.c: 299: else if (7 < count_ms1 && count_ms1 < 11)
+      0001D8 07 17                  613 	mov	a, #0x07
+      0001DA 4E 06                  614 	sub	a, _count_ms1+0
+      0001DC 00 17                  615 	mov	a, #0x00
+      0001DE CF 06                  616 	subc	a, _count_ms1+1
+      0001E0 20 0D                  617 	t1sn.io	f, c
+      0001E2 FC 18                  618 	goto	00116$
+      0001E4 CF 07                  619 	mov	a, _count_ms1+1
+      0001E6 C0 05                  620 	mov	p, a
+      0001E8 CE 07                  621 	mov	a, _count_ms1+0
+      0001EA 0B 11                  622 	sub	a, #0x0b
+      0001EC C0 07                  623 	mov	a, p
+      0001EE 11 00                  624 	subc	a
+      0001F0 20 0D                  625 	t1sn.io	f, c
+      0001F2 FC 18                  626 	goto	00116$
+                                    627 ;	pms150_ws2812.c: 301: data |= 0x00000001;
+      0001F4 01 17                  628 	mov	a, #0x01
+      0001F6 68 05                  629 	or	_IR_read_sloc1_1_0+0, a
+      0001F8                        630 00116$:
+                                    631 ;	pms150_ws2812.c: 304: count_ms = 0;
+      0001F8 8C 09                  632 	clear	_count_ms+0
+      0001FA 8D 09                  633 	clear	_count_ms+1
+                                    634 ;	pms150_ws2812.c: 282: for (uint8_t i = 0; i < 33; i++) // receive 32 bits
+      0001FC 2C 09                  635 	inc	_IR_read_sloc2_1_0+0
+      0001FE A9 18                  636 	goto	00123$
+      000200                        637 00119$:
+                                    638 ;	pms150_ws2812.c: 309: uint8_t cmd1 = data >> 8; // get first  command byte
+      000200 E9 07                  639 	mov	a, _IR_read_sloc1_1_0+1
+      000202 EF 05                  640 	mov	_IR_read_sloc4_1_0+0, a
+                                    641 ;	pms150_ws2812.c: 310: uint8_t cmd2 = data;	  // get second command byte
+      000204 E8 07                  642 	mov	a, _IR_read_sloc1_1_0+0
+      000206 F0 05                  643 	mov	_IR_read_sloc5_1_0+0, a
+                                    644 ;	pms150_ws2812.c: 311: if (((uint16_t)cmd1 + (uint16_t)cmd2) < 255)
+      000208 80 09                  645 	clear	p
+      00020A EF 07                  646 	mov	a, _IR_read_sloc4_1_0+0
+      00020C 30 06                  647 	add	a, _IR_read_sloc5_1_0+0
+      00020E 32 00                  648 	push	af
+      000210 00 08                  649 	addc	p
+      000212 33 00                  650 	pop	af
+      000214 FF 11                  651 	sub	a, #0xff
+      000216 C0 07                  652 	mov	a, p
+      000218 11 00                  653 	subc	a
+      00021A 20 0D                  654 	t1sn.io	f, c
+      00021C 10 19                  655 	goto	00121$
+                                    656 ;	pms150_ws2812.c: 312: return IR_FAIL; // if second command byte is not the inverse of the first
+      00021E F1 01                  657 	ret	#0xf1
+      000220                        658 00121$:
+                                    659 ;	pms150_ws2812.c: 318: return cmd1; // return command code
+      000220 EF 07                  660 	mov	a, _IR_read_sloc4_1_0+0
+                                    661 ;	pms150_ws2812.c: 319: }
+      000222 3A 00                  662 	ret
+                                    663 ;	pms150_ws2812.c: 322: void interrupt(void) __interrupt(0)
+                                    664 ;	-----------------------------------------
+                                    665 ;	 function interrupt
+                                    666 ;	-----------------------------------------
+      000224                        667 _interrupt:
+      000224 32 00                  668 	push	af
+      000226 C0 07                  669 	mov	a, p
+      000228 32 00                  670 	push	af
+                                    671 ;	pms150_ws2812.c: 333: if (INTRQ & INTRQ_T16)
+      00022A A5 00                  672 	mov.io	a, __intrq
+      00022C C0 05                  673 	mov	p, a
+      00022E 50 02                  674 	t1sn	p, #2
+      000230 27 19                  675 	goto	00105$
+                                    676 ;	pms150_ws2812.c: 335: INTRQ &= ~INTRQ_T16;
+      000232 45 0E                  677 	set0.io	__intrq, #2
+                                    678 ;	pms150_ws2812.c: 337: count_ms++;
+      000234 0C 09                  679 	inc	_count_ms+0
+      000236 0D 08                  680 	addc	_count_ms+1
+                                    681 ;	pms150_ws2812.c: 338: if (count_ms == 100)
+      000238 CD 07                  682 	mov	a, _count_ms+1
+      00023A C0 05                  683 	mov	p, a
+      00023C CC 07                  684 	mov	a, _count_ms+0
+      00023E 64 12                  685 	ceqsn	a, #0x64
+      000240 27 19                  686 	goto	00105$
+      000242 C0 07                  687 	mov	a, p
+      000244 00 12                  688 	ceqsn	a, #0x00
+      000246 27 19                  689 	goto	00105$
+                                    690 ;	pms150_ws2812.c: 340: count_ms = 100;
+      000248 64 17                  691 	mov	a, #0x64
+      00024A CC 05                  692 	mov	_count_ms+0, a
+      00024C 8D 09                  693 	clear	_count_ms+1
+      00024E                        694 00105$:
+                                    695 ;	pms150_ws2812.c: 343: }
+      00024E 33 00                  696 	pop	af
+      000250 C0 05                  697 	mov	p, a
+      000252 33 00                  698 	pop	af
+      000254 3B 00                  699 	reti
+                                    700 ;	pms150_ws2812.c: 351: void standby(void)
+                                    701 ;	-----------------------------------------
+                                    702 ;	 function standby
+                                    703 ;	-----------------------------------------
+      000256                        704 _standby:
+                                    705 ;	pms150_ws2812.c: 354: changeColor(0, 0, 0);
+      000256 95 09                  706 	clear	_changeColor_PARM_1+0
+      000258 96 09                  707 	clear	_changeColor_PARM_1+1
+      00025A 97 09                  708 	clear	_changeColor_PARM_2+0
+      00025C 98 09                  709 	clear	_changeColor_PARM_2+1
+      00025E 99 09                  710 	clear	_changeColor_PARM_3+0
+      000260 9A 09                  711 	clear	_changeColor_PARM_3+1
+      000262 3C 1D                  712 	call	_changeColor
+                                    713 ;	pms150_ws2812.c: 355: while (1)
+      000264                        714 00106$:
+                                    715 ;	pms150_ws2812.c: 359: if (IR_available() == 0)
+      000264 B0 00                  716 	mov.io	a, __pa
+      000266 10 14                  717 	and	a, #0x10
+      000268 1E 00                  718 	swap	a
+      00026A 0F 14                  719 	and	a, #0x0f
+      00026C 00 12                  720 	ceqsn	a, #0x00
+      00026E 32 19                  721 	goto	00106$
+                                    722 ;	pms150_ws2812.c: 360: if (IR_read() == BIR_OK)
+      000270 A2 1C                  723 	call	_IR_read
+      000272 1C 12                  724 	ceqsn	a, #0x1c
+      000274 32 19                  725 	goto	00106$
+                                    726 ;	pms150_ws2812.c: 361: break; // exit on power button
+                                    727 ;	pms150_ws2812.c: 363: }
+      000276 3A 00                  728 	ret
+                                    729 ;	pms150_ws2812.c: 369: void changeColor(int r, int g, int b)
+                                    730 ;	-----------------------------------------
+                                    731 ;	 function changeColor
+                                    732 ;	-----------------------------------------
+      000278                        733 _changeColor:
+                                    734 ;	pms150_ws2812.c: 371: cli();
+      000278 39 00                  735 	disgint
+                                    736 ;	pms150_ws2812.c: 372: for (uint8_t i = NEO_PIXELS; i; i--)
+      00027A 18 17                  737 	mov	a, #0x18
+      00027C DB 05                  738 	mov	_changeColor_sloc6_1_0+0, a
+      00027E                        739 00103$:
+      00027E DB 07                  740 	mov	a, _changeColor_sloc6_1_0+0
+      000280 00 12                  741 	ceqsn	a, #0x00
+      000282 43 19                  742 	goto	00116$
+      000284 4C 19                  743 	goto	00101$
+      000286                        744 00116$:
+                                    745 ;	pms150_ws2812.c: 373: NEO_writeColor(r, g, b);
+      000286 D5 07                  746 	mov	a, _changeColor_PARM_1+0
+      000288 D2 05                  747 	mov	_NEO_writeColor_PARM_1+0, a
+      00028A D7 07                  748 	mov	a, _changeColor_PARM_2+0
+      00028C D3 05                  749 	mov	_NEO_writeColor_PARM_2+0, a
+      00028E D9 07                  750 	mov	a, _changeColor_PARM_3+0
+      000290 D4 05                  751 	mov	_NEO_writeColor_PARM_3+0, a
+      000292 8C 1C                  752 	call	_NEO_writeColor
+                                    753 ;	pms150_ws2812.c: 372: for (uint8_t i = NEO_PIXELS; i; i--)
+      000294 5B 09                  754 	dec	_changeColor_sloc6_1_0+0
+      000296 3F 19                  755 	goto	00103$
+      000298                        756 00101$:
+                                    757 ;	pms150_ws2812.c: 374: sei();
+      000298 38 00                  758 	engint
+                                    759 ;	pms150_ws2812.c: 375: }
+      00029A 3A 00                  760 	ret
+                                    761 ;	pms150_ws2812.c: 377: void switchColor(void)
+                                    762 ;	-----------------------------------------
+                                    763 ;	 function switchColor
+                                    764 ;	-----------------------------------------
+      00029C                        765 _switchColor:
+                                    766 ;	pms150_ws2812.c: 379: changeColor(rv[hue], gv[hue], bv[hue]);
+      00029C 7A 17                  767 	mov	a, #<(_rv + 0)
+      00029E 08 06                  768 	add	a, _hue+0
+      0002A0 C0 05                  769 	mov	p, a
+      0002A2 82 17                  770 	mov	a, #>(_rv + 0x8000 + 0)
+      0002A4 10 00                  771 	addc	a
+      0002A6 5F 1E                  772 	call	__gptrget
+      0002A8 D5 05                  773 	mov	_changeColor_PARM_1+0, a
+      0002AA 96 09                  774 	clear	_changeColor_PARM_1+1
+      0002AC 7E 17                  775 	mov	a, #<(_gv + 0)
+      0002AE 08 06                  776 	add	a, _hue+0
+      0002B0 C0 05                  777 	mov	p, a
+      0002B2 82 17                  778 	mov	a, #>(_gv + 0x8000 + 0)
+      0002B4 10 00                  779 	addc	a
+      0002B6 5F 1E                  780 	call	__gptrget
+      0002B8 D7 05                  781 	mov	_changeColor_PARM_2+0, a
+      0002BA 98 09                  782 	clear	_changeColor_PARM_2+1
+      0002BC 82 17                  783 	mov	a, #<(_bv + 0)
+      0002BE 08 06                  784 	add	a, _hue+0
+      0002C0 C0 05                  785 	mov	p, a
+      0002C2 82 17                  786 	mov	a, #>(_bv + 0x8000 + 0)
+      0002C4 10 00                  787 	addc	a
+      0002C6 5F 1E                  788 	call	__gptrget
+      0002C8 D9 05                  789 	mov	_changeColor_PARM_3+0, a
+      0002CA 9A 09                  790 	clear	_changeColor_PARM_3+1
+      0002CC 3C 1D                  791 	call	_changeColor
+                                    792 ;	pms150_ws2812.c: 380: hue++;
+      0002CE 08 09                  793 	inc	_hue+0
+                                    794 ;	pms150_ws2812.c: 381: if (hue == 4)
+      0002D0 C8 07                  795 	mov	a, _hue+0
+      0002D2 04 12                  796 	ceqsn	a, #0x04
+      0002D4 6C 19                  797 	goto	00102$
+                                    798 ;	pms150_ws2812.c: 382: hue = 0;
+      0002D6 88 09                  799 	clear	_hue+0
+      0002D8                        800 00102$:
+                                    801 ;	pms150_ws2812.c: 383: my_delay_ms();
+      0002D8 8F 19                  802 	goto	_my_delay_ms
+                                    803 ;	pms150_ws2812.c: 394: }
+      0002DA 3A 00                  804 	ret
+                                    805 ;	pms150_ws2812.c: 396: void fadeColor(void)
+                                    806 ;	-----------------------------------------
+                                    807 ;	 function fadeColor
+                                    808 ;	-----------------------------------------
+      0002DC                        809 _fadeColor:
+                                    810 ;	pms150_ws2812.c: 398: changeColor(0, gfv, bfv[hue1]);
+      0002DC 9F 1E                  811 	call	_gfv+0
+      0002DE D7 05                  812 	mov	_changeColor_PARM_2+0, a
+      0002E0 98 09                  813 	clear	_changeColor_PARM_2+1
+      0002E2 A0 17                  814 	mov	a, #<(_bfv + 0)
+      0002E4 09 06                  815 	add	a, _hue1+0
+      0002E6 C0 05                  816 	mov	p, a
+      0002E8 82 17                  817 	mov	a, #>(_bfv + 0x8000 + 0)
+      0002EA 10 00                  818 	addc	a
+      0002EC 5F 1E                  819 	call	__gptrget
+      0002EE D9 05                  820 	mov	_changeColor_PARM_3+0, a
+      0002F0 9A 09                  821 	clear	_changeColor_PARM_3+1
+      0002F2 95 09                  822 	clear	_changeColor_PARM_1+0
+      0002F4 96 09                  823 	clear	_changeColor_PARM_1+1
+      0002F6 3C 1D                  824 	call	_changeColor
+                                    825 ;	pms150_ws2812.c: 399: if (hue1 == 0)
+      0002F8 C9 07                  826 	mov	a, _hue1+0
+      0002FA 00 12                  827 	ceqsn	a, #0x00
+      0002FC 80 19                  828 	goto	00102$
+                                    829 ;	pms150_ws2812.c: 400: huef = 0;
+      0002FE 8A 09                  830 	clear	_huef+0
+      000300                        831 00102$:
+                                    832 ;	pms150_ws2812.c: 401: if (hue1 == 6)
+      000300 C9 07                  833 	mov	a, _hue1+0
+      000302 06 12                  834 	ceqsn	a, #0x06
+      000304 85 19                  835 	goto	00104$
+                                    836 ;	pms150_ws2812.c: 402: huef = 1;
+      000306 01 17                  837 	mov	a, #0x01
+      000308 CA 05                  838 	mov	_huef+0, a
+      00030A                        839 00104$:
+                                    840 ;	pms150_ws2812.c: 403: if (huef == 1)
+      00030A CA 07                  841 	mov	a, _huef+0
+      00030C 01 12                  842 	ceqsn	a, #0x01
+      00030E 89 19                  843 	goto	00106$
+                                    844 ;	pms150_ws2812.c: 404: hue1--;
+      000310 49 09                  845 	dec	_hue1+0
+      000312                        846 00106$:
+                                    847 ;	pms150_ws2812.c: 405: if (huef == 0)
+      000312 CA 07                  848 	mov	a, _huef+0
+      000314 00 12                  849 	ceqsn	a, #0x00
+      000316 8D 19                  850 	goto	00108$
+                                    851 ;	pms150_ws2812.c: 406: hue1++;
+      000318 09 09                  852 	inc	_hue1+0
+      00031A                        853 00108$:
+                                    854 ;	pms150_ws2812.c: 407: my_delay_ms();
+      00031A 8F 19                  855 	goto	_my_delay_ms
+                                    856 ;	pms150_ws2812.c: 425: }
+      00031C 3A 00                  857 	ret
+                                    858 ;	pms150_ws2812.c: 427: void my_delay_ms(void)
+                                    859 ;	-----------------------------------------
+                                    860 ;	 function my_delay_ms
+                                    861 ;	-----------------------------------------
+      00031E                        862 _my_delay_ms:
+                                    863 ;	pms150_ws2812.c: 429: for (int x = 0; x <= mode_delay[light_mode - 7]; x++)
+      00031E 9C 09                  864 	clear	_my_delay_ms_sloc7_1_0+0
+      000320 9D 09                  865 	clear	_my_delay_ms_sloc7_1_0+1
+      000322                        866 00103$:
+      000322 C5 07                  867 	mov	a, _light_mode+0
+      000324 07 11                  868 	sub	a, #0x07
+      000326 32 00                  869 	push	af
+      000328 1B 00                  870 	sl	a
+      00032A 00 17                  871 	mov	a, #0x00
+      00032C 11 00                  872 	subc	a
+      00032E C0 05                  873 	mov	p, a
+      000330 33 00                  874 	pop	af
+      000332 6B 10                  875 	add	a, #<(_mode_delay + 0)
+      000334 C0 09                  876 	xch	a, p
+      000336 10 00                  877 	addc	a
+      000338 82 10                  878 	add	a, #>(_mode_delay + 0x8000 + 0)
+      00033A 5F 1E                  879 	call	__gptrget
+      00033C 80 09                  880 	clear	p
+      00033E 5C 06                  881 	sub	a, _my_delay_ms_sloc7_1_0+0
+      000340 C0 07                  882 	mov	a, p
+      000342 DD 06                  883 	subc	a, _my_delay_ms_sloc7_1_0+1
+      000344 60 0C                  884 	t0sn.io	f, ov
+      000346 80 16                  885 	xor	a, #0x80
+      000348 1B 00                  886 	sl	a
+      00034A 20 0C                  887 	t0sn.io	f, c
+      00034C AF 19                  888 	goto	00105$
+                                    889 ;	pms150_ws2812.c: 430: _delay_ms(1);
+      00034E E6 17                  890 	mov	a, #0xe6
+      000350 E2 05                  891 	mov	__delay_loop_16_PARM_1+0, a
+      000352 03 17                  892 	mov	a, #0x03
+      000354 E3 05                  893 	mov	__delay_loop_16_PARM_1+1, a
+      000356 4B 1E                  894 	call	__delay_loop_16
+                                    895 ;	pms150_ws2812.c: 429: for (int x = 0; x <= mode_delay[light_mode - 7]; x++)
+      000358 1C 09                  896 	inc	_my_delay_ms_sloc7_1_0+0
+      00035A 1D 08                  897 	addc	_my_delay_ms_sloc7_1_0+1
+      00035C 91 19                  898 	goto	00103$
+      00035E                        899 00105$:
+                                    900 ;	pms150_ws2812.c: 431: }
+      00035E 3A 00                  901 	ret
+                                    902 ;	pms150_ws2812.c: 438: int main(void)
+                                    903 ;	-----------------------------------------
+                                    904 ;	 function main
+                                    905 ;	-----------------------------------------
+      000360                        906 _main:
+                                    907 ;	pms150_ws2812.c: 444: NEO_init();	   // init Neopixels
+      000360 71 0F                  908 	set1.io	__pac, #3
+                                    909 ;	pms150_ws2812.c: 445: IR_init();	   // init IR receiver
+      000362 96 1C                  910 	call	_IR_init
+                                    911 ;	pms150_ws2812.c: 446: BUTTON_init(); // init Button
+      000364 32 1C                  912 	call	_BUTTON_init
+                                    913 ;	pms150_ws2812.c: 447: sei();		   // enable global interrupts
+      000366 38 00                  914 	engint
+                                    915 ;	pms150_ws2812.c: 448: light_mode = 0;
+      000368 85 09                  916 	clear	_light_mode+0
+                                    917 ;	pms150_ws2812.c: 449: lm = 0;
+      00036A 8B 09                  918 	clear	_lm+0
+                                    919 ;	pms150_ws2812.c: 473: while (1)
+      00036C                        920 00143$:
+                                    921 ;	pms150_ws2812.c: 476: button_value = inbit(Px, BUTTON_PIN); // get value of button pin
+      00036C B0 00                  922 	mov.io	a, __pa
+      00036E 40 14                  923 	and	a, #0x40
+      000370 C2 05                  924 	mov	_button_value+0, a
+      000372 06 17                  925 	mov	a, #6
+      000374                        926 00246$:
+      000374 82 0A                  927 	sr	_button_value+0
+      000376 13 00                  928 	dzsn	a
+      000378 BA 19                  929 	goto	00246$
+                                    930 ;	pms150_ws2812.c: 478: if (button_value == 1 && !button_flag)
+      00037A C2 07                  931 	mov	a, _button_value+0
+      00037C 01 12                  932 	ceqsn	a, #0x01
+      00037E C5 19                  933 	goto	00102$
+      000380 C3 07                  934 	mov	a, _button_flag+0
+      000382 00 12                  935 	ceqsn	a, #0x00
+      000384 C5 19                  936 	goto	00102$
+                                    937 ;	pms150_ws2812.c: 480: button_flag = 1;
+      000386 01 17                  938 	mov	a, #0x01
+      000388 C3 05                  939 	mov	_button_flag+0, a
+      00038A                        940 00102$:
+                                    941 ;	pms150_ws2812.c: 482: if (button_value == 0 && button_flag)
+      00038A C2 07                  942 	mov	a, _button_value+0
+      00038C 00 12                  943 	ceqsn	a, #0x00
+      00038E D2 19                  944 	goto	00107$
+      000390 C3 07                  945 	mov	a, _button_flag+0
+      000392 00 12                  946 	ceqsn	a, #0x00
+      000394 CC 19                  947 	goto	00247$
+      000396 D2 19                  948 	goto	00107$
+      000398                        949 00247$:
+                                    950 ;	pms150_ws2812.c: 484: button_flag = 0;
+      000398 83 09                  951 	clear	_button_flag+0
+                                    952 ;	pms150_ws2812.c: 486: light_mode++;
+      00039A 05 09                  953 	inc	_light_mode+0
+                                    954 ;	pms150_ws2812.c: 487: if (light_mode == 11)
+      00039C C5 07                  955 	mov	a, _light_mode+0
+      00039E 0B 12                  956 	ceqsn	a, #0x0b
+      0003A0 D2 19                  957 	goto	00107$
+                                    958 ;	pms150_ws2812.c: 489: light_mode = 0;
+      0003A2 85 09                  959 	clear	_light_mode+0
+      0003A4                        960 00107$:
+                                    961 ;	pms150_ws2812.c: 512: if (light_mode <= 6)
+      0003A4 06 17                  962 	mov	a, #0x06
+      0003A6 45 06                  963 	sub	a, _light_mode+0
+      0003A8 20 0C                  964 	t0sn.io	f, c
+      0003AA EF 19                  965 	goto	00110$
+                                    966 ;	pms150_ws2812.c: 514: changeColor(rsv[light_mode], gsv[light_mode], bsv[light_mode]);
+      0003AC 86 17                  967 	mov	a, #<(_rsv + 0)
+      0003AE 05 06                  968 	add	a, _light_mode+0
+      0003B0 C0 05                  969 	mov	p, a
+      0003B2 82 17                  970 	mov	a, #>(_rsv + 0x8000 + 0)
+      0003B4 10 00                  971 	addc	a
+      0003B6 5F 1E                  972 	call	__gptrget
+      0003B8 D5 05                  973 	mov	_changeColor_PARM_1+0, a
+      0003BA 96 09                  974 	clear	_changeColor_PARM_1+1
+      0003BC 8E 17                  975 	mov	a, #<(_gsv + 0)
+      0003BE 05 06                  976 	add	a, _light_mode+0
+      0003C0 C0 05                  977 	mov	p, a
+      0003C2 82 17                  978 	mov	a, #>(_gsv + 0x8000 + 0)
+      0003C4 10 00                  979 	addc	a
+      0003C6 5F 1E                  980 	call	__gptrget
+      0003C8 D7 05                  981 	mov	_changeColor_PARM_2+0, a
+      0003CA 98 09                  982 	clear	_changeColor_PARM_2+1
+      0003CC 96 17                  983 	mov	a, #<(_bsv + 0)
+      0003CE 05 06                  984 	add	a, _light_mode+0
+      0003D0 C0 05                  985 	mov	p, a
+      0003D2 82 17                  986 	mov	a, #>(_bsv + 0x8000 + 0)
+      0003D4 10 00                  987 	addc	a
+      0003D6 5F 1E                  988 	call	__gptrget
+      0003D8 D9 05                  989 	mov	_changeColor_PARM_3+0, a
+      0003DA 9A 09                  990 	clear	_changeColor_PARM_3+1
+      0003DC 3C 1D                  991 	call	_changeColor
+      0003DE                        992 00110$:
+                                    993 ;	pms150_ws2812.c: 517: if (light_mode == 7 || light_mode == 8)
+      0003DE C5 07                  994 	mov	a, _light_mode+0
+      0003E0 07 12                  995 	ceqsn	a, #0x07
+      0003E2 F3 19                  996 	goto	00249$
+      0003E4 F6 19                  997 	goto	00111$
+      0003E6                        998 00249$:
+      0003E6 C5 07                  999 	mov	a, _light_mode+0
+      0003E8 08 12                 1000 	ceqsn	a, #0x08
+      0003EA F7 19                 1001 	goto	00112$
+      0003EC                       1002 00111$:
+                                   1003 ;	pms150_ws2812.c: 519: switchColor();
+      0003EC 4E 1D                 1004 	call	_switchColor
+      0003EE                       1005 00112$:
+                                   1006 ;	pms150_ws2812.c: 522: if (light_mode == 9)
+      0003EE C5 07                 1007 	mov	a, _light_mode+0
+      0003F0 09 12                 1008 	ceqsn	a, #0x09
+      0003F2 FB 19                 1009 	goto	00173$
+                                   1010 ;	pms150_ws2812.c: 524: fadeColor();
+      0003F4 6E 1D                 1011 	call	_fadeColor
+                                   1012 ;	pms150_ws2812.c: 528: for (uint8_t i = 80; i; i--)
+      0003F6                       1013 00173$:
+      0003F6 50 17                 1014 	mov	a, #0x50
+      0003F8 E0 05                 1015 	mov	_main_sloc8_1_0+0, a
+      0003FA                       1016 00146$:
+      0003FA E0 07                 1017 	mov	a, _main_sloc8_1_0+0
+      0003FC 00 12                 1018 	ceqsn	a, #0x00
+      0003FE 01 1A                 1019 	goto	00250$
+      000400 B6 19                 1020 	goto	00143$
+      000402                       1021 00250$:
+                                   1022 ;	pms150_ws2812.c: 530: if (IR_available() == 0 && button_value == 1)
+      000402 B0 00                 1023 	mov.io	a, __pa
+      000404 10 14                 1024 	and	a, #0x10
+      000406 1E 00                 1025 	swap	a
+      000408 0F 14                 1026 	and	a, #0x0f
+      00040A 00 12                 1027 	ceqsn	a, #0x00
+      00040C 40 1A                 1028 	goto	00139$
+      00040E C2 07                 1029 	mov	a, _button_value+0
+      000410 01 12                 1030 	ceqsn	a, #0x01
+      000412 40 1A                 1031 	goto	00139$
+                                   1032 ;	pms150_ws2812.c: 532: command = IR_read();
+      000414 A2 1C                 1033 	call	_IR_read
+                                   1034 ;	pms150_ws2812.c: 542: if (command == BIR_1)
+      000416 C6 05                 1035 	mov	_command+0, a
+      000418 45 12                 1036 	ceqsn	a, #0x45
+      00041A 0F 1A                 1037 	goto	00117$
+                                   1038 ;	pms150_ws2812.c: 544: light_mode = 0;
+      00041C 85 09                 1039 	clear	_light_mode+0
+      00041E                       1040 00117$:
+                                   1041 ;	pms150_ws2812.c: 546: if (command == BIR_2)
+      00041E C6 07                 1042 	mov	a, _command+0
+      000420 46 12                 1043 	ceqsn	a, #0x46
+      000422 14 1A                 1044 	goto	00119$
+                                   1045 ;	pms150_ws2812.c: 548: light_mode = 1;
+      000424 01 17                 1046 	mov	a, #0x01
+      000426 C5 05                 1047 	mov	_light_mode+0, a
+      000428                       1048 00119$:
+                                   1049 ;	pms150_ws2812.c: 550: if (command == BIR_3)
+      000428 C6 07                 1050 	mov	a, _command+0
+      00042A 47 12                 1051 	ceqsn	a, #0x47
+      00042C 19 1A                 1052 	goto	00121$
+                                   1053 ;	pms150_ws2812.c: 552: light_mode = 2;
+      00042E 02 17                 1054 	mov	a, #0x02
+      000430 C5 05                 1055 	mov	_light_mode+0, a
+      000432                       1056 00121$:
+                                   1057 ;	pms150_ws2812.c: 554: if (command == BIR_4)
+      000432 C6 07                 1058 	mov	a, _command+0
+      000434 44 12                 1059 	ceqsn	a, #0x44
+      000436 1E 1A                 1060 	goto	00123$
+                                   1061 ;	pms150_ws2812.c: 556: light_mode = 3;
+      000438 03 17                 1062 	mov	a, #0x03
+      00043A C5 05                 1063 	mov	_light_mode+0, a
+      00043C                       1064 00123$:
+                                   1065 ;	pms150_ws2812.c: 558: if (command == BIR_5)
+      00043C C6 07                 1066 	mov	a, _command+0
+      00043E 40 12                 1067 	ceqsn	a, #0x40
+      000440 23 1A                 1068 	goto	00125$
+                                   1069 ;	pms150_ws2812.c: 560: light_mode = 4;
+      000442 04 17                 1070 	mov	a, #0x04
+      000444 C5 05                 1071 	mov	_light_mode+0, a
+      000446                       1072 00125$:
+                                   1073 ;	pms150_ws2812.c: 562: if (command == BIR_6)
+      000446 C6 07                 1074 	mov	a, _command+0
+      000448 43 12                 1075 	ceqsn	a, #0x43
+      00044A 28 1A                 1076 	goto	00127$
+                                   1077 ;	pms150_ws2812.c: 564: light_mode = 5;
+      00044C 05 17                 1078 	mov	a, #0x05
+      00044E C5 05                 1079 	mov	_light_mode+0, a
+      000450                       1080 00127$:
+                                   1081 ;	pms150_ws2812.c: 566: if (command == BIR_7)
+      000450 C6 07                 1082 	mov	a, _command+0
+      000452 07 12                 1083 	ceqsn	a, #0x07
+      000454 2D 1A                 1084 	goto	00129$
+                                   1085 ;	pms150_ws2812.c: 568: light_mode = 6;
+      000456 06 17                 1086 	mov	a, #0x06
+      000458 C5 05                 1087 	mov	_light_mode+0, a
+      00045A                       1088 00129$:
+                                   1089 ;	pms150_ws2812.c: 571: if (command == BIR_IZQ)
+      00045A C6 07                 1090 	mov	a, _command+0
+      00045C 08 12                 1091 	ceqsn	a, #0x08
+      00045E 32 1A                 1092 	goto	00131$
+                                   1093 ;	pms150_ws2812.c: 573: light_mode = 7;
+      000460 07 17                 1094 	mov	a, #0x07
+      000462 C5 05                 1095 	mov	_light_mode+0, a
+      000464                       1096 00131$:
+                                   1097 ;	pms150_ws2812.c: 575: if (command == BIR_DER)
+      000464 C6 07                 1098 	mov	a, _command+0
+      000466 5A 12                 1099 	ceqsn	a, #0x5a
+      000468 37 1A                 1100 	goto	00133$
+                                   1101 ;	pms150_ws2812.c: 577: light_mode = 8;
+      00046A 08 17                 1102 	mov	a, #0x08
+      00046C C5 05                 1103 	mov	_light_mode+0, a
+      00046E                       1104 00133$:
+                                   1105 ;	pms150_ws2812.c: 579: if (command == BIR_ARR)
+      00046E C6 07                 1106 	mov	a, _command+0
+      000470 18 12                 1107 	ceqsn	a, #0x18
+      000472 3C 1A                 1108 	goto	00135$
+                                   1109 ;	pms150_ws2812.c: 581: light_mode = 9;
+      000474 09 17                 1110 	mov	a, #0x09
+      000476 C5 05                 1111 	mov	_light_mode+0, a
+      000478                       1112 00135$:
+                                   1113 ;	pms150_ws2812.c: 584: if (command == BIR_OK)
+      000478 C6 07                 1114 	mov	a, _command+0
+      00047A 1C 12                 1115 	ceqsn	a, #0x1c
+      00047C 40 1A                 1116 	goto	00139$
+                                   1117 ;	pms150_ws2812.c: 586: standby();
+      00047E 2B 1D                 1118 	call	_standby
+      000480                       1119 00139$:
+                                   1120 ;	pms150_ws2812.c: 608: _delay_ms(1);
+      000480 E6 17                 1121 	mov	a, #0xe6
+      000482 E2 05                 1122 	mov	__delay_loop_16_PARM_1+0, a
+      000484 03 17                 1123 	mov	a, #0x03
+      000486 E3 05                 1124 	mov	__delay_loop_16_PARM_1+1, a
+      000488 4B 1E                 1125 	call	__delay_loop_16
+                                   1126 ;	pms150_ws2812.c: 528: for (uint8_t i = 80; i; i--)
+      00048A 60 09                 1127 	dec	_main_sloc8_1_0+0
+      00048C FD 19                 1128 	goto	00146$
+                                   1129 ;	pms150_ws2812.c: 611: }
+      00048E 3A 00                 1130 	ret
+                                   1131 	.area CODE
+                                   1132 	.area CONST
+      0004D6                       1133 _mode_delay:
+      0004D6 DC 01                 1134 	ret #0xdc	; 220
+      0004D8 96 01                 1135 	ret #0x96	; 150
+      0004DA 96 01                 1136 	ret #0x96	; 150
+      0004DC 64 01                 1137 	ret #0x64	; 100	'd'
+      0004DE                       1138 _mode:
+      0004DE 45 01                 1139 	ret #0x45	; 69	'E'
+      0004E0 46 01                 1140 	ret #0x46	; 70	'F'
+      0004E2 47 01                 1141 	ret #0x47	; 71	'G'
+      0004E4 44 01                 1142 	ret #0x44	; 68	'D'
+      0004E6 40 01                 1143 	ret #0x40	; 64
+      0004E8 43 01                 1144 	ret #0x43	; 67	'C'
+      0004EA 07 01                 1145 	ret #0x07	; 7
+      0004EC 08 01                 1146 	ret #0x08	; 8
+      0004EE 5A 01                 1147 	ret #0x5a	; 90	'Z'
+      0004F0 18 01                 1148 	ret #0x18	; 24
+      0004F2 52 01                 1149 	ret #0x52	; 82	'R'
+      0004F4                       1150 _rv:
+      0004F4 00 01                 1151 	ret #0x00	; 0
+      0004F6 FD 01                 1152 	ret #0xfd	; 253
+      0004F8 D8 01                 1153 	ret #0xd8	; 216
+      0004FA EF 01                 1154 	ret #0xef	; 239
+      0004FC                       1155 _gv:
+      0004FC E4 01                 1156 	ret #0xe4	; 228
+      0004FE 54 01                 1157 	ret #0x54	; 84	'T'
+      000500 00 01                 1158 	ret #0x00	; 0
+      000502 00 01                 1159 	ret #0x00	; 0
+      000504                       1160 _bv:
+      000504 FF 01                 1161 	ret #0xff	; 255
+      000506 02 01                 1162 	ret #0x02	; 2
+      000508 EB 01                 1163 	ret #0xeb	; 235
+      00050A 0B 01                 1164 	ret #0x0b	; 11
+      00050C                       1165 _rsv:
+      00050C 00 01                 1166 	ret #0x00	; 0
+      00050E FF 01                 1167 	ret #0xff	; 255
+      000510 37 01                 1168 	ret #0x37	; 55	'7'
+      000512 FD 01                 1169 	ret #0xfd	; 253
+      000514 FF 01                 1170 	ret #0xff	; 255
+      000516 FF 01                 1171 	ret #0xff	; 255
+      000518 EF 01                 1172 	ret #0xef	; 239
+      00051A 00 01                 1173 	ret #0x00
+      00051C                       1174 _gsv:
+      00051C 75 01                 1175 	ret #0x75	; 117	'u'
+      00051E 00 01                 1176 	ret #0x00	; 0
+      000520 EB 01                 1177 	ret #0xeb	; 235
+      000522 54 01                 1178 	ret #0x54	; 84	'T'
+      000524 FF 01                 1179 	ret #0xff	; 255
+      000526 F2 01                 1180 	ret #0xf2	; 242
+      000528 00 01                 1181 	ret #0x00	; 0
+      00052A 00 01                 1182 	ret #0x00
+      00052C                       1183 _bsv:
+      00052C D8 01                 1184 	ret #0xd8	; 216
+      00052E 64 01                 1185 	ret #0x64	; 100	'd'
+      000530 00 01                 1186 	ret #0x00	; 0
+      000532 02 01                 1187 	ret #0x02	; 2
+      000534 FF 01                 1188 	ret #0xff	; 255
+      000536 00 01                 1189 	ret #0x00	; 0
+      000538 0B 01                 1190 	ret #0x0b	; 11
+      00053A 00 01                 1191 	ret #0x00
+      00053C                       1192 _rfv:
+      00053C 00 01                 1193 	ret #0x00	; 0
+      00053E                       1194 _gfv:
+      00053E FF 01                 1195 	ret #0xff	; 255
+      000540                       1196 _bfv:
+      000540 FF 01                 1197 	ret #0xff	; 255
+      000542 C8 01                 1198 	ret #0xc8	; 200
+      000544 9B 01                 1199 	ret #0x9b	; 155
+      000546 64 01                 1200 	ret #0x64	; 100	'd'
+      000548 37 01                 1201 	ret #0x37	; 55	'7'
+      00054A 00 01                 1202 	ret #0x00	; 0
+                                   1203 	.area CABS (ABS)

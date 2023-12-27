@@ -1,0 +1,334 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module gpio
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _main
+                                     17 	.globl __sdcc_external_startup
+                                     18 	.globl __delay_loop_32
+                                     19 	.globl __delay_loop_16
+                                     20 	.globl __delay_loop_8
+                                     21 	.globl __t16c
+                                     22 	.globl __rop
+                                     23 	.globl __bgtr
+                                     24 	.globl __ilrcr
+                                     25 	.globl __pwmg2dtl
+                                     26 	.globl __pwmg2dth
+                                     27 	.globl __pwmg2c
+                                     28 	.globl __pwmg1dtl
+                                     29 	.globl __pwmg1dth
+                                     30 	.globl __pwmg1c
+                                     31 	.globl __pwmgcubl
+                                     32 	.globl __pwmgcubh
+                                     33 	.globl __pwmg0dtl
+                                     34 	.globl __pwmg0dth
+                                     35 	.globl __pwmgclk
+                                     36 	.globl __pwmg0c
+                                     37 	.globl __tm3b
+                                     38 	.globl __tm3s
+                                     39 	.globl __tm3ct
+                                     40 	.globl __tm3c
+                                     41 	.globl __tm2b
+                                     42 	.globl __tm2s
+                                     43 	.globl __tm2ct
+                                     44 	.globl __tm2c
+                                     45 	.globl __gpcs
+                                     46 	.globl __gpcc
+                                     47 	.globl __misclvr
+                                     48 	.globl __misc2
+                                     49 	.globl __misc
+                                     50 	.globl __adcrgc
+                                     51 	.globl __adcr
+                                     52 	.globl __adcm
+                                     53 	.globl __adcc
+                                     54 	.globl __pcpl
+                                     55 	.globl __pbpl
+                                     56 	.globl __pcph
+                                     57 	.globl __pcc
+                                     58 	.globl __pc
+                                     59 	.globl __pbph
+                                     60 	.globl __pbc
+                                     61 	.globl __pb
+                                     62 	.globl __paph
+                                     63 	.globl __pac
+                                     64 	.globl __pa
+                                     65 	.globl __pcdier
+                                     66 	.globl __pbdier
+                                     67 	.globl __padier
+                                     68 	.globl __integs
+                                     69 	.globl __ihrcr
+                                     70 	.globl __eoscr
+                                     71 	.globl __t16m
+                                     72 	.globl __intrq
+                                     73 	.globl __inten
+                                     74 	.globl __clkmd
+                                     75 	.globl __sp
+                                     76 	.globl __flag
+                                     77 	.globl __delay_loop_32_PARM_1
+                                     78 	.globl __delay_loop_16_PARM_1
+                                     79 	.globl __delay_loop_8_PARM_1
+                                     80 ;--------------------------------------------------------
+                                     81 ; special function registers
+                                     82 ;--------------------------------------------------------
+                                     83 	.area RSEG (ABS)
+      000000                         84 	.org 0x0000
+                           000000    85 __flag	=	0x0000
+                           000002    86 __sp	=	0x0002
+                           000003    87 __clkmd	=	0x0003
+                           000004    88 __inten	=	0x0004
+                           000005    89 __intrq	=	0x0005
+                           000006    90 __t16m	=	0x0006
+                           00000A    91 __eoscr	=	0x000a
+                           00000B    92 __ihrcr	=	0x000b
+                           00000C    93 __integs	=	0x000c
+                           00000D    94 __padier	=	0x000d
+                           00000E    95 __pbdier	=	0x000e
+                           00000F    96 __pcdier	=	0x000f
+                           000010    97 __pa	=	0x0010
+                           000011    98 __pac	=	0x0011
+                           000012    99 __paph	=	0x0012
+                           000013   100 __pb	=	0x0013
+                           000014   101 __pbc	=	0x0014
+                           000015   102 __pbph	=	0x0015
+                           000016   103 __pc	=	0x0016
+                           000017   104 __pcc	=	0x0017
+                           000018   105 __pcph	=	0x0018
+                           000019   106 __pbpl	=	0x0019
+                           00001A   107 __pcpl	=	0x001a
+                           000020   108 __adcc	=	0x0020
+                           000021   109 __adcm	=	0x0021
+                           000022   110 __adcr	=	0x0022
+                           000024   111 __adcrgc	=	0x0024
+                           000026   112 __misc	=	0x0026
+                           000027   113 __misc2	=	0x0027
+                           000028   114 __misclvr	=	0x0028
+                           00002B   115 __gpcc	=	0x002b
+                           00002C   116 __gpcs	=	0x002c
+                           000030   117 __tm2c	=	0x0030
+                           000031   118 __tm2ct	=	0x0031
+                           000032   119 __tm2s	=	0x0032
+                           000033   120 __tm2b	=	0x0033
+                           000034   121 __tm3c	=	0x0034
+                           000035   122 __tm3ct	=	0x0035
+                           000036   123 __tm3s	=	0x0036
+                           000037   124 __tm3b	=	0x0037
+                           000040   125 __pwmg0c	=	0x0040
+                           000041   126 __pwmgclk	=	0x0041
+                           000042   127 __pwmg0dth	=	0x0042
+                           000043   128 __pwmg0dtl	=	0x0043
+                           000044   129 __pwmgcubh	=	0x0044
+                           000045   130 __pwmgcubl	=	0x0045
+                           000046   131 __pwmg1c	=	0x0046
+                           000048   132 __pwmg1dth	=	0x0048
+                           000049   133 __pwmg1dtl	=	0x0049
+                           00004C   134 __pwmg2c	=	0x004c
+                           00004E   135 __pwmg2dth	=	0x004e
+                           00004F   136 __pwmg2dtl	=	0x004f
+                           000062   137 __ilrcr	=	0x0062
+                           000063   138 __bgtr	=	0x0063
+                           000067   139 __rop	=	0x0067
+      000000                        140 __t16c::
+      000000                        141 	.ds 2
+                                    142 ;--------------------------------------------------------
+                                    143 ; ram data
+                                    144 ;--------------------------------------------------------
+                                    145 	.area DATA
+      000000                        146 __delay_loop_8_PARM_1:
+      000000                        147 	.ds 1
+      000001                        148 __delay_loop_16_PARM_1:
+      000001                        149 	.ds 2
+      000003                        150 __delay_loop_32_PARM_1:
+      000003                        151 	.ds 4
+                                    152 ;--------------------------------------------------------
+                                    153 ; overlayable items in ram
+                                    154 ;--------------------------------------------------------
+                                    155 ;--------------------------------------------------------
+                                    156 ; Stack segment in internal ram
+                                    157 ;--------------------------------------------------------
+                                    158 	.area	SSEG
+      000000                        159 __start__stack:
+      000000                        160 	.ds	1
+                                    161 
+                                    162 ;--------------------------------------------------------
+                                    163 ; absolute external ram data
+                                    164 ;--------------------------------------------------------
+                                    165 	.area DABS (ABS)
+                                    166 ;--------------------------------------------------------
+                                    167 ; interrupt vector
+                                    168 ;--------------------------------------------------------
+                                    169 	.area HOME
+      000000                        170 __interrupt_vect:
+                                    171 	.area	HEADER (ABS)
+      000020                        172 	.org	 0x0020
+      000020 7B 00                  173 	reti
+                                    174 ;--------------------------------------------------------
+                                    175 ; global & static initialisations
+                                    176 ;--------------------------------------------------------
+                                    177 	.area HOME
+                                    178 	.area GSINIT
+                                    179 	.area GSFINAL
+                                    180 	.area GSINIT
+                                    181 	.area	PREG (ABS)
+      000000                        182 	.org 0x00
+      000000                        183 p::
+      000000                        184 	.ds 2
+                                    185 	.area	HEADER (ABS)
+      000000                        186 	.org 0x0000
+      000000 00 00                  187 	nop
+      000002r01r26                  188 	clear	p+1
+      000004r00r57                  189 	mov	a, #s_OSEG
+      000006r01r50                  190 	add	a, #l_OSEG + 1
+      000008 FE 54                  191 	and	a, #0xfe
+      00000A 02 01                  192 	mov.io	sp, a
+      00000Cr2Er70                  193 	call	__sdcc_external_startup
+      00000Er00r60                  194 	goto	s_GSINIT
+                                    195 	.area GSINIT
+      000000                        196 __sdcc_init_data:
+      000000r00r57                  197 	mov	a, #s_DATA
+      000002r00r17                  198 	mov	p, a
+      000004r0Er60                  199 	goto	00002$
+      000006                        200 00001$:
+      000006 00 57                  201 	mov	a, #0x00
+      000008r00r07                  202 	idxm	p, a
+      00000Ar00r24                  203 	inc	p
+      00000Cr00r57                  204 	mov	a, #s_DATA
+      00000E                        205 00002$:
+      00000Er00r50                  206 	add	a, #l_DATA
+      000010r00r2E                  207 	ceqsn	a, p
+      000012r06r60                  208 	goto	00001$
+                                    209 	.area GSFINAL
+      000000r00r60                  210 	goto	__sdcc_program_startup
+                                    211 ;--------------------------------------------------------
+                                    212 ; Home
+                                    213 ;--------------------------------------------------------
+                                    214 	.area HOME
+                                    215 	.area HOME
+      000000                        216 __sdcc_program_startup:
+      000000r48r60                  217 	goto	_main
+                                    218 ;	return from main will return to caller
+                                    219 ;--------------------------------------------------------
+                                    220 ; code
+                                    221 ;--------------------------------------------------------
+                                    222 	.area CODE
+                                    223 ;	delay.h: 34: void _delay_loop_8(uint8_t loop_ctr) {
+                                    224 ;	-----------------------------------------
+                                    225 ;	 function _delay_loop_8
+                                    226 ;	-----------------------------------------
+      000000                        227 __delay_loop_8:
+                                    228 ;	delay.h: 44: __endasm;
+      000000                        229 	00001$:
+                                    230 ; 4 cycles per loop
+      000000r00r23                  231 	dzsn	__delay_loop_8_PARM_1 ; 1 cycle + 1 cycle for final skip
+      000002r00r60                  232 	goto	00001$ ; 2 cycles
+      000004                        233 00101$:
+                                    234 ;	delay.h: 45: }
+      000004 7A 00                  235 	ret
+                                    236 ;	delay.h: 48: void _delay_loop_16(uint16_t loop_ctr) {
+                                    237 ;	-----------------------------------------
+                                    238 ;	 function _delay_loop_16
+                                    239 ;	-----------------------------------------
+      000006                        240 __delay_loop_16:
+                                    241 ;	delay.h: 65: __endasm;
+      000006                        242 	00001$:
+                                    243 ; 8 cycles per loop
+      000006 00 00                  244 	nop	; 1 cycle
+      000008r01r25                  245 	dec	__delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Ar02r21                  246 	subc	__delay_loop_16_PARM_1+1 ; 1 cycle
+      00000Cr01r1F                  247 	mov	a, __delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Er02r1D                  248 	or	a, __delay_loop_16_PARM_1+1 ; 1 cycle
+      000010 00 34                  249 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      000012r06r60                  250 	goto	00001$ ; 2 cycles
+      000014                        251 00101$:
+                                    252 ;	delay.h: 66: }
+      000014 7A 00                  253 	ret
+                                    254 ;	delay.h: 69: void _delay_loop_32(uint32_t loop_ctr) {
+                                    255 ;	-----------------------------------------
+                                    256 ;	 function _delay_loop_32
+                                    257 ;	-----------------------------------------
+      000016                        258 __delay_loop_32:
+                                    259 ;	delay.h: 94: __endasm;
+      000016                        260 	00001$:
+                                    261 ; 12 cycles per loop
+      000016 00 00                  262 	nop	; 1 cycle
+      000018r03r25                  263 	dec	__delay_loop_32_PARM_1+0 ; 1 cycle
+      00001Ar04r21                  264 	subc	__delay_loop_32_PARM_1+1 ; 1 cycle
+      00001Cr05r21                  265 	subc	__delay_loop_32_PARM_1+2 ; 1 cycle
+      00001Er06r21                  266 	subc	__delay_loop_32_PARM_1+3 ; 1 cycle
+      000020r03r1F                  267 	mov	a, __delay_loop_32_PARM_1+0 ; 1 cycle
+      000022r04r1D                  268 	or	a, __delay_loop_32_PARM_1+1 ; 1 cycle
+      000024r05r1D                  269 	or	a, __delay_loop_32_PARM_1+2 ; 1 cycle
+      000026r06r1D                  270 	or	a, __delay_loop_32_PARM_1+3 ; 1 cycle
+      000028 00 34                  271 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      00002Ar16r60                  272 	goto	00001$ ; 2 cycles
+      00002C                        273 00101$:
+                                    274 ;	delay.h: 95: }
+      00002C 7A 00                  275 	ret
+                                    276 ;	gpio.c: 10: unsigned char _sdcc_external_startup(void)
+                                    277 ;	-----------------------------------------
+                                    278 ;	 function _sdcc_external_startup
+                                    279 ;	-----------------------------------------
+      00002E                        280 __sdcc_external_startup:
+                                    281 ;	gpio.c: 12: EASY_PDK_INIT_SYSCLOCK_8MHZ();        //use 8MHz sysclock
+      00002E 34 57                  282 	mov	a, #0x34
+      000030 03 01                  283 	mov.io	__clkmd, a
+                                    284 ;	gpio.c: 13: EASY_PDK_CALIBRATE_IHRC(F_CPU, 4000); //tune SYSCLK to 8MHz @ 4.000V
+      000032 52 54                  285 	and	a, #'R'                        
+      000034 43 54                  286 	and	a, #'C'                        
+      000036 01 54                  287 	and	a, #((1))          
+      000038 00 54                  288 	and	a, #((8000000))     
+      00003A 12 54                  289 	and	a, #((8000000)>>8)  
+      00003C 7A 54                  290 	and	a, #((8000000)>>16) 
+      00003E 00 54                  291 	and	a, #((8000000)>>24) 
+      000040 A0 54                  292 	and	a, #((4000))     
+      000042 0F 54                  293 	and	a, #((4000)>>8)  
+      000044 0B 54                  294 	and	a, #((0x0B))           
+                                    295 ;	gpio.c: 14: return 0;                             //perform normal initialization
+                                    296 ;	gpio.c: 15: }
+      000046 00 02                  297 	ret	#0x00
+                                    298 ;	gpio.c: 17: void main(void)
+                                    299 ;	-----------------------------------------
+                                    300 ;	 function main
+                                    301 ;	-----------------------------------------
+      000048                        302 _main:
+                                    303 ;	gpio.c: 20: setb(PBC, 4);
+      000048 14 3E                  304 	set1.io	__pbc, #4
+                                    305 ;	gpio.c: 21: while (1)
+      00004A                        306 00102$:
+                                    307 ;	gpio.c: 23: setb(PB, 4);
+      00004A 13 3E                  308 	set1.io	__pb, #4
+                                    309 ;	gpio.c: 24: _delay_ms(1000);
+      00004C 29 57                  310 	mov	a, #0x29
+      00004Er03r17                  311 	mov	__delay_loop_32_PARM_1+0, a
+      000050 2C 57                  312 	mov	a, #0x2c
+      000052r04r17                  313 	mov	__delay_loop_32_PARM_1+1, a
+      000054 0A 57                  314 	mov	a, #0x0a
+      000056r05r17                  315 	mov	__delay_loop_32_PARM_1+2, a
+      000058r06r26                  316 	clear	__delay_loop_32_PARM_1+3
+      00005Ar16r70                  317 	call	__delay_loop_32
+                                    318 ;	gpio.c: 25: clrb(PB, 4);
+      00005C 13 3A                  319 	set0.io	__pb, #4
+                                    320 ;	gpio.c: 26: _delay_ms(1000);
+      00005E 29 57                  321 	mov	a, #0x29
+      000060r03r17                  322 	mov	__delay_loop_32_PARM_1+0, a
+      000062 2C 57                  323 	mov	a, #0x2c
+      000064r04r17                  324 	mov	__delay_loop_32_PARM_1+1, a
+      000066 0A 57                  325 	mov	a, #0x0a
+      000068r05r17                  326 	mov	__delay_loop_32_PARM_1+2, a
+      00006Ar06r26                  327 	clear	__delay_loop_32_PARM_1+3
+      00006Cr16r70                  328 	call	__delay_loop_32
+      00006Er4Ar60                  329 	goto	00102$
+                                    330 ;	gpio.c: 28: }
+      000070 7A 00                  331 	ret
+                                    332 	.area CODE
+                                    333 	.area CONST
+                                    334 	.area CABS (ABS)

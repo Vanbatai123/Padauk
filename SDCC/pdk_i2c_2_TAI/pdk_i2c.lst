@@ -1,0 +1,663 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.0.0 #11528 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_i2c
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl __delay_loop_8
+                                     17 	.globl __t16c
+                                     18 	.globl __rop
+                                     19 	.globl __bgtr
+                                     20 	.globl __ilrcr
+                                     21 	.globl __pwmg2dtl
+                                     22 	.globl __pwmg2dth
+                                     23 	.globl __pwmg2c
+                                     24 	.globl __pwmg1dtl
+                                     25 	.globl __pwmg1dth
+                                     26 	.globl __pwmg1c
+                                     27 	.globl __pwmgcubl
+                                     28 	.globl __pwmgcubh
+                                     29 	.globl __pwmg0dtl
+                                     30 	.globl __pwmg0dth
+                                     31 	.globl __pwmgclk
+                                     32 	.globl __pwmg0c
+                                     33 	.globl __tm3b
+                                     34 	.globl __tm3s
+                                     35 	.globl __tm3ct
+                                     36 	.globl __tm3c
+                                     37 	.globl __tm2b
+                                     38 	.globl __tm2s
+                                     39 	.globl __tm2ct
+                                     40 	.globl __tm2c
+                                     41 	.globl __gpcs
+                                     42 	.globl __gpcc
+                                     43 	.globl __misclvr
+                                     44 	.globl __misc2
+                                     45 	.globl __misc
+                                     46 	.globl __adcrgc
+                                     47 	.globl __adcr
+                                     48 	.globl __adcm
+                                     49 	.globl __adcc
+                                     50 	.globl __pcpl
+                                     51 	.globl __pbpl
+                                     52 	.globl __pcph
+                                     53 	.globl __pcc
+                                     54 	.globl __pc
+                                     55 	.globl __pbph
+                                     56 	.globl __pbc
+                                     57 	.globl __pb
+                                     58 	.globl __paph
+                                     59 	.globl __pac
+                                     60 	.globl __pa
+                                     61 	.globl __pcdier
+                                     62 	.globl __pbdier
+                                     63 	.globl __padier
+                                     64 	.globl __integs
+                                     65 	.globl __ihrcr
+                                     66 	.globl __eoscr
+                                     67 	.globl __t16m
+                                     68 	.globl __intrq
+                                     69 	.globl __inten
+                                     70 	.globl __clkmd
+                                     71 	.globl __sp
+                                     72 	.globl __flag
+                                     73 	.globl _I2C_requestFrom_PARM_2
+                                     74 	.globl _I2C_requestFrom_PARM_1
+                                     75 	.globl _I2C_writeBuffer_PARM_2
+                                     76 	.globl _I2C_writeBuffer_PARM_1
+                                     77 	.globl _I2C_write2_PARM_1
+                                     78 	.globl _I2C_beginTransmission_PARM_1
+                                     79 	.globl _I2C_read_t_PARM_1
+                                     80 	.globl _I2C_write_t_PARM_1
+                                     81 	.globl _txBuffer
+                                     82 	.globl _txBufferLength
+                                     83 	.globl _txBufferIndex
+                                     84 	.globl _rxBuffer
+                                     85 	.globl _rxBufferLength
+                                     86 	.globl _rxBufferIndex
+                                     87 	.globl _I2C_Ack
+                                     88 	.globl _I2C_NoAck
+                                     89 	.globl _I2C_start
+                                     90 	.globl _I2C_stop
+                                     91 	.globl _I2C_write_t
+                                     92 	.globl _I2C_read_t
+                                     93 	.globl _I2C_beginTransmission
+                                     94 	.globl _I2C_write2
+                                     95 	.globl _I2C_writeBuffer
+                                     96 	.globl _I2C_endTransmission
+                                     97 	.globl _I2C_requestFrom
+                                     98 	.globl _I2C_read
+                                     99 ;--------------------------------------------------------
+                                    100 ; special function registers
+                                    101 ;--------------------------------------------------------
+                                    102 	.area RSEG (ABS)
+      000000                        103 	.org 0x0000
+                           000000   104 __flag	=	0x0000
+                           000002   105 __sp	=	0x0002
+                           000003   106 __clkmd	=	0x0003
+                           000004   107 __inten	=	0x0004
+                           000005   108 __intrq	=	0x0005
+                           000006   109 __t16m	=	0x0006
+                           00000A   110 __eoscr	=	0x000a
+                           00000B   111 __ihrcr	=	0x000b
+                           00000C   112 __integs	=	0x000c
+                           00000D   113 __padier	=	0x000d
+                           00000E   114 __pbdier	=	0x000e
+                           00000F   115 __pcdier	=	0x000f
+                           000010   116 __pa	=	0x0010
+                           000011   117 __pac	=	0x0011
+                           000012   118 __paph	=	0x0012
+                           000013   119 __pb	=	0x0013
+                           000014   120 __pbc	=	0x0014
+                           000015   121 __pbph	=	0x0015
+                           000016   122 __pc	=	0x0016
+                           000017   123 __pcc	=	0x0017
+                           000018   124 __pcph	=	0x0018
+                           000019   125 __pbpl	=	0x0019
+                           00001A   126 __pcpl	=	0x001a
+                           000020   127 __adcc	=	0x0020
+                           000021   128 __adcm	=	0x0021
+                           000022   129 __adcr	=	0x0022
+                           000024   130 __adcrgc	=	0x0024
+                           000026   131 __misc	=	0x0026
+                           000027   132 __misc2	=	0x0027
+                           000028   133 __misclvr	=	0x0028
+                           00002B   134 __gpcc	=	0x002b
+                           00002C   135 __gpcs	=	0x002c
+                           000030   136 __tm2c	=	0x0030
+                           000031   137 __tm2ct	=	0x0031
+                           000032   138 __tm2s	=	0x0032
+                           000033   139 __tm2b	=	0x0033
+                           000034   140 __tm3c	=	0x0034
+                           000035   141 __tm3ct	=	0x0035
+                           000036   142 __tm3s	=	0x0036
+                           000037   143 __tm3b	=	0x0037
+                           000040   144 __pwmg0c	=	0x0040
+                           000041   145 __pwmgclk	=	0x0041
+                           000042   146 __pwmg0dth	=	0x0042
+                           000043   147 __pwmg0dtl	=	0x0043
+                           000044   148 __pwmgcubh	=	0x0044
+                           000045   149 __pwmgcubl	=	0x0045
+                           000046   150 __pwmg1c	=	0x0046
+                           000048   151 __pwmg1dth	=	0x0048
+                           000049   152 __pwmg1dtl	=	0x0049
+                           00004C   153 __pwmg2c	=	0x004c
+                           00004E   154 __pwmg2dth	=	0x004e
+                           00004F   155 __pwmg2dtl	=	0x004f
+                           000062   156 __ilrcr	=	0x0062
+                           000063   157 __bgtr	=	0x0063
+                           000067   158 __rop	=	0x0067
+      000000                        159 __t16c::
+      000000                        160 	.ds 2
+                                    161 ;--------------------------------------------------------
+                                    162 ; ram data
+                                    163 ;--------------------------------------------------------
+                                    164 	.area DATA
+      000000                        165 _rxBufferIndex::
+      000000                        166 	.ds 1
+      000001                        167 _rxBufferLength::
+      000001                        168 	.ds 1
+      000002                        169 _rxBuffer::
+      000002                        170 	.ds 16
+      000012                        171 _txBufferIndex::
+      000012                        172 	.ds 1
+      000013                        173 _txBufferLength::
+      000013                        174 	.ds 1
+      000014                        175 _txBuffer::
+      000014                        176 	.ds 16
+      000024                        177 _I2C_write_t_PARM_1:
+      000024                        178 	.ds 1
+      000025                        179 _I2C_write_t_sloc0_1_0:
+      000025                        180 	.ds 1
+      000026                        181 _I2C_read_t_PARM_1:
+      000026                        182 	.ds 1
+      000027                        183 _I2C_read_t_sloc1_1_0:
+      000027                        184 	.ds 1
+      000028                        185 _I2C_read_t_sloc2_1_0:
+      000028                        186 	.ds 1
+      000029                        187 _I2C_beginTransmission_PARM_1:
+      000029                        188 	.ds 1
+      00002A                        189 _I2C_write2_PARM_1:
+      00002A                        190 	.ds 1
+      00002B                        191 _I2C_writeBuffer_PARM_1:
+      00002B                        192 	.ds 2
+      00002D                        193 _I2C_writeBuffer_PARM_2:
+      00002D                        194 	.ds 1
+      00002E                        195 _I2C_writeBuffer_sloc3_1_0:
+      00002E                        196 	.ds 1
+      00002F                        197 _I2C_endTransmission_sloc4_1_0:
+      00002F                        198 	.ds 1
+      000030                        199 _I2C_requestFrom_PARM_1:
+      000030                        200 	.ds 1
+      000031                        201 _I2C_requestFrom_PARM_2:
+      000031                        202 	.ds 1
+      000032                        203 _I2C_requestFrom_sloc5_1_0:
+      000032                        204 	.ds 1
+      000033                        205 _I2C_requestFrom_sloc6_1_0:
+      000033                        206 	.ds 2
+      000035                        207 _I2C_requestFrom_sloc7_1_0:
+      000035                        208 	.ds 1
+                                    209 ;--------------------------------------------------------
+                                    210 ; overlayable items in ram 
+                                    211 ;--------------------------------------------------------
+                                    212 ;--------------------------------------------------------
+                                    213 ; absolute external ram data
+                                    214 ;--------------------------------------------------------
+                                    215 	.area DABS (ABS)
+                                    216 ;--------------------------------------------------------
+                                    217 ; global & static initialisations
+                                    218 ;--------------------------------------------------------
+                                    219 	.area HOME
+                                    220 	.area GSINIT
+                                    221 	.area GSFINAL
+                                    222 	.area GSINIT
+                                    223 ;--------------------------------------------------------
+                                    224 ; Home
+                                    225 ;--------------------------------------------------------
+                                    226 	.area HOME
+                                    227 	.area HOME
+                                    228 ;--------------------------------------------------------
+                                    229 ; code
+                                    230 ;--------------------------------------------------------
+                                    231 	.area CODE
+                                    232 ;	pdk_i2c.c: 19: void I2C_Ack()
+                                    233 ;	-----------------------------------------
+                                    234 ;	 function I2C_Ack
+                                    235 ;	-----------------------------------------
+      000000                        236 _I2C_Ack:
+                                    237 ;	pdk_i2c.c: 21: _delay_us(4);
+      000000 08 57                  238 	mov	a, #0x08
+      000002r00r17                  239 	mov	__delay_loop_8_PARM_1+0, a
+      000004r00r70                  240 	call	__delay_loop_8
+                                    241 ;	pdk_i2c.c: 22: SDA0;
+      000006 13 3B                  242 	set0	__pb, #6
+                                    243 ;	pdk_i2c.c: 23: _delay_us(4);
+      000008 08 57                  244 	mov	a, #0x08
+      00000Ar00r17                  245 	mov	__delay_loop_8_PARM_1+0, a
+      00000Cr00r70                  246 	call	__delay_loop_8
+                                    247 ;	pdk_i2c.c: 24: SCL1;
+      00000E 93 3F                  248 	set1	__pb, #7
+                                    249 ;	pdk_i2c.c: 25: _delay_us(4);
+      000010 08 57                  250 	mov	a, #0x08
+      000012r00r17                  251 	mov	__delay_loop_8_PARM_1+0, a
+      000014r00r70                  252 	call	__delay_loop_8
+                                    253 ;	pdk_i2c.c: 26: SCL0;
+      000016 93 3B                  254 	set0	__pb, #7
+                                    255 ;	pdk_i2c.c: 27: _delay_us(4);
+      000018 08 57                  256 	mov	a, #0x08
+      00001Ar00r17                  257 	mov	__delay_loop_8_PARM_1+0, a
+      00001Cr00r60                  258 	goto	__delay_loop_8
+                                    259 ;	pdk_i2c.c: 28: }
+      00001E 7A 00                  260 	ret
+                                    261 ;	pdk_i2c.c: 30: void I2C_NoAck()
+                                    262 ;	-----------------------------------------
+                                    263 ;	 function I2C_NoAck
+                                    264 ;	-----------------------------------------
+      000020                        265 _I2C_NoAck:
+                                    266 ;	pdk_i2c.c: 32: _delay_us(4);
+      000020 08 57                  267 	mov	a, #0x08
+      000022r00r17                  268 	mov	__delay_loop_8_PARM_1+0, a
+      000024r00r70                  269 	call	__delay_loop_8
+                                    270 ;	pdk_i2c.c: 33: SDA1;
+      000026 13 3F                  271 	set1	__pb, #6
+                                    272 ;	pdk_i2c.c: 34: _delay_us(4);
+      000028 08 57                  273 	mov	a, #0x08
+      00002Ar00r17                  274 	mov	__delay_loop_8_PARM_1+0, a
+      00002Cr00r70                  275 	call	__delay_loop_8
+                                    276 ;	pdk_i2c.c: 35: SCL1;
+      00002E 93 3F                  277 	set1	__pb, #7
+                                    278 ;	pdk_i2c.c: 36: _delay_us(4);
+      000030 08 57                  279 	mov	a, #0x08
+      000032r00r17                  280 	mov	__delay_loop_8_PARM_1+0, a
+      000034r00r70                  281 	call	__delay_loop_8
+                                    282 ;	pdk_i2c.c: 37: SCL0;
+      000036 93 3B                  283 	set0	__pb, #7
+                                    284 ;	pdk_i2c.c: 38: _delay_us(4);
+      000038 08 57                  285 	mov	a, #0x08
+      00003Ar00r17                  286 	mov	__delay_loop_8_PARM_1+0, a
+      00003Cr00r60                  287 	goto	__delay_loop_8
+                                    288 ;	pdk_i2c.c: 39: }
+      00003E 7A 00                  289 	ret
+                                    290 ;	pdk_i2c.c: 41: void I2C_start()
+                                    291 ;	-----------------------------------------
+                                    292 ;	 function I2C_start
+                                    293 ;	-----------------------------------------
+      000040                        294 _I2C_start:
+                                    295 ;	pdk_i2c.c: 43: SCL1;
+      000040 93 3F                  296 	set1	__pb, #7
+                                    297 ;	pdk_i2c.c: 44: SDA1;
+      000042 13 3F                  298 	set1	__pb, #6
+                                    299 ;	pdk_i2c.c: 45: _delay_us(4);
+      000044 08 57                  300 	mov	a, #0x08
+      000046r00r17                  301 	mov	__delay_loop_8_PARM_1+0, a
+      000048r00r70                  302 	call	__delay_loop_8
+                                    303 ;	pdk_i2c.c: 46: SDA0;
+      00004A 13 3B                  304 	set0	__pb, #6
+                                    305 ;	pdk_i2c.c: 47: _delay_us(4);
+      00004C 08 57                  306 	mov	a, #0x08
+      00004Er00r17                  307 	mov	__delay_loop_8_PARM_1+0, a
+      000050r00r70                  308 	call	__delay_loop_8
+                                    309 ;	pdk_i2c.c: 48: SCL0;
+      000052 93 3B                  310 	set0	__pb, #7
+                                    311 ;	pdk_i2c.c: 49: _delay_us(4);
+      000054 08 57                  312 	mov	a, #0x08
+      000056r00r17                  313 	mov	__delay_loop_8_PARM_1+0, a
+      000058r00r60                  314 	goto	__delay_loop_8
+                                    315 ;	pdk_i2c.c: 50: }
+      00005A 7A 00                  316 	ret
+                                    317 ;	pdk_i2c.c: 51: void I2C_stop()
+                                    318 ;	-----------------------------------------
+                                    319 ;	 function I2C_stop
+                                    320 ;	-----------------------------------------
+      00005C                        321 _I2C_stop:
+                                    322 ;	pdk_i2c.c: 53: SCL0;
+      00005C 93 3B                  323 	set0	__pb, #7
+                                    324 ;	pdk_i2c.c: 54: SDA0;
+      00005E 13 3B                  325 	set0	__pb, #6
+                                    326 ;	pdk_i2c.c: 55: _delay_us(4);
+      000060 08 57                  327 	mov	a, #0x08
+      000062r00r17                  328 	mov	__delay_loop_8_PARM_1+0, a
+      000064r00r70                  329 	call	__delay_loop_8
+                                    330 ;	pdk_i2c.c: 56: SCL1;
+      000066 93 3F                  331 	set1	__pb, #7
+                                    332 ;	pdk_i2c.c: 57: _delay_us(4);
+      000068 08 57                  333 	mov	a, #0x08
+      00006Ar00r17                  334 	mov	__delay_loop_8_PARM_1+0, a
+      00006Cr00r70                  335 	call	__delay_loop_8
+                                    336 ;	pdk_i2c.c: 58: SDA1;
+      00006E 13 3F                  337 	set1	__pb, #6
+                                    338 ;	pdk_i2c.c: 59: _delay_us(4);
+      000070 08 57                  339 	mov	a, #0x08
+      000072r00r17                  340 	mov	__delay_loop_8_PARM_1+0, a
+      000074r00r60                  341 	goto	__delay_loop_8
+                                    342 ;	pdk_i2c.c: 60: }
+      000076 7A 00                  343 	ret
+                                    344 ;	pdk_i2c.c: 61: uint8_t I2C_write_t(uint8_t dat)
+                                    345 ;	-----------------------------------------
+                                    346 ;	 function I2C_write_t
+                                    347 ;	-----------------------------------------
+      000078                        348 _I2C_write_t:
+                                    349 ;	pdk_i2c.c: 66: for (i = 0; i < 8; i++)
+      000078r25r26                  350 	clear	_I2C_write_t_sloc0_1_0+0
+      00007A                        351 00105$:
+                                    352 ;	pdk_i2c.c: 69: if (dat & 0x80)
+      00007Ar24r1F                  353 	mov	a, _I2C_write_t_PARM_1+0
+      00007Cr00r17                  354 	mov	p, a
+      00007Er80r47                  355 	t1sn	p, #7
+      000080r86r60                  356 	goto	00102$
+                                    357 ;	pdk_i2c.c: 70: SDA1;
+      000082 13 3F                  358 	set1	__pb, #6
+      000084r88r60                  359 	goto	00103$
+      000086                        360 00102$:
+                                    361 ;	pdk_i2c.c: 72: SDA0;
+      000086 13 3B                  362 	set0	__pb, #6
+      000088                        363 00103$:
+                                    364 ;	pdk_i2c.c: 74: _delay_us(4);
+      000088 08 57                  365 	mov	a, #0x08
+      00008Ar00r17                  366 	mov	__delay_loop_8_PARM_1+0, a
+      00008Cr00r70                  367 	call	__delay_loop_8
+                                    368 ;	pdk_i2c.c: 75: SCL1;
+      00008E 93 3F                  369 	set1	__pb, #7
+                                    370 ;	pdk_i2c.c: 76: _delay_us(4);
+      000090 08 57                  371 	mov	a, #0x08
+      000092r00r17                  372 	mov	__delay_loop_8_PARM_1+0, a
+      000094r00r70                  373 	call	__delay_loop_8
+                                    374 ;	pdk_i2c.c: 77: SCL0;
+      000096 93 3B                  375 	set0	__pb, #7
+                                    376 ;	pdk_i2c.c: 78: dat <<= 1;
+      000098r24r2B                  377 	sl	_I2C_write_t_PARM_1+0
+                                    378 ;	pdk_i2c.c: 66: for (i = 0; i < 8; i++)
+      00009Ar25r24                  379 	inc	_I2C_write_t_sloc0_1_0+0
+      00009Cr25r1F                  380 	mov	a, _I2C_write_t_sloc0_1_0+0
+      00009E 08 51                  381 	sub	a, #0x08
+      0000A0 80 30                  382 	t0sn	f, c
+      0000A2r7Ar60                  383 	goto	00105$
+                                    384 ;	pdk_i2c.c: 80: SDA0;
+      0000A4 13 3B                  385 	set0	__pb, #6
+                                    386 ;	pdk_i2c.c: 81: setb(PBPH, SDA);
+      0000A6 15 3F                  387 	set1	__pbph, #6
+                                    388 ;	pdk_i2c.c: 82: setb(PBDIER, SDA);
+      0000A8 0E 3F                  389 	set1	__pbdier, #6
+                                    390 ;	pdk_i2c.c: 83: clrb(PBC, SDA);
+      0000AA 14 3B                  391 	set0	__pbc, #6
+                                    392 ;	pdk_i2c.c: 84: _delay_us(4);
+      0000AC 08 57                  393 	mov	a, #0x08
+      0000AEr00r17                  394 	mov	__delay_loop_8_PARM_1+0, a
+      0000B0r00r70                  395 	call	__delay_loop_8
+                                    396 ;	pdk_i2c.c: 85: SCL1;
+      0000B2 93 3F                  397 	set1	__pb, #7
+                                    398 ;	pdk_i2c.c: 86: _delay_us(4);
+      0000B4 08 57                  399 	mov	a, #0x08
+      0000B6r00r17                  400 	mov	__delay_loop_8_PARM_1+0, a
+      0000B8r00r70                  401 	call	__delay_loop_8
+                                    402 ;	pdk_i2c.c: 87: SCL0;
+      0000BA 93 3B                  403 	set0	__pb, #7
+                                    404 ;	pdk_i2c.c: 88: setb(PBC, SDA);
+      0000BC 14 3F                  405 	set1	__pbc, #6
+                                    406 ;	pdk_i2c.c: 89: return dat;
+      0000BEr24r1F                  407 	mov	a, _I2C_write_t_PARM_1+0
+                                    408 ;	pdk_i2c.c: 90: }
+      0000C0 7A 00                  409 	ret
+                                    410 ;	pdk_i2c.c: 92: uint8_t I2C_read_t(uint8_t ack)
+                                    411 ;	-----------------------------------------
+                                    412 ;	 function I2C_read_t
+                                    413 ;	-----------------------------------------
+      0000C2                        414 _I2C_read_t:
+                                    415 ;	pdk_i2c.c: 94: uint8_t dat = 0x00;
+      0000C2r27r26                  416 	clear	_I2C_read_t_sloc1_1_0+0
+                                    417 ;	pdk_i2c.c: 97: clrb(PBC, SDA);
+      0000C4 14 3B                  418 	set0	__pbc, #6
+                                    419 ;	pdk_i2c.c: 98: setb(PBPH, SDA);
+      0000C6 15 3F                  420 	set1	__pbph, #6
+                                    421 ;	pdk_i2c.c: 99: setb(PBDIER, SDA);
+      0000C8 0E 3F                  422 	set1	__pbdier, #6
+                                    423 ;	pdk_i2c.c: 101: for (uint8_t i = 0; i < 8; i++) /* For loop read dataa 1 byte */
+      0000CAr28r26                  424 	clear	_I2C_read_t_sloc2_1_0+0
+      0000CC                        425 00108$:
+      0000CCr28r1F                  426 	mov	a, _I2C_read_t_sloc2_1_0+0
+      0000CE 08 51                  427 	sub	a, #0x08
+      0000D0 80 34                  428 	t1sn	f, c
+      0000D2rFEr60                  429 	goto	00103$
+                                    430 ;	pdk_i2c.c: 103: _delay_us(4);
+      0000D4 08 57                  431 	mov	a, #0x08
+      0000D6r00r17                  432 	mov	__delay_loop_8_PARM_1+0, a
+      0000D8r00r70                  433 	call	__delay_loop_8
+                                    434 ;	pdk_i2c.c: 104: SCL1;
+      0000DA 93 3F                  435 	set1	__pb, #7
+                                    436 ;	pdk_i2c.c: 105: dat = dat << 1;
+      0000DCr27r2B                  437 	sl	_I2C_read_t_sloc1_1_0+0
+                                    438 ;	pdk_i2c.c: 106: if (inbit(PB, SDA))
+      0000DE 93 01                  439 	mov	a, __pb
+      0000E0 40 54                  440 	and	a, #0x40
+      0000E2 6E 00                  441 	swap	a
+      0000E4 0F 54                  442 	and	a, #0x0f
+      0000E6 6A 00                  443 	sr	a
+      0000E8 6A 00                  444 	sr	a
+      0000EA 00 53                  445 	cneqsn	a, #0x00
+      0000ECrF2r60                  446 	goto	00102$
+                                    447 ;	pdk_i2c.c: 107: dat = dat | 0x01; /* Keep biit daata in dat */
+      0000EE 01 57                  448 	mov	a, #0x01
+      0000F0r27r15                  449 	or	_I2C_read_t_sloc1_1_0+0, a
+      0000F2                        450 00102$:
+                                    451 ;	pdk_i2c.c: 109: _delay_us(4);
+      0000F2 08 57                  452 	mov	a, #0x08
+      0000F4r00r17                  453 	mov	__delay_loop_8_PARM_1+0, a
+      0000F6r00r70                  454 	call	__delay_loop_8
+                                    455 ;	pdk_i2c.c: 110: SCL0; /* Clear SCL */
+      0000F8 93 3B                  456 	set0	__pb, #7
+                                    457 ;	pdk_i2c.c: 101: for (uint8_t i = 0; i < 8; i++) /* For loop read dataa 1 byte */
+      0000FAr28r24                  458 	inc	_I2C_read_t_sloc2_1_0+0
+      0000FCrCCr60                  459 	goto	00108$
+      0000FE                        460 00103$:
+                                    461 ;	pdk_i2c.c: 112: setb(PBC, SDA);
+      0000FE 14 3F                  462 	set1	__pbc, #6
+                                    463 ;	pdk_i2c.c: 113: if (ack == 0)
+      000100r26r1F                  464 	mov	a, _I2C_read_t_PARM_1+0
+      000102 00 52                  465 	ceqsn	a, #0x00
+      000104r0Ar61                  466 	goto	00105$
+                                    467 ;	pdk_i2c.c: 114: I2C_NoAck();
+      000106r20r70                  468 	call	_I2C_NoAck
+      000108r0Cr61                  469 	goto	00106$
+      00010A                        470 00105$:
+                                    471 ;	pdk_i2c.c: 116: I2C_Ack();
+      00010Ar00r70                  472 	call	_I2C_Ack
+      00010C                        473 00106$:
+                                    474 ;	pdk_i2c.c: 118: return dat;
+      00010Cr27r1F                  475 	mov	a, _I2C_read_t_sloc1_1_0+0
+                                    476 ;	pdk_i2c.c: 119: }
+      00010E 7A 00                  477 	ret
+                                    478 ;	pdk_i2c.c: 121: void I2C_beginTransmission(uint8_t addr)
+                                    479 ;	-----------------------------------------
+                                    480 ;	 function I2C_beginTransmission
+                                    481 ;	-----------------------------------------
+      000110                        482 _I2C_beginTransmission:
+                                    483 ;	pdk_i2c.c: 123: txBufferIndex = 0;
+      000110r12r26                  484 	clear	_txBufferIndex+0
+                                    485 ;	pdk_i2c.c: 124: txBufferLength = 0;
+      000112r13r26                  486 	clear	_txBufferLength+0
+                                    487 ;	pdk_i2c.c: 127: I2C_start();
+      000114r40r70                  488 	call	_I2C_start
+                                    489 ;	pdk_i2c.c: 130: I2C_write_t((addr << 1) | I2C_WRITE);
+      000116r29r1F                  490 	mov	a, _I2C_beginTransmission_PARM_1+0
+      000118 6B 00                  491 	sl	a
+      00011Ar24r17                  492 	mov	_I2C_write_t_PARM_1+0, a
+      00011Cr78r60                  493 	goto	_I2C_write_t
+                                    494 ;	pdk_i2c.c: 131: }
+      00011E 7A 00                  495 	ret
+                                    496 ;	pdk_i2c.c: 133: void I2C_write2(uint8_t data)
+                                    497 ;	-----------------------------------------
+                                    498 ;	 function I2C_write2
+                                    499 ;	-----------------------------------------
+      000120                        500 _I2C_write2:
+                                    501 ;	pdk_i2c.c: 135: txBuffer[txBufferIndex++] = data;
+      000120r12r1F                  502 	mov	a, _txBufferIndex+0
+      000122r12r24                  503 	inc	_txBufferIndex+0
+      000124r14r50                  504 	add	a, #(_txBuffer + 0)
+      000126r00r17                  505 	mov	p, a
+      000128r2Ar1F                  506 	mov	a, _I2C_write2_PARM_1+0
+      00012Ar00r07                  507 	idxm	p, a
+                                    508 ;	pdk_i2c.c: 136: txBufferLength = txBufferIndex;
+      00012Cr12r1F                  509 	mov	a, _txBufferIndex+0
+      00012Er13r17                  510 	mov	_txBufferLength+0, a
+                                    511 ;	pdk_i2c.c: 137: }
+      000130 7A 00                  512 	ret
+                                    513 ;	pdk_i2c.c: 139: void I2C_writeBuffer(uint8_t *data, uint8_t len)
+                                    514 ;	-----------------------------------------
+                                    515 ;	 function I2C_writeBuffer
+                                    516 ;	-----------------------------------------
+      000132                        517 _I2C_writeBuffer:
+                                    518 ;	pdk_i2c.c: 141: uint8_t i = 0;
+      000132r2Er26                  519 	clear	_I2C_writeBuffer_sloc3_1_0+0
+      000134                        520 00103$:
+                                    521 ;	pdk_i2c.c: 142: for (; i < len; ++i)
+      000134r2Er1F                  522 	mov	a, _I2C_writeBuffer_sloc3_1_0+0
+      000136r2Dr19                  523 	sub	a, _I2C_writeBuffer_PARM_2+0
+      000138 80 34                  524 	t1sn	f, c
+      00013Ar50r61                  525 	goto	00105$
+                                    526 ;	pdk_i2c.c: 144: I2C_write2(data[i]);
+      00013Cr2Br1F                  527 	mov	a, _I2C_writeBuffer_PARM_1+0
+      00013Er2Er18                  528 	add	a, _I2C_writeBuffer_sloc3_1_0+0
+      000140r00r17                  529 	mov	p, a
+      000142r2Cr1F                  530 	mov	a, _I2C_writeBuffer_PARM_1+1
+      000144 60 00                  531 	addc	a
+      000146r00r70                  532 	call	__gptrget
+      000148r2Ar17                  533 	mov	_I2C_write2_PARM_1+0, a
+      00014Ar20r71                  534 	call	_I2C_write2
+                                    535 ;	pdk_i2c.c: 142: for (; i < len; ++i)
+      00014Cr2Er24                  536 	inc	_I2C_writeBuffer_sloc3_1_0+0
+      00014Er34r61                  537 	goto	00103$
+      000150                        538 00105$:
+                                    539 ;	pdk_i2c.c: 146: }
+      000150 7A 00                  540 	ret
+                                    541 ;	pdk_i2c.c: 148: void I2C_endTransmission(void)
+                                    542 ;	-----------------------------------------
+                                    543 ;	 function I2C_endTransmission
+                                    544 ;	-----------------------------------------
+      000152                        545 _I2C_endTransmission:
+                                    546 ;	pdk_i2c.c: 152: for (i = 0; i < txBufferLength; ++i)
+      000152r2Fr26                  547 	clear	_I2C_endTransmission_sloc4_1_0+0
+      000154                        548 00103$:
+      000154r2Fr1F                  549 	mov	a, _I2C_endTransmission_sloc4_1_0+0
+      000156r13r19                  550 	sub	a, _txBufferLength+0
+      000158 80 34                  551 	t1sn	f, c
+      00015Ar6Cr61                  552 	goto	00101$
+                                    553 ;	pdk_i2c.c: 155: I2C_write_t(txBuffer[i]);
+      00015Cr14r57                  554 	mov	a, #(_txBuffer + 0)
+      00015Er2Fr18                  555 	add	a, _I2C_endTransmission_sloc4_1_0+0
+      000160r00r17                  556 	mov	p, a
+      000162r01r07                  557 	idxm	a, p
+      000164r24r17                  558 	mov	_I2C_write_t_PARM_1+0, a
+      000166r78r70                  559 	call	_I2C_write_t
+                                    560 ;	pdk_i2c.c: 152: for (i = 0; i < txBufferLength; ++i)
+      000168r2Fr24                  561 	inc	_I2C_endTransmission_sloc4_1_0+0
+      00016Ar54r61                  562 	goto	00103$
+      00016C                        563 00101$:
+                                    564 ;	pdk_i2c.c: 159: I2C_stop();
+      00016Cr5Cr60                  565 	goto	_I2C_stop
+                                    566 ;	pdk_i2c.c: 160: }
+      00016E 7A 00                  567 	ret
+                                    568 ;	pdk_i2c.c: 162: void I2C_requestFrom(uint8_t addr, uint8_t len)
+                                    569 ;	-----------------------------------------
+                                    570 ;	 function I2C_requestFrom
+                                    571 ;	-----------------------------------------
+      000170                        572 _I2C_requestFrom:
+                                    573 ;	pdk_i2c.c: 165: rxBufferLength = len;
+      000170r31r1F                  574 	mov	a, _I2C_requestFrom_PARM_2+0
+      000172r01r17                  575 	mov	_rxBufferLength+0, a
+                                    576 ;	pdk_i2c.c: 166: rxBufferIndex = 0;
+      000174r00r26                  577 	clear	_rxBufferIndex+0
+                                    578 ;	pdk_i2c.c: 169: I2C_start();
+      000176r40r70                  579 	call	_I2C_start
+                                    580 ;	pdk_i2c.c: 172: I2C_write_t((addr << 1) | I2C_READ);
+      000178r30r1F                  581 	mov	a, _I2C_requestFrom_PARM_1+0
+      00017A 6B 00                  582 	sl	a
+      00017C 01 55                  583 	or	a, #0x01
+      00017Er24r17                  584 	mov	_I2C_write_t_PARM_1+0, a
+      000180r78r70                  585 	call	_I2C_write_t
+                                    586 ;	pdk_i2c.c: 175: for (i = 0; i < rxBufferLength - 1; i++)
+      000182r32r26                  587 	clear	_I2C_requestFrom_sloc5_1_0+0
+      000184                        588 00103$:
+      000184r01r1F                  589 	mov	a, _rxBufferLength+0
+      000186 01 51                  590 	sub	a, #0x01
+      000188r33r17                  591 	mov	_I2C_requestFrom_sloc6_1_0+0, a
+      00018A 00 57                  592 	mov	a, #0x00
+      00018C 61 00                  593 	subc	a
+      00018Er34r17                  594 	mov	_I2C_requestFrom_sloc6_1_0+1, a
+      000190r00r26                  595 	clear	p
+      000192r32r1F                  596 	mov	a, _I2C_requestFrom_sloc5_1_0+0
+      000194r33r19                  597 	sub	a, _I2C_requestFrom_sloc6_1_0+0
+      000196r00r1F                  598 	mov	a, p
+      000198r34r1B                  599 	subc	a, _I2C_requestFrom_sloc6_1_0+1
+      00019A 80 31                  600 	t0sn	f, ov
+      00019C 80 56                  601 	xor	a, #0x80
+      00019E 6B 00                  602 	sl	a
+      0001A0 80 34                  603 	t1sn	f, c
+      0001A2rBCr61                  604 	goto	00101$
+                                    605 ;	pdk_i2c.c: 177: rxBuffer[i] = I2C_read_t(ACK);
+      0001A4r02r57                  606 	mov	a, #(_rxBuffer + 0)
+      0001A6r32r18                  607 	add	a, _I2C_requestFrom_sloc5_1_0+0
+      0001A8r35r17                  608 	mov	_I2C_requestFrom_sloc7_1_0+0, a
+      0001AA 01 57                  609 	mov	a, #0x01
+      0001ACr26r17                  610 	mov	_I2C_read_t_PARM_1+0, a
+      0001AErC2r70                  611 	call	_I2C_read_t
+      0001B0r00r17                  612 	mov	p, a
+      0001B2r35r1F                  613 	mov	a, _I2C_requestFrom_sloc7_1_0+0
+      0001B4r00r27                  614 	xch	a, p
+      0001B6r00r07                  615 	idxm	p, a
+                                    616 ;	pdk_i2c.c: 175: for (i = 0; i < rxBufferLength - 1; i++)
+      0001B8r32r24                  617 	inc	_I2C_requestFrom_sloc5_1_0+0
+      0001BAr84r61                  618 	goto	00103$
+      0001BC                        619 00101$:
+                                    620 ;	pdk_i2c.c: 180: rxBuffer[rxBufferLength - 1] = I2C_read_t(NACK);
+      0001BCr01r1F                  621 	mov	a, _rxBufferLength+0
+      0001BE 01 51                  622 	sub	a, #0x01
+      0001C0r02r50                  623 	add	a, #(_rxBuffer + 0)
+      0001C2r26r26                  624 	clear	_I2C_read_t_PARM_1+0
+      0001C4 72 00                  625 	push	af
+      0001C6rC2r70                  626 	call	_I2C_read_t
+      0001C8r00r17                  627 	mov	p, a
+      0001CA 73 00                  628 	pop	af
+      0001CCr00r27                  629 	xch	a, p
+      0001CEr00r07                  630 	idxm	p, a
+                                    631 ;	pdk_i2c.c: 183: I2C_stop();
+      0001D0r5Cr60                  632 	goto	_I2C_stop
+                                    633 ;	pdk_i2c.c: 184: }
+      0001D2 7A 00                  634 	ret
+                                    635 ;	pdk_i2c.c: 186: int8_t I2C_read(void)
+                                    636 ;	-----------------------------------------
+                                    637 ;	 function I2C_read
+                                    638 ;	-----------------------------------------
+      0001D4                        639 _I2C_read:
+                                    640 ;	pdk_i2c.c: 188: int8_t value = 5;
+      0001D4 05 57                  641 	mov	a, #0x05
+      0001D6r00r17                  642 	mov	p, a
+                                    643 ;	pdk_i2c.c: 190: if (rxBufferIndex < rxBufferLength)
+      0001D8r00r1F                  644 	mov	a, _rxBufferIndex+0
+      0001DAr01r19                  645 	sub	a, _rxBufferLength+0
+      0001DC 80 34                  646 	t1sn	f, c
+      0001DErECr61                  647 	goto	00102$
+                                    648 ;	pdk_i2c.c: 192: value = rxBuffer[rxBufferIndex];
+      0001E0r02r57                  649 	mov	a, #(_rxBuffer + 0)
+      0001E2r00r18                  650 	add	a, _rxBufferIndex+0
+      0001E4r00r17                  651 	mov	p, a
+      0001E6r01r07                  652 	idxm	a, p
+      0001E8r00r17                  653 	mov	p, a
+                                    654 ;	pdk_i2c.c: 193: ++rxBufferIndex;
+      0001EAr00r24                  655 	inc	_rxBufferIndex+0
+      0001EC                        656 00102$:
+                                    657 ;	pdk_i2c.c: 195: return value;
+      0001ECr00r1F                  658 	mov	a, p
+                                    659 ;	pdk_i2c.c: 196: }
+      0001EE 7A 00                  660 	ret
+                                    661 	.area CODE
+                                    662 	.area CONST
+                                    663 	.area CABS (ABS)

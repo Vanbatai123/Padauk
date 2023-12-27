@@ -1,0 +1,11 @@
+-muwx
+-i pfs173_uart.ihx
+-b HOME = 0x0022
+-b DATA = 0x0002
+-k C:\PROGRA~1\SDCC\bin\..\lib\pdk15
+-l pdk15
+pfs173_uart.rel
+pdk_uart.rel
+delay.rel
+
+-e

@@ -1,0 +1,951 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module timer16
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _main
+                                     17 	.globl _UART_printNum
+                                     18 	.globl _UART_print
+                                     19 	.globl _interrupt
+                                     20 	.globl __sdcc_external_startup
+                                     21 	.globl _TIM2_interrupt
+                                     22 	.globl _putChar
+                                     23 	.globl _UART_begin
+                                     24 	.globl _millis_irq_handler
+                                     25 	.globl _millis
+                                     26 	.globl _millis_setup
+                                     27 	.globl __delay_loop_32
+                                     28 	.globl __delay_loop_16
+                                     29 	.globl __delay_loop_8
+                                     30 	.globl __t16c
+                                     31 	.globl __rop
+                                     32 	.globl __bgtr
+                                     33 	.globl __ilrcr
+                                     34 	.globl __pwmg2dtl
+                                     35 	.globl __pwmg2dth
+                                     36 	.globl __pwmg2c
+                                     37 	.globl __pwmg1dtl
+                                     38 	.globl __pwmg1dth
+                                     39 	.globl __pwmg1c
+                                     40 	.globl __pwmgcubl
+                                     41 	.globl __pwmgcubh
+                                     42 	.globl __pwmg0dtl
+                                     43 	.globl __pwmg0dth
+                                     44 	.globl __pwmgclk
+                                     45 	.globl __pwmg0c
+                                     46 	.globl __tm3b
+                                     47 	.globl __tm3s
+                                     48 	.globl __tm3ct
+                                     49 	.globl __tm3c
+                                     50 	.globl __tm2b
+                                     51 	.globl __tm2s
+                                     52 	.globl __tm2ct
+                                     53 	.globl __tm2c
+                                     54 	.globl __gpcs
+                                     55 	.globl __gpcc
+                                     56 	.globl __misclvr
+                                     57 	.globl __misc2
+                                     58 	.globl __misc
+                                     59 	.globl __adcrgc
+                                     60 	.globl __adcr
+                                     61 	.globl __adcm
+                                     62 	.globl __adcc
+                                     63 	.globl __pcpl
+                                     64 	.globl __pbpl
+                                     65 	.globl __pcph
+                                     66 	.globl __pcc
+                                     67 	.globl __pc
+                                     68 	.globl __pbph
+                                     69 	.globl __pbc
+                                     70 	.globl __pb
+                                     71 	.globl __paph
+                                     72 	.globl __pac
+                                     73 	.globl __pa
+                                     74 	.globl __pcdier
+                                     75 	.globl __pbdier
+                                     76 	.globl __padier
+                                     77 	.globl __integs
+                                     78 	.globl __ihrcr
+                                     79 	.globl __eoscr
+                                     80 	.globl __t16m
+                                     81 	.globl __intrq
+                                     82 	.globl __inten
+                                     83 	.globl __clkmd
+                                     84 	.globl __sp
+                                     85 	.globl __flag
+                                     86 	.globl _t
+                                     87 	.globl _UART_printNum_PARM_2
+                                     88 	.globl _UART_printNum_PARM_1
+                                     89 	.globl _UART_print_PARM_1
+                                     90 	.globl _txdata
+                                     91 	.globl _flag
+                                     92 	.globl __millis
+                                     93 	.globl __ticks
+                                     94 	.globl __delay_loop_32_PARM_1
+                                     95 	.globl __delay_loop_16_PARM_1
+                                     96 	.globl __delay_loop_8_PARM_1
+                                     97 ;--------------------------------------------------------
+                                     98 ; special function registers
+                                     99 ;--------------------------------------------------------
+                                    100 	.area RSEG (ABS)
+      000000                        101 	.org 0x0000
+                           000000   102 __flag	=	0x0000
+                           000002   103 __sp	=	0x0002
+                           000003   104 __clkmd	=	0x0003
+                           000004   105 __inten	=	0x0004
+                           000005   106 __intrq	=	0x0005
+                           000006   107 __t16m	=	0x0006
+                           00000A   108 __eoscr	=	0x000a
+                           00000B   109 __ihrcr	=	0x000b
+                           00000C   110 __integs	=	0x000c
+                           00000D   111 __padier	=	0x000d
+                           00000E   112 __pbdier	=	0x000e
+                           00000F   113 __pcdier	=	0x000f
+                           000010   114 __pa	=	0x0010
+                           000011   115 __pac	=	0x0011
+                           000012   116 __paph	=	0x0012
+                           000013   117 __pb	=	0x0013
+                           000014   118 __pbc	=	0x0014
+                           000015   119 __pbph	=	0x0015
+                           000016   120 __pc	=	0x0016
+                           000017   121 __pcc	=	0x0017
+                           000018   122 __pcph	=	0x0018
+                           000019   123 __pbpl	=	0x0019
+                           00001A   124 __pcpl	=	0x001a
+                           000020   125 __adcc	=	0x0020
+                           000021   126 __adcm	=	0x0021
+                           000022   127 __adcr	=	0x0022
+                           000024   128 __adcrgc	=	0x0024
+                           000026   129 __misc	=	0x0026
+                           000027   130 __misc2	=	0x0027
+                           000028   131 __misclvr	=	0x0028
+                           00002B   132 __gpcc	=	0x002b
+                           00002C   133 __gpcs	=	0x002c
+                           000030   134 __tm2c	=	0x0030
+                           000031   135 __tm2ct	=	0x0031
+                           000032   136 __tm2s	=	0x0032
+                           000033   137 __tm2b	=	0x0033
+                           000034   138 __tm3c	=	0x0034
+                           000035   139 __tm3ct	=	0x0035
+                           000036   140 __tm3s	=	0x0036
+                           000037   141 __tm3b	=	0x0037
+                           000040   142 __pwmg0c	=	0x0040
+                           000041   143 __pwmgclk	=	0x0041
+                           000042   144 __pwmg0dth	=	0x0042
+                           000043   145 __pwmg0dtl	=	0x0043
+                           000044   146 __pwmgcubh	=	0x0044
+                           000045   147 __pwmgcubl	=	0x0045
+                           000046   148 __pwmg1c	=	0x0046
+                           000048   149 __pwmg1dth	=	0x0048
+                           000049   150 __pwmg1dtl	=	0x0049
+                           00004C   151 __pwmg2c	=	0x004c
+                           00004E   152 __pwmg2dth	=	0x004e
+                           00004F   153 __pwmg2dtl	=	0x004f
+                           000062   154 __ilrcr	=	0x0062
+                           000063   155 __bgtr	=	0x0063
+                           000067   156 __rop	=	0x0067
+      000000                        157 __t16c::
+      000000                        158 	.ds 2
+                                    159 ;--------------------------------------------------------
+                                    160 ; ram data
+                                    161 ;--------------------------------------------------------
+                                    162 	.area DATA
+      000000                        163 __delay_loop_8_PARM_1:
+      000000                        164 	.ds 1
+      000001                        165 __delay_loop_16_PARM_1:
+      000001                        166 	.ds 2
+      000003                        167 __delay_loop_32_PARM_1:
+      000003                        168 	.ds 4
+      000007                        169 __ticks::
+      000007                        170 	.ds 1
+      000008                        171 __millis::
+      000008                        172 	.ds 4
+      00000C                        173 _flag::
+      00000C                        174 	.ds 1
+      00000D                        175 _txdata::
+      00000D                        176 	.ds 2
+      00000F                        177 _UART_print_PARM_1:
+      00000F                        178 	.ds 2
+      000011                        179 _UART_print_sloc2_1_0:
+      000011                        180 	.ds 1
+      000012                        181 _UART_printNum_PARM_1:
+      000012                        182 	.ds 4
+      000016                        183 _UART_printNum_PARM_2:
+      000016                        184 	.ds 1
+      000017                        185 _UART_printNum_dis_65536_23:
+      000017                        186 	.ds 10
+      000021                        187 _UART_printNum_sloc3_1_0:
+      000021                        188 	.ds 4
+      000025                        189 _UART_printNum_sloc4_1_0:
+      000025                        190 	.ds 4
+      000029                        191 _UART_printNum_sloc5_1_0:
+      000029                        192 	.ds 1
+      00002A                        193 _UART_printNum_sloc6_1_0:
+      00002A                        194 	.ds 1
+      00002B                        195 _UART_printNum_sloc7_1_0:
+      00002B                        196 	.ds 4
+      00002F                        197 _UART_printNum_sloc8_1_0:
+      00002F                        198 	.ds 1
+      000030                        199 _UART_printNum_sloc9_1_0:
+      000030                        200 	.ds 1
+      000031                        201 _UART_printNum_sloc10_1_0:
+      000031                        202 	.ds 1
+      000032                        203 _UART_printNum_sloc11_1_0:
+      000032                        204 	.ds 1
+      000033                        205 _UART_printNum_sloc12_1_0:
+      000033                        206 	.ds 1
+      000034                        207 _UART_printNum_sloc13_1_0:
+      000034                        208 	.ds 1
+      000035                        209 _UART_printNum_sloc14_1_0:
+      000035                        210 	.ds 2
+      000037                        211 _UART_printNum_sloc15_1_0:
+      000037                        212 	.ds 1
+      000038                        213 _UART_printNum_sloc16_1_0:
+      000038                        214 	.ds 1
+      000039                        215 _UART_printNum_sloc17_1_0:
+      000039                        216 	.ds 1
+      00003A                        217 _UART_printNum_sloc18_1_0:
+      00003A                        218 	.ds 1
+      00003B                        219 _t::
+      00003B                        220 	.ds 4
+      00003F                        221 _main_sloc19_1_0:
+      00003F                        222 	.ds 4
+      000043                        223 _main_sloc20_1_0:
+      000043                        224 	.ds 4
+                                    225 ;--------------------------------------------------------
+                                    226 ; overlayable items in ram
+                                    227 ;--------------------------------------------------------
+                                    228 	.area	OSEG (OVR,DATA)
+      000000                        229 _millis_sloc0_1_0:
+      000000                        230 	.ds 4
+                                    231 	.area	OSEG (OVR,DATA)
+      000000                        232 _millis_irq_handler_sloc1_1_0:
+      000000                        233 	.ds 4
+                                    234 ;--------------------------------------------------------
+                                    235 ; Stack segment in internal ram
+                                    236 ;--------------------------------------------------------
+                                    237 	.area	SSEG
+      000000                        238 __start__stack:
+      000000                        239 	.ds	1
+                                    240 
+                                    241 ;--------------------------------------------------------
+                                    242 ; absolute external ram data
+                                    243 ;--------------------------------------------------------
+                                    244 	.area DABS (ABS)
+                                    245 ;--------------------------------------------------------
+                                    246 ; interrupt vector
+                                    247 ;--------------------------------------------------------
+                                    248 	.area HOME
+      000000                        249 __interrupt_vect:
+                                    250 	.area	HEADER (ABS)
+      000020                        251 	.org	 0x0020
+      000020rBEr60                  252 	goto	_interrupt
+                                    253 ;--------------------------------------------------------
+                                    254 ; global & static initialisations
+                                    255 ;--------------------------------------------------------
+                                    256 	.area HOME
+                                    257 	.area GSINIT
+                                    258 	.area GSFINAL
+                                    259 	.area GSINIT
+                                    260 	.area	PREG (ABS)
+      000000                        261 	.org 0x00
+      000000                        262 p::
+      000000                        263 	.ds 2
+                                    264 	.area	HEADER (ABS)
+      000000                        265 	.org 0x0000
+      000000 00 00                  266 	nop
+      000002r01r26                  267 	clear	p+1
+      000004r00r57                  268 	mov	a, #s_OSEG
+      000006r01r50                  269 	add	a, #l_OSEG + 1
+      000008 FE 54                  270 	and	a, #0xfe
+      00000A 02 01                  271 	mov.io	sp, a
+      00000CrA4r70                  272 	call	__sdcc_external_startup
+      00000Er00r60                  273 	goto	s_GSINIT
+                                    274 	.area GSINIT
+      000000                        275 __sdcc_init_data:
+      000000r00r57                  276 	mov	a, #s_DATA
+      000002r00r17                  277 	mov	p, a
+      000004r0Er60                  278 	goto	00002$
+      000006                        279 00001$:
+      000006 00 57                  280 	mov	a, #0x00
+      000008r00r07                  281 	idxm	p, a
+      00000Ar00r24                  282 	inc	p
+      00000Cr00r57                  283 	mov	a, #s_DATA
+      00000E                        284 00002$:
+      00000Er00r50                  285 	add	a, #l_DATA
+      000010r00r2E                  286 	ceqsn	a, p
+      000012r06r60                  287 	goto	00001$
+                                    288 ;	timer16.c: 13: uint8_t flag = 0;
+      000014r0Cr26                  289 	clear	_flag+0
+                                    290 ;	timer16.c: 97: uint32_t t = 0;
+      000016r3Br26                  291 	clear	_t+0
+      000018r3Cr26                  292 	clear	_t+1
+      00001Ar3Dr26                  293 	clear	_t+2
+      00001Cr3Er26                  294 	clear	_t+3
+                                    295 	.area GSFINAL
+      000000r00r60                  296 	goto	__sdcc_program_startup
+                                    297 ;--------------------------------------------------------
+                                    298 ; Home
+                                    299 ;--------------------------------------------------------
+                                    300 	.area HOME
+                                    301 	.area HOME
+      000000                        302 __sdcc_program_startup:
+      000000r36r63                  303 	goto	_main
+                                    304 ;	return from main will return to caller
+                                    305 ;--------------------------------------------------------
+                                    306 ; code
+                                    307 ;--------------------------------------------------------
+                                    308 	.area CODE
+                                    309 ;	delay.h: 34: void _delay_loop_8(uint8_t loop_ctr) {
+                                    310 ;	-----------------------------------------
+                                    311 ;	 function _delay_loop_8
+                                    312 ;	-----------------------------------------
+      000000                        313 __delay_loop_8:
+                                    314 ;	delay.h: 44: __endasm;
+      000000                        315 	00001$:
+                                    316 ; 4 cycles per loop
+      000000r00r23                  317 	dzsn	__delay_loop_8_PARM_1 ; 1 cycle + 1 cycle for final skip
+      000002r00r60                  318 	goto	00001$ ; 2 cycles
+      000004                        319 00101$:
+                                    320 ;	delay.h: 45: }
+      000004 7A 00                  321 	ret
+                                    322 ;	delay.h: 48: void _delay_loop_16(uint16_t loop_ctr) {
+                                    323 ;	-----------------------------------------
+                                    324 ;	 function _delay_loop_16
+                                    325 ;	-----------------------------------------
+      000006                        326 __delay_loop_16:
+                                    327 ;	delay.h: 65: __endasm;
+      000006                        328 	00001$:
+                                    329 ; 8 cycles per loop
+      000006 00 00                  330 	nop	; 1 cycle
+      000008r01r25                  331 	dec	__delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Ar02r21                  332 	subc	__delay_loop_16_PARM_1+1 ; 1 cycle
+      00000Cr01r1F                  333 	mov	a, __delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Er02r1D                  334 	or	a, __delay_loop_16_PARM_1+1 ; 1 cycle
+      000010 00 34                  335 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      000012r06r60                  336 	goto	00001$ ; 2 cycles
+      000014                        337 00101$:
+                                    338 ;	delay.h: 66: }
+      000014 7A 00                  339 	ret
+                                    340 ;	delay.h: 69: void _delay_loop_32(uint32_t loop_ctr) {
+                                    341 ;	-----------------------------------------
+                                    342 ;	 function _delay_loop_32
+                                    343 ;	-----------------------------------------
+      000016                        344 __delay_loop_32:
+                                    345 ;	delay.h: 94: __endasm;
+      000016                        346 	00001$:
+                                    347 ; 12 cycles per loop
+      000016 00 00                  348 	nop	; 1 cycle
+      000018r03r25                  349 	dec	__delay_loop_32_PARM_1+0 ; 1 cycle
+      00001Ar04r21                  350 	subc	__delay_loop_32_PARM_1+1 ; 1 cycle
+      00001Cr05r21                  351 	subc	__delay_loop_32_PARM_1+2 ; 1 cycle
+      00001Er06r21                  352 	subc	__delay_loop_32_PARM_1+3 ; 1 cycle
+      000020r03r1F                  353 	mov	a, __delay_loop_32_PARM_1+0 ; 1 cycle
+      000022r04r1D                  354 	or	a, __delay_loop_32_PARM_1+1 ; 1 cycle
+      000024r05r1D                  355 	or	a, __delay_loop_32_PARM_1+2 ; 1 cycle
+      000026r06r1D                  356 	or	a, __delay_loop_32_PARM_1+3 ; 1 cycle
+      000028 00 34                  357 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      00002Ar16r60                  358 	goto	00001$ ; 2 cycles
+      00002C                        359 00101$:
+                                    360 ;	delay.h: 95: }
+      00002C 7A 00                  361 	ret
+                                    362 ;	millis.h: 12: void millis_setup()
+                                    363 ;	-----------------------------------------
+                                    364 ;	 function millis_setup
+                                    365 ;	-----------------------------------------
+      00002E                        366 _millis_setup:
+                                    367 ;	millis.h: 18: T16C = 0;
+      00002Er00r26                  368 	clear	p
+      000030r00r06                  369 	stt16	p
+                                    370 ;	millis.h: 20: }
+      000032 7A 00                  371 	ret
+                                    372 ;	millis.h: 22: uint32_t millis()
+                                    373 ;	-----------------------------------------
+                                    374 ;	 function millis
+                                    375 ;	-----------------------------------------
+      000034                        376 _millis:
+                                    377 ;	millis.h: 24: INTEN &= ~INTEN_T16;			  // Disable T16 (read of 32 bit value _millis is non-atomic)
+      000034 04 39                  378 	set0.io	__inten, #2
+                                    379 ;	millis.h: 25: uint32_t currentMillis = _millis; // Read _millis while T16 interrupt is off (otherwise it might be modified on us!)
+      000036r08r1F                  380 	mov	a, __millis+0
+      000038r00r17                  381 	mov	_millis_sloc0_1_0+0, a
+      00003Ar09r1F                  382 	mov	a, __millis+1
+      00003Cr01r17                  383 	mov	_millis_sloc0_1_0+1, a
+      00003Er0Ar1F                  384 	mov	a, __millis+2
+      000040r02r17                  385 	mov	_millis_sloc0_1_0+2, a
+      000042r0Br1F                  386 	mov	a, __millis+3
+      000044r03r17                  387 	mov	_millis_sloc0_1_0+3, a
+                                    388 ;	millis.h: 26: INTEN |= INTEN_T16;				  // Re-enable T16
+      000046 04 3D                  389 	set1.io	__inten, #2
+                                    390 ;	millis.h: 27: return currentMillis;
+      000048 82 01                  391 	mov.io	a, sp
+      00004A FC 50                  392 	add	a, #0xfc
+      00004Cr00r17                  393 	mov	p, a
+      00004Er01r07                  394 	idxm	a, p
+      000050r00r17                  395 	mov	p, a
+      000052r00r1F                  396 	mov	a, _millis_sloc0_1_0+0
+      000054r00r07                  397 	idxm	p, a
+      000056r00r24                  398 	inc	p
+      000058r01r1F                  399 	mov	a, _millis_sloc0_1_0+1
+      00005Ar00r07                  400 	idxm	p, a
+      00005Cr00r24                  401 	inc	p
+      00005Er02r1F                  402 	mov	a, _millis_sloc0_1_0+2
+      000060r00r07                  403 	idxm	p, a
+      000062r00r24                  404 	inc	p
+      000064r03r1F                  405 	mov	a, _millis_sloc0_1_0+3
+      000066r00r07                  406 	idxm	p, a
+                                    407 ;	millis.h: 28: }
+      000068 7A 00                  408 	ret
+                                    409 ;	millis.h: 30: void millis_irq_handler()
+                                    410 ;	-----------------------------------------
+                                    411 ;	 function millis_irq_handler
+                                    412 ;	-----------------------------------------
+      00006A                        413 _millis_irq_handler:
+                                    414 ;	millis.h: 32: if (_ticks++ == (uint8_t)(1000 / US_PER_TICK))
+      00006Ar07r1F                  415 	mov	a, __ticks+0
+      00006C 72 00                  416 	push	af
+      00006E 01 50                  417 	add	a, #0x01
+      000070r07r17                  418 	mov	__ticks+0, a
+      000072 73 00                  419 	pop	af
+      000074 1F 52                  420 	ceqsn	a, #0x1f
+      000076rA2r60                  421 	goto	00103$
+                                    422 ;	millis.h: 34: _ticks = 0;
+      000078r07r26                  423 	clear	__ticks+0
+                                    424 ;	millis.h: 35: _millis++;
+      00007Ar08r1F                  425 	mov	a, __millis+0
+      00007Cr00r17                  426 	mov	_millis_irq_handler_sloc1_1_0+0, a
+      00007Er09r1F                  427 	mov	a, __millis+1
+      000080r01r17                  428 	mov	_millis_irq_handler_sloc1_1_0+1, a
+      000082r0Ar1F                  429 	mov	a, __millis+2
+      000084r02r17                  430 	mov	_millis_irq_handler_sloc1_1_0+2, a
+      000086r0Br1F                  431 	mov	a, __millis+3
+      000088r03r17                  432 	mov	_millis_irq_handler_sloc1_1_0+3, a
+      00008Ar00r1F                  433 	mov	a, _millis_irq_handler_sloc1_1_0+0
+      00008C 01 50                  434 	add	a, #0x01
+      00008Er08r17                  435 	mov	__millis+0, a
+      000090r01r1F                  436 	mov	a, _millis_irq_handler_sloc1_1_0+1
+      000092 60 00                  437 	addc	a
+      000094r09r17                  438 	mov	__millis+1, a
+      000096r02r1F                  439 	mov	a, _millis_irq_handler_sloc1_1_0+2
+      000098 60 00                  440 	addc	a
+      00009Ar0Ar17                  441 	mov	__millis+2, a
+      00009Cr03r1F                  442 	mov	a, _millis_irq_handler_sloc1_1_0+3
+      00009E 60 00                  443 	addc	a
+      0000A0r0Br17                  444 	mov	__millis+3, a
+      0000A2                        445 00103$:
+                                    446 ;	millis.h: 37: }
+      0000A2 7A 00                  447 	ret
+                                    448 ;	timer16.c: 16: unsigned char _sdcc_external_startup(void)
+                                    449 ;	-----------------------------------------
+                                    450 ;	 function _sdcc_external_startup
+                                    451 ;	-----------------------------------------
+      0000A4                        452 __sdcc_external_startup:
+                                    453 ;	timer16.c: 18: EASY_PDK_INIT_SYSCLOCK_8MHZ();		  // use 1MHz sysclock
+      0000A4 34 57                  454 	mov	a, #0x34
+      0000A6 03 01                  455 	mov.io	__clkmd, a
+                                    456 ;	timer16.c: 19: EASY_PDK_CALIBRATE_IHRC(F_CPU, 5000); // tune SYSCLK to 8MHz @ 4.000V
+      0000A8 52 54                  457 	and	a, #'R'                        
+      0000AA 43 54                  458 	and	a, #'C'                        
+      0000AC 01 54                  459 	and	a, #((1))          
+      0000AE 00 54                  460 	and	a, #((8000000))     
+      0000B0 12 54                  461 	and	a, #((8000000)>>8)  
+      0000B2 7A 54                  462 	and	a, #((8000000)>>16) 
+      0000B4 00 54                  463 	and	a, #((8000000)>>24) 
+      0000B6 88 54                  464 	and	a, #((5000))     
+      0000B8 13 54                  465 	and	a, #((5000)>>8)  
+      0000BA 0B 54                  466 	and	a, #((0x0B))           
+                                    467 ;	timer16.c: 20: return 0;							  // perform normal initialization
+                                    468 ;	timer16.c: 21: }
+      0000BC 00 02                  469 	ret	#0x00
+                                    470 ;	timer16.c: 23: void interrupt(void) __interrupt(0)
+                                    471 ;	-----------------------------------------
+                                    472 ;	 function interrupt
+                                    473 ;	-----------------------------------------
+      0000BE                        474 _interrupt:
+      0000BE 72 00                  475 	push	af
+      0000C0r00r1F                  476 	mov	a, p
+      0000C2 72 00                  477 	push	af
+                                    478 ;	timer16.c: 25: if (INTRQ & INTRQ_T16) // TM2 interrupt request?
+      0000C4 85 01                  479 	mov.io	a, __intrq
+      0000C6 04 54                  480 	and	a, #0x04
+      0000C8 00 53                  481 	cneqsn	a, #0x00
+      0000CArD0r60                  482 	goto	00102$
+                                    483 ;	timer16.c: 27: millis_irq_handler();
+      0000CCr6Ar70                  484 	call	_millis_irq_handler
+                                    485 ;	timer16.c: 28: INTRQ &= ~INTRQ_T16;
+      0000CE 05 39                  486 	set0.io	__intrq, #2
+      0000D0                        487 00102$:
+                                    488 ;	timer16.c: 31: if (INTRQ & INTRQ_TM2)
+      0000D0 85 01                  489 	mov.io	a, __intrq
+      0000D2 40 54                  490 	and	a, #0x40
+      0000D4 00 53                  491 	cneqsn	a, #0x00
+      0000D6rDCr60                  492 	goto	00105$
+                                    493 ;	timer16.c: 33: INTRQ &= ~INTRQ_TM2; // Mark TM2 interrupt request processed
+      0000D8 05 3B                  494 	set0.io	__intrq, #6
+                                    495 ;	timer16.c: 35: TIM2_interrupt();
+      0000DAr00r70                  496 	call	_TIM2_interrupt
+      0000DC                        497 00105$:
+                                    498 ;	timer16.c: 37: }
+      0000DC 73 00                  499 	pop	af
+      0000DEr00r17                  500 	mov	p, a
+      0000E0 73 00                  501 	pop	af
+      0000E2 7B 00                  502 	reti
+                                    503 ;	timer16.c: 39: void UART_print(char *str)
+                                    504 ;	-----------------------------------------
+                                    505 ;	 function UART_print
+                                    506 ;	-----------------------------------------
+      0000E4                        507 _UART_print:
+                                    508 ;	timer16.c: 42: while (str[i] != '\0')
+      0000E4r11r26                  509 	clear	_UART_print_sloc2_1_0+0
+      0000E6                        510 00101$:
+      0000E6r0Fr1F                  511 	mov	a, _UART_print_PARM_1+0
+      0000E8r11r18                  512 	add	a, _UART_print_sloc2_1_0+0
+      0000EAr00r17                  513 	mov	p, a
+      0000ECr10r1F                  514 	mov	a, _UART_print_PARM_1+1
+      0000EE 60 00                  515 	addc	a
+      0000F0r00r70                  516 	call	__gptrget
+      0000F2 00 53                  517 	cneqsn	a, #0x00
+      0000F4r0Cr61                  518 	goto	00104$
+                                    519 ;	timer16.c: 43: putChar(str[i++]);
+      0000F6r0Fr1F                  520 	mov	a, _UART_print_PARM_1+0
+      0000F8r11r18                  521 	add	a, _UART_print_sloc2_1_0+0
+      0000FAr00r17                  522 	mov	p, a
+      0000FCr10r1F                  523 	mov	a, _UART_print_PARM_1+1
+      0000FE 60 00                  524 	addc	a
+      000100r11r24                  525 	inc	_UART_print_sloc2_1_0+0
+      000102r00r70                  526 	call	__gptrget
+      000104r00r17                  527 	mov	_putChar_PARM_1+0, a
+      000106r01r26                  528 	clear	_putChar_PARM_1+1
+      000108r00r70                  529 	call	_putChar
+      00010ArE6r60                  530 	goto	00101$
+      00010C                        531 00104$:
+                                    532 ;	timer16.c: 44: }
+      00010C 7A 00                  533 	ret
+                                    534 ;	timer16.c: 46: void UART_printNum(int32_t num, uint8_t base)
+                                    535 ;	-----------------------------------------
+                                    536 ;	 function UART_printNum
+                                    537 ;	-----------------------------------------
+      00010E                        538 _UART_printNum:
+                                    539 ;	timer16.c: 49: int8_t max = 0, flag = 0; // max: index of dis array, flag: = 1 if negative
+      00010Er00r26                  540 	clear	p
+      000110r29r26                  541 	clear	_UART_printNum_sloc5_1_0+0
+                                    542 ;	timer16.c: 51: if (num == 0) // input 0
+      000112r12r1F                  543 	mov	a, _UART_printNum_PARM_1+0
+      000114r13r1D                  544 	or	a, _UART_printNum_PARM_1+1
+      000116r14r1D                  545 	or	a, _UART_printNum_PARM_1+2
+      000118r15r1D                  546 	or	a, _UART_printNum_PARM_1+3
+      00011A 00 52                  547 	ceqsn	a, #0x00
+      00011Cr28r61                  548 	goto	00104$
+                                    549 ;	timer16.c: 53: dis[max++] = '0';
+      00011E 01 57                  550 	mov	a, #0x01
+      000120r00r17                  551 	mov	p, a
+      000122 30 57                  552 	mov	a, #0x30
+      000124r17r17                  553 	mov	_UART_printNum_dis_65536_23+0, a
+      000126r4Cr61                  554 	goto	00131$
+      000128                        555 00104$:
+                                    556 ;	timer16.c: 55: else if (num < 0) // negative number
+      000128r15r1F                  557 	mov	a, _UART_printNum_PARM_1+3
+      00012A 80 51                  558 	sub	a, #0x80
+      00012C 80 30                  559 	t0sn.io	f, c
+      00012Er4Cr61                  560 	goto	00131$
+                                    561 ;	timer16.c: 57: num = 0 - num;
+      000130 00 57                  562 	mov	a, #0x00
+      000132r12r19                  563 	sub	a, _UART_printNum_PARM_1+0
+      000134r12r17                  564 	mov	_UART_printNum_PARM_1+0, a
+      000136 00 57                  565 	mov	a, #0x00
+      000138r13r1B                  566 	subc	a, _UART_printNum_PARM_1+1
+      00013Ar13r17                  567 	mov	_UART_printNum_PARM_1+1, a
+      00013C 00 57                  568 	mov	a, #0x00
+      00013Er14r1B                  569 	subc	a, _UART_printNum_PARM_1+2
+      000140r14r17                  570 	mov	_UART_printNum_PARM_1+2, a
+      000142 00 57                  571 	mov	a, #0x00
+      000144r15r1B                  572 	subc	a, _UART_printNum_PARM_1+3
+      000146r15r17                  573 	mov	_UART_printNum_PARM_1+3, a
+                                    574 ;	timer16.c: 58: flag = 1;
+      000148 01 57                  575 	mov	a, #0x01
+      00014Ar29r17                  576 	mov	_UART_printNum_sloc5_1_0+0, a
+                                    577 ;	timer16.c: 60: while (num > 0) // convert to base number and add to dis array
+      00014C                        578 00131$:
+      00014Cr00r1F                  579 	mov	a, p
+      00014Er2Ar17                  580 	mov	_UART_printNum_sloc6_1_0+0, a
+      000150                        581 00109$:
+      000150 00 57                  582 	mov	a, #0x00
+      000152r12r19                  583 	sub	a, _UART_printNum_PARM_1+0
+      000154 00 57                  584 	mov	a, #0x00
+      000156r13r1B                  585 	subc	a, _UART_printNum_PARM_1+1
+      000158 00 57                  586 	mov	a, #0x00
+      00015Ar14r1B                  587 	subc	a, _UART_printNum_PARM_1+2
+      00015C 00 57                  588 	mov	a, #0x00
+      00015Er15r1B                  589 	subc	a, _UART_printNum_PARM_1+3
+      000160 80 31                  590 	t0sn.io	f, ov
+      000162 80 56                  591 	xor	a, #0x80
+      000164 6B 00                  592 	sl	a
+      000166 80 34                  593 	t1sn.io	f, c
+      000168r14r62                  594 	goto	00138$
+                                    595 ;	timer16.c: 62: if (num % base >= 10)
+      00016Ar16r1F                  596 	mov	a, _UART_printNum_PARM_2+0
+      00016Cr2Br17                  597 	mov	_UART_printNum_sloc7_1_0+0, a
+      00016Er2Cr26                  598 	clear	_UART_printNum_sloc7_1_0+1
+      000170r2Dr26                  599 	clear	_UART_printNum_sloc7_1_0+2
+      000172r2Er26                  600 	clear	_UART_printNum_sloc7_1_0+3
+      000174r12r1F                  601 	mov	a, _UART_printNum_PARM_1+0
+      000176r00r17                  602 	mov	__modslong_PARM_1+0, a
+      000178r13r1F                  603 	mov	a, _UART_printNum_PARM_1+1
+      00017Ar01r17                  604 	mov	__modslong_PARM_1+1, a
+      00017Cr14r1F                  605 	mov	a, _UART_printNum_PARM_1+2
+      00017Er02r17                  606 	mov	__modslong_PARM_1+2, a
+      000180r15r1F                  607 	mov	a, _UART_printNum_PARM_1+3
+      000182r03r17                  608 	mov	__modslong_PARM_1+3, a
+      000184r2Br1F                  609 	mov	a, _UART_printNum_sloc7_1_0+0
+      000186r00r17                  610 	mov	__modslong_PARM_2+0, a
+      000188r2Cr1F                  611 	mov	a, _UART_printNum_sloc7_1_0+1
+      00018Ar01r17                  612 	mov	__modslong_PARM_2+1, a
+      00018Cr2Dr1F                  613 	mov	a, _UART_printNum_sloc7_1_0+2
+      00018Er02r17                  614 	mov	__modslong_PARM_2+2, a
+      000190r2Er1F                  615 	mov	a, _UART_printNum_sloc7_1_0+3
+      000192r03r17                  616 	mov	__modslong_PARM_2+3, a
+      000194r21r57                  617 	mov	a, #_UART_printNum_sloc3_1_0
+      000196 72 00                  618 	push	af
+      000198r00r70                  619 	call	__modslong
+      00019A 82 01                  620 	mov.io	a, sp
+      00019C FE 50                  621 	add	a, #-2
+      00019E 02 01                  622 	mov.io	sp, a
+      0001A0r21r1F                  623 	mov	a, _UART_printNum_sloc3_1_0+0
+      0001A2 0A 51                  624 	sub	a, #0x0a
+      0001A4r22r1F                  625 	mov	a, _UART_printNum_sloc3_1_0+1
+      0001A6 61 00                  626 	subc	a
+      0001A8r23r1F                  627 	mov	a, _UART_printNum_sloc3_1_0+2
+      0001AA 61 00                  628 	subc	a
+      0001ACr24r1F                  629 	mov	a, _UART_printNum_sloc3_1_0+3
+      0001AE 61 00                  630 	subc	a
+      0001B0 80 31                  631 	t0sn.io	f, ov
+      0001B2 80 56                  632 	xor	a, #0x80
+      0001B4 6B 00                  633 	sl	a
+      0001B6 80 30                  634 	t0sn.io	f, c
+      0001B8rC8r61                  635 	goto	00107$
+                                    636 ;	timer16.c: 63: dis[max] = num % base + 55;
+      0001BAr17r57                  637 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      0001BCr2Ar18                  638 	add	a, _UART_printNum_sloc6_1_0+0
+      0001BEr00r17                  639 	mov	p, a
+      0001C0r21r1F                  640 	mov	a, _UART_printNum_sloc3_1_0+0
+      0001C2 37 50                  641 	add	a, #0x37
+      0001C4r00r07                  642 	idxm	p, a
+      0001C6rD4r61                  643 	goto	00108$
+      0001C8                        644 00107$:
+                                    645 ;	timer16.c: 65: dis[max] = num % base + 48;
+      0001C8r17r57                  646 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      0001CAr2Ar18                  647 	add	a, _UART_printNum_sloc6_1_0+0
+      0001CCr00r17                  648 	mov	p, a
+      0001CEr21r1F                  649 	mov	a, _UART_printNum_sloc3_1_0+0
+      0001D0 30 50                  650 	add	a, #0x30
+      0001D2r00r07                  651 	idxm	p, a
+      0001D4                        652 00108$:
+                                    653 ;	timer16.c: 67: num = num / base;
+      0001D4r12r1F                  654 	mov	a, _UART_printNum_PARM_1+0
+      0001D6r00r17                  655 	mov	__divslong_PARM_1+0, a
+      0001D8r13r1F                  656 	mov	a, _UART_printNum_PARM_1+1
+      0001DAr01r17                  657 	mov	__divslong_PARM_1+1, a
+      0001DCr14r1F                  658 	mov	a, _UART_printNum_PARM_1+2
+      0001DEr02r17                  659 	mov	__divslong_PARM_1+2, a
+      0001E0r15r1F                  660 	mov	a, _UART_printNum_PARM_1+3
+      0001E2r03r17                  661 	mov	__divslong_PARM_1+3, a
+      0001E4r2Br1F                  662 	mov	a, _UART_printNum_sloc7_1_0+0
+      0001E6r00r17                  663 	mov	__divslong_PARM_2+0, a
+      0001E8r2Cr1F                  664 	mov	a, _UART_printNum_sloc7_1_0+1
+      0001EAr01r17                  665 	mov	__divslong_PARM_2+1, a
+      0001ECr2Dr1F                  666 	mov	a, _UART_printNum_sloc7_1_0+2
+      0001EEr02r17                  667 	mov	__divslong_PARM_2+2, a
+      0001F0r2Er1F                  668 	mov	a, _UART_printNum_sloc7_1_0+3
+      0001F2r03r17                  669 	mov	__divslong_PARM_2+3, a
+      0001F4r25r57                  670 	mov	a, #_UART_printNum_sloc4_1_0
+      0001F6 72 00                  671 	push	af
+      0001F8r00r70                  672 	call	__divslong
+      0001FA 82 01                  673 	mov.io	a, sp
+      0001FC FE 50                  674 	add	a, #-2
+      0001FE 02 01                  675 	mov.io	sp, a
+      000200r25r1F                  676 	mov	a, _UART_printNum_sloc4_1_0+0
+      000202r12r17                  677 	mov	_UART_printNum_PARM_1+0, a
+      000204r26r1F                  678 	mov	a, _UART_printNum_sloc4_1_0+1
+      000206r13r17                  679 	mov	_UART_printNum_PARM_1+1, a
+      000208r27r1F                  680 	mov	a, _UART_printNum_sloc4_1_0+2
+      00020Ar14r17                  681 	mov	_UART_printNum_PARM_1+2, a
+      00020Cr28r1F                  682 	mov	a, _UART_printNum_sloc4_1_0+3
+      00020Er15r17                  683 	mov	_UART_printNum_PARM_1+3, a
+                                    684 ;	timer16.c: 68: max++;
+      000210r2Ar24                  685 	inc	_UART_printNum_sloc6_1_0+0
+      000212r50r61                  686 	goto	00109$
+      000214                        687 00138$:
+      000214r2Ar1F                  688 	mov	a, _UART_printNum_sloc6_1_0+0
+      000216r2Fr17                  689 	mov	_UART_printNum_sloc8_1_0+0, a
+                                    690 ;	timer16.c: 71: if (base == HEX) // add 0x for HEX and 0B for BIN
+      000218r16r1F                  691 	mov	a, _UART_printNum_PARM_2+0
+      00021A 10 52                  692 	ceqsn	a, #0x10
+      00021Cr76r62                  693 	goto	00117$
+                                    694 ;	timer16.c: 73: if (max % 2 == 1)
+      00021Er2Ar1F                  695 	mov	a, _UART_printNum_sloc6_1_0+0
+      000220r00r17                  696 	mov	__modsint_PARM_1+0, a
+      000222 6B 00                  697 	sl	a
+      000224 00 57                  698 	mov	a, #0x00
+      000226 61 00                  699 	subc	a
+      000228r01r17                  700 	mov	__modsint_PARM_1+1, a
+      00022A 02 57                  701 	mov	a, #0x02
+      00022Cr00r17                  702 	mov	__modsint_PARM_2+0, a
+      00022Er01r26                  703 	clear	__modsint_PARM_2+1
+      000230r00r70                  704 	call	__modsint
+      000232 01 52                  705 	ceqsn	a, #0x01
+      000234r4Cr62                  706 	goto	00113$
+      000236r00r1F                  707 	mov	a, p
+      000238 00 52                  708 	ceqsn	a, #0x00
+      00023Ar4Cr62                  709 	goto	00113$
+                                    710 ;	timer16.c: 74: dis[max++] = '0';
+      00023Cr2Ar1F                  711 	mov	a, _UART_printNum_sloc6_1_0+0
+      00023E 01 50                  712 	add	a, #0x01
+      000240r2Fr17                  713 	mov	_UART_printNum_sloc8_1_0+0, a
+      000242r17r57                  714 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      000244r2Ar18                  715 	add	a, _UART_printNum_sloc6_1_0+0
+      000246r00r17                  716 	mov	p, a
+      000248 30 57                  717 	mov	a, #0x30
+      00024Ar00r07                  718 	idxm	p, a
+      00024C                        719 00113$:
+                                    720 ;	timer16.c: 76: dis[max++] = 'x';
+      00024Cr2Fr1F                  721 	mov	a, _UART_printNum_sloc8_1_0+0
+      00024Er30r17                  722 	mov	_UART_printNum_sloc9_1_0+0, a
+      000250r2Fr1F                  723 	mov	a, _UART_printNum_sloc8_1_0+0
+      000252 01 50                  724 	add	a, #0x01
+      000254r31r17                  725 	mov	_UART_printNum_sloc10_1_0+0, a
+      000256r17r57                  726 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      000258r30r18                  727 	add	a, _UART_printNum_sloc9_1_0+0
+      00025Ar00r17                  728 	mov	p, a
+      00025C 78 57                  729 	mov	a, #0x78
+      00025Er00r07                  730 	idxm	p, a
+                                    731 ;	timer16.c: 77: dis[max++] = '0';
+      000260r31r1F                  732 	mov	a, _UART_printNum_sloc10_1_0+0
+      000262r00r17                  733 	mov	p, a
+      000264r31r1F                  734 	mov	a, _UART_printNum_sloc10_1_0+0
+      000266 01 50                  735 	add	a, #0x01
+      000268r2Fr17                  736 	mov	_UART_printNum_sloc8_1_0+0, a
+      00026Ar17r57                  737 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      00026Cr00r18                  738 	add	a, p
+      00026Er00r17                  739 	mov	p, a
+      000270 30 57                  740 	mov	a, #0x30
+      000272r00r07                  741 	idxm	p, a
+      000274rA0r62                  742 	goto	00118$
+      000276                        743 00117$:
+                                    744 ;	timer16.c: 79: else if (base == BIN)
+      000276r16r1F                  745 	mov	a, _UART_printNum_PARM_2+0
+      000278 02 52                  746 	ceqsn	a, #0x02
+      00027ArA0r62                  747 	goto	00118$
+                                    748 ;	timer16.c: 81: dis[max++] = 'B';
+      00027Cr2Ar1F                  749 	mov	a, _UART_printNum_sloc6_1_0+0
+      00027E 01 50                  750 	add	a, #0x01
+      000280r32r17                  751 	mov	_UART_printNum_sloc11_1_0+0, a
+      000282r17r57                  752 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      000284r2Ar18                  753 	add	a, _UART_printNum_sloc6_1_0+0
+      000286r00r17                  754 	mov	p, a
+      000288 42 57                  755 	mov	a, #0x42
+      00028Ar00r07                  756 	idxm	p, a
+                                    757 ;	timer16.c: 82: dis[max++] = '0';
+      00028Cr32r1F                  758 	mov	a, _UART_printNum_sloc11_1_0+0
+      00028Er00r17                  759 	mov	p, a
+      000290r32r1F                  760 	mov	a, _UART_printNum_sloc11_1_0+0
+      000292 01 50                  761 	add	a, #0x01
+      000294r2Fr17                  762 	mov	_UART_printNum_sloc8_1_0+0, a
+      000296r17r57                  763 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      000298r00r18                  764 	add	a, p
+      00029Ar00r17                  765 	mov	p, a
+      00029C 30 57                  766 	mov	a, #0x30
+      00029Er00r07                  767 	idxm	p, a
+      0002A0                        768 00118$:
+                                    769 ;	timer16.c: 85: if (flag == 1) // add minus to negative number
+      0002A0r29r1F                  770 	mov	a, _UART_printNum_sloc5_1_0+0
+      0002A2 01 52                  771 	ceqsn	a, #0x01
+      0002A4rB2r62                  772 	goto	00137$
+                                    773 ;	timer16.c: 86: dis[max++] = '-';
+      0002A6r2Fr1F                  774 	mov	a, _UART_printNum_sloc8_1_0+0
+      0002A8r2Fr24                  775 	inc	_UART_printNum_sloc8_1_0+0
+      0002AAr17r50                  776 	add	a, #(_UART_printNum_dis_65536_23 + 0)
+      0002ACr00r17                  777 	mov	p, a
+      0002AE 2D 57                  778 	mov	a, #0x2d
+      0002B0r00r07                  779 	idxm	p, a
+                                    780 ;	timer16.c: 88: for (uint8_t i = 0; i < max / 2; i++) // revert dis array
+      0002B2                        781 00137$:
+      0002B2r2Fr1F                  782 	mov	a, _UART_printNum_sloc8_1_0+0
+      0002B4 01 51                  783 	sub	a, #0x01
+      0002B6r33r17                  784 	mov	_UART_printNum_sloc12_1_0+0, a
+      0002B8r34r26                  785 	clear	_UART_printNum_sloc13_1_0+0
+      0002BA                        786 00123$:
+      0002BAr2Fr1F                  787 	mov	a, _UART_printNum_sloc8_1_0+0
+      0002BCr00r17                  788 	mov	__divsint_PARM_1+0, a
+      0002BE 6B 00                  789 	sl	a
+      0002C0 00 57                  790 	mov	a, #0x00
+      0002C2 61 00                  791 	subc	a
+      0002C4r01r17                  792 	mov	__divsint_PARM_1+1, a
+      0002C6 02 57                  793 	mov	a, #0x02
+      0002C8r00r17                  794 	mov	__divsint_PARM_2+0, a
+      0002CAr01r26                  795 	clear	__divsint_PARM_2+1
+      0002CCr00r70                  796 	call	__divsint
+      0002CEr35r17                  797 	mov	_UART_printNum_sloc14_1_0+0, a
+      0002D0r00r1F                  798 	mov	a, p
+      0002D2r36r17                  799 	mov	_UART_printNum_sloc14_1_0+1, a
+      0002D4r00r26                  800 	clear	p
+      0002D6r34r1F                  801 	mov	a, _UART_printNum_sloc13_1_0+0
+      0002D8r35r19                  802 	sub	a, _UART_printNum_sloc14_1_0+0
+      0002DAr00r1F                  803 	mov	a, p
+      0002DCr36r1B                  804 	subc	a, _UART_printNum_sloc14_1_0+1
+      0002DE 80 31                  805 	t0sn.io	f, ov
+      0002E0 80 56                  806 	xor	a, #0x80
+      0002E2 6B 00                  807 	sl	a
+      0002E4 80 34                  808 	t1sn.io	f, c
+      0002E6r22r63                  809 	goto	00121$
+                                    810 ;	timer16.c: 90: dis[max] = dis[i];
+      0002E8r17r57                  811 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      0002EAr2Fr18                  812 	add	a, _UART_printNum_sloc8_1_0+0
+      0002ECr37r17                  813 	mov	_UART_printNum_sloc15_1_0+0, a
+      0002EEr17r57                  814 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      0002F0r34r18                  815 	add	a, _UART_printNum_sloc13_1_0+0
+      0002F2r38r17                  816 	mov	_UART_printNum_sloc16_1_0+0, a
+      0002F4r00r17                  817 	mov	p, a
+      0002F6r01r07                  818 	idxm	a, p
+      0002F8r39r17                  819 	mov	_UART_printNum_sloc17_1_0+0, a
+      0002FAr37r1F                  820 	mov	a, _UART_printNum_sloc15_1_0+0
+      0002FCr00r17                  821 	mov	p, a
+      0002FEr39r1F                  822 	mov	a, _UART_printNum_sloc17_1_0+0
+      000300r00r07                  823 	idxm	p, a
+                                    824 ;	timer16.c: 91: dis[i] = dis[max - 1 - i];
+      000302r33r1F                  825 	mov	a, _UART_printNum_sloc12_1_0+0
+      000304r34r19                  826 	sub	a, _UART_printNum_sloc13_1_0+0
+      000306r17r50                  827 	add	a, #(_UART_printNum_dis_65536_23 + 0)
+      000308r3Ar17                  828 	mov	_UART_printNum_sloc18_1_0+0, a
+      00030Ar00r17                  829 	mov	p, a
+      00030Cr01r07                  830 	idxm	a, p
+      00030Er00r17                  831 	mov	p, a
+      000310r38r1F                  832 	mov	a, _UART_printNum_sloc16_1_0+0
+      000312r00r27                  833 	xch	a, p
+      000314r00r07                  834 	idxm	p, a
+                                    835 ;	timer16.c: 92: dis[max - 1 - i] = dis[max];
+      000316r3Ar1F                  836 	mov	a, _UART_printNum_sloc18_1_0+0
+      000318r00r17                  837 	mov	p, a
+      00031Ar39r1F                  838 	mov	a, _UART_printNum_sloc17_1_0+0
+      00031Cr00r07                  839 	idxm	p, a
+                                    840 ;	timer16.c: 88: for (uint8_t i = 0; i < max / 2; i++) // revert dis array
+      00031Er34r24                  841 	inc	_UART_printNum_sloc13_1_0+0
+      000320rBAr62                  842 	goto	00123$
+      000322                        843 00121$:
+                                    844 ;	timer16.c: 94: dis[max] = '\0';  // end string character
+      000322r17r57                  845 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      000324r2Fr18                  846 	add	a, _UART_printNum_sloc8_1_0+0
+      000326r00r17                  847 	mov	p, a
+      000328 00 57                  848 	mov	a, #0x00
+      00032Ar00r07                  849 	idxm	p, a
+                                    850 ;	timer16.c: 95: UART_print(dis); // print dis
+      00032Cr17r57                  851 	mov	a, #(_UART_printNum_dis_65536_23 + 0)
+      00032Er0Fr17                  852 	mov	_UART_print_PARM_1+0, a
+      000330r10r26                  853 	clear	_UART_print_PARM_1+1
+      000332rE4r60                  854 	goto	_UART_print
+                                    855 ;	timer16.c: 96: }
+      000334 7A 00                  856 	ret
+                                    857 ;	timer16.c: 98: void main(void)
+                                    858 ;	-----------------------------------------
+                                    859 ;	 function main
+                                    860 ;	-----------------------------------------
+      000336                        861 _main:
+                                    862 ;	timer16.c: 100: UART_begin();
+      000336r00r70                  863 	call	_UART_begin
+                                    864 ;	timer16.c: 101: setb(PBC, 4);
+      000338 14 3E                  865 	set1.io	__pbc, #4
+                                    866 ;	timer16.c: 102: millis_setup();
+      00033Ar2Er70                  867 	call	_millis_setup
+                                    868 ;	timer16.c: 103: INTRQ = 0;
+      00033C 00 57                  869 	mov	a, #0x00
+      00033E 05 01                  870 	mov.io	__intrq, a
+                                    871 ;	timer16.c: 104: sei();
+      000340 78 00                  872 	engint
+                                    873 ;	timer16.c: 106: UART_print("123\n");
+      000342r00r57                  874 	mov	a, #<(___str_0 + 0)
+      000344r0Fr17                  875 	mov	_UART_print_PARM_1+0, a
+      000346r00r57                  876 	mov	a, #>(___str_0 + 0x8000 + 0)
+      000348r10r17                  877 	mov	_UART_print_PARM_1+1, a
+      00034ArE4r70                  878 	call	_UART_print
+                                    879 ;	timer16.c: 108: while (1)
+      00034C                        880 00102$:
+                                    881 ;	timer16.c: 113: t = millis();
+      00034Cr3Fr57                  882 	mov	a, #_main_sloc19_1_0
+      00034E 72 00                  883 	push	af
+      000350r34r70                  884 	call	_millis
+      000352 82 01                  885 	mov.io	a, sp
+      000354 FE 50                  886 	add	a, #-2
+      000356 02 01                  887 	mov.io	sp, a
+      000358r3Fr1F                  888 	mov	a, _main_sloc19_1_0+0
+      00035Ar3Br17                  889 	mov	_t+0, a
+      00035Cr40r1F                  890 	mov	a, _main_sloc19_1_0+1
+      00035Er3Cr17                  891 	mov	_t+1, a
+      000360r41r1F                  892 	mov	a, _main_sloc19_1_0+2
+      000362r3Dr17                  893 	mov	_t+2, a
+      000364r42r1F                  894 	mov	a, _main_sloc19_1_0+3
+      000366r3Er17                  895 	mov	_t+3, a
+                                    896 ;	timer16.c: 116: _delay_ms(1000);
+      000368 29 57                  897 	mov	a, #0x29
+      00036Ar03r17                  898 	mov	__delay_loop_32_PARM_1+0, a
+      00036C 2C 57                  899 	mov	a, #0x2c
+      00036Er04r17                  900 	mov	__delay_loop_32_PARM_1+1, a
+      000370 0A 57                  901 	mov	a, #0x0a
+      000372r05r17                  902 	mov	__delay_loop_32_PARM_1+2, a
+      000374r06r26                  903 	clear	__delay_loop_32_PARM_1+3
+      000376r16r70                  904 	call	__delay_loop_32
+                                    905 ;	timer16.c: 117: UART_printNum(t-millis(), DEC);
+      000378r43r57                  906 	mov	a, #_main_sloc20_1_0
+      00037A 72 00                  907 	push	af
+      00037Cr34r70                  908 	call	_millis
+      00037E 82 01                  909 	mov.io	a, sp
+      000380 FE 50                  910 	add	a, #-2
+      000382 02 01                  911 	mov.io	sp, a
+      000384r3Br1F                  912 	mov	a, _t+0
+      000386r43r19                  913 	sub	a, _main_sloc20_1_0+0
+      000388r12r17                  914 	mov	_UART_printNum_PARM_1+0, a
+      00038Ar3Cr1F                  915 	mov	a, _t+1
+      00038Cr44r1B                  916 	subc	a, _main_sloc20_1_0+1
+      00038Er13r17                  917 	mov	_UART_printNum_PARM_1+1, a
+      000390r3Dr1F                  918 	mov	a, _t+2
+      000392r45r1B                  919 	subc	a, _main_sloc20_1_0+2
+      000394r14r17                  920 	mov	_UART_printNum_PARM_1+2, a
+      000396r3Er1F                  921 	mov	a, _t+3
+      000398r46r1B                  922 	subc	a, _main_sloc20_1_0+3
+      00039Ar15r17                  923 	mov	_UART_printNum_PARM_1+3, a
+      00039C 0A 57                  924 	mov	a, #0x0a
+      00039Er16r17                  925 	mov	_UART_printNum_PARM_2+0, a
+      0003A0r0Er71                  926 	call	_UART_printNum
+                                    927 ;	timer16.c: 118: UART_print("\n");
+      0003A2r0Ar57                  928 	mov	a, #<(___str_1 + 0)
+      0003A4r0Fr17                  929 	mov	_UART_print_PARM_1+0, a
+      0003A6r0Ar57                  930 	mov	a, #>(___str_1 + 0x8000 + 0)
+      0003A8r10r17                  931 	mov	_UART_print_PARM_1+1, a
+      0003AArE4r70                  932 	call	_UART_print
+      0003ACr4Cr63                  933 	goto	00102$
+                                    934 ;	timer16.c: 121: }
+      0003AE 7A 00                  935 	ret
+                                    936 	.area CODE
+                                    937 	.area CONST
+                                    938 	.area CONST
+      000000                        939 ___str_0:
+      000000 31 02                  940 	ret #0x31	; 1
+      000002 32 02                  941 	ret #0x32	; 2
+      000004 33 02                  942 	ret #0x33	; 3
+      000006 0A 02                  943 	ret #0x0a
+      000008 00 02                  944 	ret #0x00
+                                    945 	.area CODE
+                                    946 	.area CONST
+      00000A                        947 ___str_1:
+      00000A 0A 02                  948 	ret #0x0a
+      00000C 00 02                  949 	ret #0x00
+                                    950 	.area CODE
+                                    951 	.area CABS (ABS)

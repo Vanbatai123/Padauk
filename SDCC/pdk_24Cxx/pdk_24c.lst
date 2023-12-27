@@ -1,0 +1,491 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_24c
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl __delay_loop_16
+                                     17 	.globl _I2C_available
+                                     18 	.globl _I2C_read
+                                     19 	.globl _I2C_requestFrom
+                                     20 	.globl _I2C_endTransmission
+                                     21 	.globl _I2C_write
+                                     22 	.globl _I2C_beginTransmission
+                                     23 	.globl __t16c
+                                     24 	.globl __rop
+                                     25 	.globl __bgtr
+                                     26 	.globl __ilrcr
+                                     27 	.globl __pwmg2dtl
+                                     28 	.globl __pwmg2dth
+                                     29 	.globl __pwmg2c
+                                     30 	.globl __pwmg1dtl
+                                     31 	.globl __pwmg1dth
+                                     32 	.globl __pwmg1c
+                                     33 	.globl __pwmgcubl
+                                     34 	.globl __pwmgcubh
+                                     35 	.globl __pwmg0dtl
+                                     36 	.globl __pwmg0dth
+                                     37 	.globl __pwmgclk
+                                     38 	.globl __pwmg0c
+                                     39 	.globl __tm3b
+                                     40 	.globl __tm3s
+                                     41 	.globl __tm3ct
+                                     42 	.globl __tm3c
+                                     43 	.globl __tm2b
+                                     44 	.globl __tm2s
+                                     45 	.globl __tm2ct
+                                     46 	.globl __tm2c
+                                     47 	.globl __gpcs
+                                     48 	.globl __gpcc
+                                     49 	.globl __misclvr
+                                     50 	.globl __misc2
+                                     51 	.globl __misc
+                                     52 	.globl __adcrgc
+                                     53 	.globl __adcr
+                                     54 	.globl __adcm
+                                     55 	.globl __adcc
+                                     56 	.globl __pcpl
+                                     57 	.globl __pbpl
+                                     58 	.globl __pcph
+                                     59 	.globl __pcc
+                                     60 	.globl __pc
+                                     61 	.globl __pbph
+                                     62 	.globl __pbc
+                                     63 	.globl __pb
+                                     64 	.globl __paph
+                                     65 	.globl __pac
+                                     66 	.globl __pa
+                                     67 	.globl __pcdier
+                                     68 	.globl __pbdier
+                                     69 	.globl __padier
+                                     70 	.globl __integs
+                                     71 	.globl __ihrcr
+                                     72 	.globl __eoscr
+                                     73 	.globl __t16m
+                                     74 	.globl __intrq
+                                     75 	.globl __inten
+                                     76 	.globl __clkmd
+                                     77 	.globl __sp
+                                     78 	.globl __flag
+                                     79 	.globl _AT24C_readBuf_PARM_3
+                                     80 	.globl _AT24C_readBuf_PARM_2
+                                     81 	.globl _AT24C_readBuf_PARM_1
+                                     82 	.globl _AT24C_writeBuf_PARM_3
+                                     83 	.globl _AT24C_writeBuf_PARM_2
+                                     84 	.globl _AT24C_writeBuf_PARM_1
+                                     85 	.globl _AT24C_read_PARM_1
+                                     86 	.globl _AT24C_write_PARM_2
+                                     87 	.globl _AT24C_write_PARM_1
+                                     88 	.globl _AT24C_write
+                                     89 	.globl _AT24C_read
+                                     90 	.globl _AT24C_erase
+                                     91 	.globl _AT24C_writeBuf
+                                     92 	.globl _AT24C_readBuf
+                                     93 ;--------------------------------------------------------
+                                     94 ; special function registers
+                                     95 ;--------------------------------------------------------
+                                     96 	.area RSEG (ABS)
+      000000                         97 	.org 0x0000
+                           000000    98 __flag	=	0x0000
+                           000002    99 __sp	=	0x0002
+                           000003   100 __clkmd	=	0x0003
+                           000004   101 __inten	=	0x0004
+                           000005   102 __intrq	=	0x0005
+                           000006   103 __t16m	=	0x0006
+                           00000A   104 __eoscr	=	0x000a
+                           00000B   105 __ihrcr	=	0x000b
+                           00000C   106 __integs	=	0x000c
+                           00000D   107 __padier	=	0x000d
+                           00000E   108 __pbdier	=	0x000e
+                           00000F   109 __pcdier	=	0x000f
+                           000010   110 __pa	=	0x0010
+                           000011   111 __pac	=	0x0011
+                           000012   112 __paph	=	0x0012
+                           000013   113 __pb	=	0x0013
+                           000014   114 __pbc	=	0x0014
+                           000015   115 __pbph	=	0x0015
+                           000016   116 __pc	=	0x0016
+                           000017   117 __pcc	=	0x0017
+                           000018   118 __pcph	=	0x0018
+                           000019   119 __pbpl	=	0x0019
+                           00001A   120 __pcpl	=	0x001a
+                           000020   121 __adcc	=	0x0020
+                           000021   122 __adcm	=	0x0021
+                           000022   123 __adcr	=	0x0022
+                           000024   124 __adcrgc	=	0x0024
+                           000026   125 __misc	=	0x0026
+                           000027   126 __misc2	=	0x0027
+                           000028   127 __misclvr	=	0x0028
+                           00002B   128 __gpcc	=	0x002b
+                           00002C   129 __gpcs	=	0x002c
+                           000030   130 __tm2c	=	0x0030
+                           000031   131 __tm2ct	=	0x0031
+                           000032   132 __tm2s	=	0x0032
+                           000033   133 __tm2b	=	0x0033
+                           000034   134 __tm3c	=	0x0034
+                           000035   135 __tm3ct	=	0x0035
+                           000036   136 __tm3s	=	0x0036
+                           000037   137 __tm3b	=	0x0037
+                           000040   138 __pwmg0c	=	0x0040
+                           000041   139 __pwmgclk	=	0x0041
+                           000042   140 __pwmg0dth	=	0x0042
+                           000043   141 __pwmg0dtl	=	0x0043
+                           000044   142 __pwmgcubh	=	0x0044
+                           000045   143 __pwmgcubl	=	0x0045
+                           000046   144 __pwmg1c	=	0x0046
+                           000048   145 __pwmg1dth	=	0x0048
+                           000049   146 __pwmg1dtl	=	0x0049
+                           00004C   147 __pwmg2c	=	0x004c
+                           00004E   148 __pwmg2dth	=	0x004e
+                           00004F   149 __pwmg2dtl	=	0x004f
+                           000062   150 __ilrcr	=	0x0062
+                           000063   151 __bgtr	=	0x0063
+                           000067   152 __rop	=	0x0067
+      000000                        153 __t16c::
+      000000                        154 	.ds 2
+                                    155 ;--------------------------------------------------------
+                                    156 ; ram data
+                                    157 ;--------------------------------------------------------
+                                    158 	.area DATA
+      000000                        159 _AT24C_write_PARM_1:
+      000000                        160 	.ds 2
+      000002                        161 _AT24C_write_PARM_2:
+      000002                        162 	.ds 1
+      000003                        163 _AT24C_write_sloc0_1_0:
+      000003                        164 	.ds 1
+      000004                        165 _AT24C_read_PARM_1:
+      000004                        166 	.ds 2
+      000006                        167 _AT24C_read_sloc1_1_0:
+      000006                        168 	.ds 1
+      000007                        169 _AT24C_erase_sloc2_1_0:
+      000007                        170 	.ds 2
+      000009                        171 _AT24C_writeBuf_PARM_1:
+      000009                        172 	.ds 2
+      00000B                        173 _AT24C_writeBuf_PARM_2:
+      00000B                        174 	.ds 2
+      00000D                        175 _AT24C_writeBuf_PARM_3:
+      00000D                        176 	.ds 1
+      00000E                        177 _AT24C_writeBuf_sloc3_1_0:
+      00000E                        178 	.ds 2
+      000010                        179 _AT24C_writeBuf_sloc4_1_0:
+      000010                        180 	.ds 1
+      000011                        181 _AT24C_readBuf_PARM_1:
+      000011                        182 	.ds 2
+      000013                        183 _AT24C_readBuf_PARM_2:
+      000013                        184 	.ds 2
+      000015                        185 _AT24C_readBuf_PARM_3:
+      000015                        186 	.ds 2
+      000017                        187 _AT24C_readBuf_sloc5_1_0:
+      000017                        188 	.ds 2
+      000019                        189 _AT24C_readBuf_sloc6_1_0:
+      000019                        190 	.ds 1
+      00001A                        191 _AT24C_readBuf_sloc7_1_0:
+      00001A                        192 	.ds 2
+                                    193 ;--------------------------------------------------------
+                                    194 ; overlayable items in ram
+                                    195 ;--------------------------------------------------------
+                                    196 ;--------------------------------------------------------
+                                    197 ; absolute external ram data
+                                    198 ;--------------------------------------------------------
+                                    199 	.area DABS (ABS)
+                                    200 ;--------------------------------------------------------
+                                    201 ; global & static initialisations
+                                    202 ;--------------------------------------------------------
+                                    203 	.area HOME
+                                    204 	.area GSINIT
+                                    205 	.area GSFINAL
+                                    206 	.area GSINIT
+                                    207 ;--------------------------------------------------------
+                                    208 ; Home
+                                    209 ;--------------------------------------------------------
+                                    210 	.area HOME
+                                    211 	.area HOME
+                                    212 ;--------------------------------------------------------
+                                    213 ; code
+                                    214 ;--------------------------------------------------------
+                                    215 	.area CODE
+                                    216 ;	pdk_24c.c: 14: void AT24C_write(uint16_t address, uint8_t data)
+                                    217 ;	-----------------------------------------
+                                    218 ;	 function AT24C_write
+                                    219 ;	-----------------------------------------
+      000000                        220 _AT24C_write:
+                                    221 ;	pdk_24c.c: 16: if ((address >= MEM_BYTE) | (AT24C_read(address) == data))
+      000000r01r1F                  222 	mov	a, _AT24C_write_PARM_1+1
+      000002r00r17                  223 	mov	p, a
+      000004 04 51                  224 	sub	a, #0x04
+      000006 00 57                  225 	mov	a, #0x00
+      000008 6D 00                  226 	slc	a
+      00000A 01 56                  227 	xor	a, #0x01
+      00000Cr03r17                  228 	mov	_AT24C_write_sloc0_1_0+0, a
+      00000Er00r1F                  229 	mov	a, _AT24C_write_PARM_1+0
+      000010r04r17                  230 	mov	_AT24C_read_PARM_1+0, a
+      000012r01r1F                  231 	mov	a, _AT24C_write_PARM_1+1
+      000014r05r17                  232 	mov	_AT24C_read_PARM_1+1, a
+      000016r52r70                  233 	call	_AT24C_read
+      000018r02r2E                  234 	ceqsn	a, _AT24C_write_PARM_2+0
+      00001Ar22r60                  235 	goto	00109$
+      00001C 01 57                  236 	mov	a, #0x01
+      00001Er00r17                  237 	mov	p, a
+      000020r24r60                  238 	goto	00110$
+      000022                        239 00109$:
+      000022r00r26                  240 	clear	p
+      000024                        241 00110$:
+      000024r03r1F                  242 	mov	a, _AT24C_write_sloc0_1_0+0
+      000026r00r1D                  243 	or	a, p
+      000028 00 53                  244 	cneqsn	a, #0x00
+      00002Ar2Er60                  245 	goto	00102$
+                                    246 ;	pdk_24c.c: 18: return; // thoát ngay
+      00002C 7A 00                  247 	ret
+      00002E                        248 00102$:
+                                    249 ;	pdk_24c.c: 26: I2C_beginTransmission(MEMADDR | ((address >> 8) & 0x07));
+      00002Er01r1F                  250 	mov	a, _AT24C_write_PARM_1+1
+      000030 07 54                  251 	and	a, #0x07
+      000032 50 55                  252 	or	a, #0x50
+      000034r00r17                  253 	mov	_I2C_beginTransmission_PARM_1+0, a
+      000036r00r70                  254 	call	_I2C_beginTransmission
+                                    255 ;	pdk_24c.c: 27: I2C_write(address & 0xFF);
+      000038r00r1F                  256 	mov	a, _AT24C_write_PARM_1+0
+      00003Ar00r17                  257 	mov	_I2C_write_PARM_1+0, a
+      00003Cr00r70                  258 	call	_I2C_write
+                                    259 ;	pdk_24c.c: 34: I2C_write(data);
+      00003Er02r1F                  260 	mov	a, _AT24C_write_PARM_2+0
+      000040r00r17                  261 	mov	_I2C_write_PARM_1+0, a
+      000042r00r70                  262 	call	_I2C_write
+                                    263 ;	pdk_24c.c: 35: I2C_endTransmission();
+      000044r00r70                  264 	call	_I2C_endTransmission
+                                    265 ;	pdk_24c.c: 36: _delay_ms(5);
+      000046 86 57                  266 	mov	a, #0x86
+      000048r00r17                  267 	mov	__delay_loop_16_PARM_1+0, a
+      00004A 13 57                  268 	mov	a, #0x13
+      00004Cr01r17                  269 	mov	__delay_loop_16_PARM_1+1, a
+      00004Er00r60                  270 	goto	__delay_loop_16
+                                    271 ;	pdk_24c.c: 37: }
+      000050 7A 00                  272 	ret
+                                    273 ;	pdk_24c.c: 39: uint8_t AT24C_read(uint16_t address)
+                                    274 ;	-----------------------------------------
+                                    275 ;	 function AT24C_read
+                                    276 ;	-----------------------------------------
+      000052                        277 _AT24C_read:
+                                    278 ;	pdk_24c.c: 42: if (address >= MEM_BYTE)
+      000052r05r1F                  279 	mov	a, _AT24C_read_PARM_1+1
+      000054r00r17                  280 	mov	p, a
+      000056 04 51                  281 	sub	a, #0x04
+      000058 80 30                  282 	t0sn.io	f, c
+      00005Ar5Er60                  283 	goto	00102$
+                                    284 ;	pdk_24c.c: 44: return 0; // thoát ngay
+      00005C 00 02                  285 	ret	#0x00
+      00005E                        286 00102$:
+                                    287 ;	pdk_24c.c: 56: I2C_beginTransmission((MEMADDR | ((address >> 8) & 0x07)));
+      00005Er05r1F                  288 	mov	a, _AT24C_read_PARM_1+1
+      000060 07 54                  289 	and	a, #0x07
+      000062 50 55                  290 	or	a, #0x50
+      000064r06r17                  291 	mov	_AT24C_read_sloc1_1_0+0, a
+      000066r00r17                  292 	mov	_I2C_beginTransmission_PARM_1+0, a
+      000068r00r70                  293 	call	_I2C_beginTransmission
+                                    294 ;	pdk_24c.c: 57: I2C_write(address & 0xFF);
+      00006Ar04r1F                  295 	mov	a, _AT24C_read_PARM_1+0
+      00006Cr00r17                  296 	mov	_I2C_write_PARM_1+0, a
+      00006Er00r70                  297 	call	_I2C_write
+                                    298 ;	pdk_24c.c: 58: I2C_endTransmission();
+      000070r00r70                  299 	call	_I2C_endTransmission
+                                    300 ;	pdk_24c.c: 59: I2C_requestFrom((MEMADDR | ((address >> 8) & 0x07)), 1);
+      000072r06r1F                  301 	mov	a, _AT24C_read_sloc1_1_0+0
+      000074r00r17                  302 	mov	_I2C_requestFrom_PARM_1+0, a
+      000076 01 57                  303 	mov	a, #0x01
+      000078r00r17                  304 	mov	_I2C_requestFrom_PARM_2+0, a
+      00007Ar00r70                  305 	call	_I2C_requestFrom
+                                    306 ;	pdk_24c.c: 67: if (I2C_available())
+      00007Cr00r70                  307 	call	_I2C_available
+      00007E 00 53                  308 	cneqsn	a, #0x00
+      000080r86r60                  309 	goto	00104$
+                                    310 ;	pdk_24c.c: 69: data = I2C_read();
+      000082r00r70                  311 	call	_I2C_read
+                                    312 ;	pdk_24c.c: 70: return data;
+      000084 7A 00                  313 	ret
+      000086                        314 00104$:
+                                    315 ;	pdk_24c.c: 72: return -1;
+                                    316 ;	pdk_24c.c: 73: }
+      000086 FF 02                  317 	ret	#0xff
+                                    318 ;	pdk_24c.c: 77: void AT24C_erase(void)
+                                    319 ;	-----------------------------------------
+                                    320 ;	 function AT24C_erase
+                                    321 ;	-----------------------------------------
+      000088                        322 _AT24C_erase:
+                                    323 ;	pdk_24c.c: 79: for (uint16_t i = 0; i < MEM_BYTE; i++)
+      000088r07r26                  324 	clear	_AT24C_erase_sloc2_1_0+0
+      00008Ar08r26                  325 	clear	_AT24C_erase_sloc2_1_0+1
+      00008C                        326 00105$:
+      00008Cr08r1F                  327 	mov	a, _AT24C_erase_sloc2_1_0+1
+      00008Er00r17                  328 	mov	p, a
+      000090 04 51                  329 	sub	a, #0x04
+      000092 80 34                  330 	t1sn.io	f, c
+      000094rB8r60                  331 	goto	00107$
+                                    332 ;	pdk_24c.c: 81: if ((AT24C_read(i) != 0xFF))
+      000096r07r1F                  333 	mov	a, _AT24C_erase_sloc2_1_0+0
+      000098r04r17                  334 	mov	_AT24C_read_PARM_1+0, a
+      00009Ar08r1F                  335 	mov	a, _AT24C_erase_sloc2_1_0+1
+      00009Cr05r17                  336 	mov	_AT24C_read_PARM_1+1, a
+      00009Er52r70                  337 	call	_AT24C_read
+      0000A0 FF 53                  338 	cneqsn	a, #0xff
+      0000A2rB2r60                  339 	goto	00106$
+      0000A4                        340 00122$:
+                                    341 ;	pdk_24c.c: 83: AT24C_write(i, 0xFF);
+      0000A4r07r1F                  342 	mov	a, _AT24C_erase_sloc2_1_0+0
+      0000A6r00r17                  343 	mov	_AT24C_write_PARM_1+0, a
+      0000A8r08r1F                  344 	mov	a, _AT24C_erase_sloc2_1_0+1
+      0000AAr01r17                  345 	mov	_AT24C_write_PARM_1+1, a
+      0000AC FF 57                  346 	mov	a, #0xff
+      0000AEr02r17                  347 	mov	_AT24C_write_PARM_2+0, a
+      0000B0r00r70                  348 	call	_AT24C_write
+      0000B2                        349 00106$:
+                                    350 ;	pdk_24c.c: 79: for (uint16_t i = 0; i < MEM_BYTE; i++)
+      0000B2r07r24                  351 	inc	_AT24C_erase_sloc2_1_0+0
+      0000B4r08r20                  352 	addc	_AT24C_erase_sloc2_1_0+1
+      0000B6r8Cr60                  353 	goto	00105$
+      0000B8                        354 00107$:
+                                    355 ;	pdk_24c.c: 86: }
+      0000B8 7A 00                  356 	ret
+                                    357 ;	pdk_24c.c: 88: void AT24C_writeBuf(uint16_t address, uint8_t *src, uint8_t len)
+                                    358 ;	-----------------------------------------
+                                    359 ;	 function AT24C_writeBuf
+                                    360 ;	-----------------------------------------
+      0000BA                        361 _AT24C_writeBuf:
+                                    362 ;	pdk_24c.c: 91: if ((address + len) >= MEM_BYTE)
+      0000BAr00r26                  363 	clear	p
+      0000BCr0Dr1F                  364 	mov	a, _AT24C_writeBuf_PARM_3+0
+      0000BE 72 00                  365 	push	af
+      0000C0r09r1F                  366 	mov	a, _AT24C_writeBuf_PARM_1+0
+      0000C2r0Er17                  367 	mov	_AT24C_writeBuf_sloc3_1_0+0, a
+      0000C4 73 00                  368 	pop	af
+      0000C6 72 00                  369 	push	af
+      0000C8r0Ar1F                  370 	mov	a, _AT24C_writeBuf_PARM_1+1
+      0000CAr0Fr17                  371 	mov	_AT24C_writeBuf_sloc3_1_0+1, a
+      0000CC 73 00                  372 	pop	af
+      0000CEr0Er18                  373 	add	a, _AT24C_writeBuf_sloc3_1_0+0
+      0000D0 72 00                  374 	push	af
+      0000D2r0Fr1F                  375 	mov	a, _AT24C_writeBuf_sloc3_1_0+1
+      0000D4r00r12                  376 	addc	p, a
+      0000D6 73 00                  377 	pop	af
+      0000D8r00r1F                  378 	mov	a, p
+      0000DA 04 51                  379 	sub	a, #0x04
+      0000DC 80 30                  380 	t0sn.io	f, c
+      0000DErE6r60                  381 	goto	00111$
+                                    382 ;	pdk_24c.c: 93: len = (MEM_BYTE - address);
+      0000E0r09r1F                  383 	mov	a, _AT24C_writeBuf_PARM_1+0
+      0000E2 69 00                  384 	neg	a
+      0000E4r0Dr17                  385 	mov	_AT24C_writeBuf_PARM_3+0, a
+                                    386 ;	pdk_24c.c: 96: for (uint8_t i = 0; i < len; i++)
+      0000E6                        387 00111$:
+      0000E6r10r26                  388 	clear	_AT24C_writeBuf_sloc4_1_0+0
+      0000E8                        389 00105$:
+      0000E8r10r1F                  390 	mov	a, _AT24C_writeBuf_sloc4_1_0+0
+      0000EAr0Dr19                  391 	sub	a, _AT24C_writeBuf_PARM_3+0
+      0000EC 80 34                  392 	t1sn.io	f, c
+      0000EEr14r61                  393 	goto	00107$
+                                    394 ;	pdk_24c.c: 98: AT24C_write(address + i, src[i]);
+      0000F0r0Er1F                  395 	mov	a, _AT24C_writeBuf_sloc3_1_0+0
+      0000F2r10r18                  396 	add	a, _AT24C_writeBuf_sloc4_1_0+0
+      0000F4r00r17                  397 	mov	p, a
+      0000F6r0Fr1F                  398 	mov	a, _AT24C_writeBuf_sloc3_1_0+1
+      0000F8 60 00                  399 	addc	a
+      0000FAr01r17                  400 	mov	_AT24C_write_PARM_1+1, a
+      0000FCr00r1F                  401 	mov	a, p
+      0000FEr00r17                  402 	mov	_AT24C_write_PARM_1+0, a
+      000100r0Br1F                  403 	mov	a, _AT24C_writeBuf_PARM_2+0
+      000102r10r18                  404 	add	a, _AT24C_writeBuf_sloc4_1_0+0
+      000104r00r17                  405 	mov	p, a
+      000106r0Cr1F                  406 	mov	a, _AT24C_writeBuf_PARM_2+1
+      000108 60 00                  407 	addc	a
+      00010Ar00r70                  408 	call	__gptrget
+      00010Cr02r17                  409 	mov	_AT24C_write_PARM_2+0, a
+      00010Er00r70                  410 	call	_AT24C_write
+                                    411 ;	pdk_24c.c: 96: for (uint8_t i = 0; i < len; i++)
+      000110r10r24                  412 	inc	_AT24C_writeBuf_sloc4_1_0+0
+      000112rE8r60                  413 	goto	00105$
+      000114                        414 00107$:
+                                    415 ;	pdk_24c.c: 100: }
+      000114 7A 00                  416 	ret
+                                    417 ;	pdk_24c.c: 102: void AT24C_readBuf(uint16_t address, uint8_t *dest, int len)
+                                    418 ;	-----------------------------------------
+                                    419 ;	 function AT24C_readBuf
+                                    420 ;	-----------------------------------------
+      000116                        421 _AT24C_readBuf:
+                                    422 ;	pdk_24c.c: 107: if ((address + len) >= MEM_BYTE)
+      000116r11r1F                  423 	mov	a, _AT24C_readBuf_PARM_1+0
+      000118r17r17                  424 	mov	_AT24C_readBuf_sloc5_1_0+0, a
+      00011Ar12r1F                  425 	mov	a, _AT24C_readBuf_PARM_1+1
+      00011Cr18r17                  426 	mov	_AT24C_readBuf_sloc5_1_0+1, a
+      00011Er16r1F                  427 	mov	a, _AT24C_readBuf_PARM_3+1
+      000120r00r17                  428 	mov	p, a
+      000122r15r1F                  429 	mov	a, _AT24C_readBuf_PARM_3+0
+      000124r17r18                  430 	add	a, _AT24C_readBuf_sloc5_1_0+0
+      000126 72 00                  431 	push	af
+      000128r18r1F                  432 	mov	a, _AT24C_readBuf_sloc5_1_0+1
+      00012Ar00r12                  433 	addc	p, a
+      00012C 73 00                  434 	pop	af
+      00012Er00r1F                  435 	mov	a, p
+      000130 04 51                  436 	sub	a, #0x04
+      000132 80 30                  437 	t0sn.io	f, c
+      000134r46r61                  438 	goto	00102$
+                                    439 ;	pdk_24c.c: 109: len = (MEM_BYTE - address);
+      000136 00 57                  440 	mov	a, #0x00
+      000138r11r19                  441 	sub	a, _AT24C_readBuf_PARM_1+0
+      00013Ar00r17                  442 	mov	p, a
+      00013C 04 57                  443 	mov	a, #0x04
+      00013Er12r1B                  444 	subc	a, _AT24C_readBuf_PARM_1+1
+      000140r16r17                  445 	mov	_AT24C_readBuf_PARM_3+1, a
+      000142r00r1F                  446 	mov	a, p
+      000144r15r17                  447 	mov	_AT24C_readBuf_PARM_3+0, a
+      000146                        448 00102$:
+                                    449 ;	pdk_24c.c: 118: I2C_beginTransmission((MEMADDR | ((address >> 8) & 0x07)));
+      000146r12r1F                  450 	mov	a, _AT24C_readBuf_PARM_1+1
+      000148 07 54                  451 	and	a, #0x07
+      00014A 50 55                  452 	or	a, #0x50
+      00014Cr19r17                  453 	mov	_AT24C_readBuf_sloc6_1_0+0, a
+      00014Er00r17                  454 	mov	_I2C_beginTransmission_PARM_1+0, a
+      000150r00r70                  455 	call	_I2C_beginTransmission
+                                    456 ;	pdk_24c.c: 119: I2C_write(address & 0xFF);
+      000152r11r1F                  457 	mov	a, _AT24C_readBuf_PARM_1+0
+      000154r00r17                  458 	mov	_I2C_write_PARM_1+0, a
+      000156r00r70                  459 	call	_I2C_write
+                                    460 ;	pdk_24c.c: 120: I2C_endTransmission();
+      000158r00r70                  461 	call	_I2C_endTransmission
+                                    462 ;	pdk_24c.c: 121: I2C_requestFrom((MEMADDR | ((address >> 8) & 0x07)), len);
+      00015Ar15r1F                  463 	mov	a, _AT24C_readBuf_PARM_3+0
+      00015Cr00r17                  464 	mov	_I2C_requestFrom_PARM_2+0, a
+      00015Er19r1F                  465 	mov	a, _AT24C_readBuf_sloc6_1_0+0
+      000160r00r17                  466 	mov	_I2C_requestFrom_PARM_1+0, a
+      000162r00r70                  467 	call	_I2C_requestFrom
+                                    468 ;	pdk_24c.c: 129: while (I2C_available())
+      000164r13r1F                  469 	mov	a, _AT24C_readBuf_PARM_2+0
+      000166r1Ar17                  470 	mov	_AT24C_readBuf_sloc7_1_0+0, a
+      000168r14r1F                  471 	mov	a, _AT24C_readBuf_PARM_2+1
+      00016Ar1Br17                  472 	mov	_AT24C_readBuf_sloc7_1_0+1, a
+      00016C                        473 00103$:
+      00016Cr00r70                  474 	call	_I2C_available
+      00016E 00 53                  475 	cneqsn	a, #0x00
+      000170r82r61                  476 	goto	00106$
+                                    477 ;	pdk_24c.c: 131: *dest++ = I2C_read();
+      000172r00r70                  478 	call	_I2C_read
+      000174r00r17                  479 	mov	p, a
+      000176r1Ar1F                  480 	mov	a, _AT24C_readBuf_sloc7_1_0+0
+      000178r00r27                  481 	xch	a, p
+      00017Ar00r07                  482 	idxm	p, a
+      00017Cr1Ar24                  483 	inc	_AT24C_readBuf_sloc7_1_0+0
+      00017Er1Br20                  484 	addc	_AT24C_readBuf_sloc7_1_0+1
+      000180r6Cr61                  485 	goto	00103$
+      000182                        486 00106$:
+                                    487 ;	pdk_24c.c: 133: }
+      000182 7A 00                  488 	ret
+                                    489 	.area CODE
+                                    490 	.area CONST
+                                    491 	.area CABS (ABS)

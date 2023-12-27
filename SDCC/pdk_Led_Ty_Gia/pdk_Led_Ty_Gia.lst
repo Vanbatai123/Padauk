@@ -1,0 +1,800 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_Led_Ty_Gia
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _interrupt
+                                     17 	.globl _main
+                                     18 	.globl _UART_printNum
+                                     19 	.globl __sdcc_external_startup
+                                     20 	.globl _TIM2_interrupt
+                                     21 	.globl _putchar
+                                     22 	.globl _UART_begin
+                                     23 	.globl __delay_loop_32
+                                     24 	.globl __delay_loop_16
+                                     25 	.globl __delay_loop_8
+                                     26 	.globl __t16c
+                                     27 	.globl __rop
+                                     28 	.globl __bgtr
+                                     29 	.globl __ilrcr
+                                     30 	.globl __pwmg2dtl
+                                     31 	.globl __pwmg2dth
+                                     32 	.globl __pwmg2c
+                                     33 	.globl __pwmg1dtl
+                                     34 	.globl __pwmg1dth
+                                     35 	.globl __pwmg1c
+                                     36 	.globl __pwmgcubl
+                                     37 	.globl __pwmgcubh
+                                     38 	.globl __pwmg0dtl
+                                     39 	.globl __pwmg0dth
+                                     40 	.globl __pwmgclk
+                                     41 	.globl __pwmg0c
+                                     42 	.globl __tm3b
+                                     43 	.globl __tm3s
+                                     44 	.globl __tm3ct
+                                     45 	.globl __tm3c
+                                     46 	.globl __tm2b
+                                     47 	.globl __tm2s
+                                     48 	.globl __tm2ct
+                                     49 	.globl __tm2c
+                                     50 	.globl __gpcs
+                                     51 	.globl __gpcc
+                                     52 	.globl __misclvr
+                                     53 	.globl __misc2
+                                     54 	.globl __misc
+                                     55 	.globl __adcrgc
+                                     56 	.globl __adcr
+                                     57 	.globl __adcm
+                                     58 	.globl __adcc
+                                     59 	.globl __pcpl
+                                     60 	.globl __pbpl
+                                     61 	.globl __pcph
+                                     62 	.globl __pcc
+                                     63 	.globl __pc
+                                     64 	.globl __pbph
+                                     65 	.globl __pbc
+                                     66 	.globl __pb
+                                     67 	.globl __paph
+                                     68 	.globl __pac
+                                     69 	.globl __pa
+                                     70 	.globl __pcdier
+                                     71 	.globl __pbdier
+                                     72 	.globl __padier
+                                     73 	.globl __integs
+                                     74 	.globl __ihrcr
+                                     75 	.globl __eoscr
+                                     76 	.globl __t16m
+                                     77 	.globl __intrq
+                                     78 	.globl __inten
+                                     79 	.globl __clkmd
+                                     80 	.globl __sp
+                                     81 	.globl __flag
+                                     82 	.globl _UART_printNum_PARM_1
+                                     83 	.globl _sta
+                                     84 	.globl _data2
+                                     85 	.globl _data
+                                     86 	.globl _count_data
+                                     87 	.globl _start_status
+                                     88 	.globl _count_ms1
+                                     89 	.globl _count_ms
+                                     90 	.globl _txdata
+                                     91 	.globl __delay_loop_32_PARM_1
+                                     92 	.globl __delay_loop_16_PARM_1
+                                     93 	.globl __delay_loop_8_PARM_1
+                                     94 ;--------------------------------------------------------
+                                     95 ; special function registers
+                                     96 ;--------------------------------------------------------
+                                     97 	.area RSEG (ABS)
+      000000                         98 	.org 0x0000
+                           000000    99 __flag	=	0x0000
+                           000002   100 __sp	=	0x0002
+                           000003   101 __clkmd	=	0x0003
+                           000004   102 __inten	=	0x0004
+                           000005   103 __intrq	=	0x0005
+                           000006   104 __t16m	=	0x0006
+                           00000A   105 __eoscr	=	0x000a
+                           00000B   106 __ihrcr	=	0x000b
+                           00000C   107 __integs	=	0x000c
+                           00000D   108 __padier	=	0x000d
+                           00000E   109 __pbdier	=	0x000e
+                           00000F   110 __pcdier	=	0x000f
+                           000010   111 __pa	=	0x0010
+                           000011   112 __pac	=	0x0011
+                           000012   113 __paph	=	0x0012
+                           000013   114 __pb	=	0x0013
+                           000014   115 __pbc	=	0x0014
+                           000015   116 __pbph	=	0x0015
+                           000016   117 __pc	=	0x0016
+                           000017   118 __pcc	=	0x0017
+                           000018   119 __pcph	=	0x0018
+                           000019   120 __pbpl	=	0x0019
+                           00001A   121 __pcpl	=	0x001a
+                           000020   122 __adcc	=	0x0020
+                           000021   123 __adcm	=	0x0021
+                           000022   124 __adcr	=	0x0022
+                           000024   125 __adcrgc	=	0x0024
+                           000026   126 __misc	=	0x0026
+                           000027   127 __misc2	=	0x0027
+                           000028   128 __misclvr	=	0x0028
+                           00002B   129 __gpcc	=	0x002b
+                           00002C   130 __gpcs	=	0x002c
+                           000030   131 __tm2c	=	0x0030
+                           000031   132 __tm2ct	=	0x0031
+                           000032   133 __tm2s	=	0x0032
+                           000033   134 __tm2b	=	0x0033
+                           000034   135 __tm3c	=	0x0034
+                           000035   136 __tm3ct	=	0x0035
+                           000036   137 __tm3s	=	0x0036
+                           000037   138 __tm3b	=	0x0037
+                           000040   139 __pwmg0c	=	0x0040
+                           000041   140 __pwmgclk	=	0x0041
+                           000042   141 __pwmg0dth	=	0x0042
+                           000043   142 __pwmg0dtl	=	0x0043
+                           000044   143 __pwmgcubh	=	0x0044
+                           000045   144 __pwmgcubl	=	0x0045
+                           000046   145 __pwmg1c	=	0x0046
+                           000048   146 __pwmg1dth	=	0x0048
+                           000049   147 __pwmg1dtl	=	0x0049
+                           00004C   148 __pwmg2c	=	0x004c
+                           00004E   149 __pwmg2dth	=	0x004e
+                           00004F   150 __pwmg2dtl	=	0x004f
+                           000062   151 __ilrcr	=	0x0062
+                           000063   152 __bgtr	=	0x0063
+                           000067   153 __rop	=	0x0067
+      000000                        154 __t16c::
+      000000                        155 	.ds 2
+                                    156 ;--------------------------------------------------------
+                                    157 ; ram data
+                                    158 ;--------------------------------------------------------
+                                    159 	.area DATA
+      000000                        160 __delay_loop_8_PARM_1:
+      000000                        161 	.ds 1
+      000001                        162 __delay_loop_16_PARM_1:
+      000001                        163 	.ds 2
+      000003                        164 __delay_loop_32_PARM_1:
+      000003                        165 	.ds 4
+      000007                        166 _txdata::
+      000007                        167 	.ds 2
+      000009                        168 _count_ms::
+      000009                        169 	.ds 2
+      00000B                        170 _count_ms1::
+      00000B                        171 	.ds 2
+      00000D                        172 _start_status::
+      00000D                        173 	.ds 2
+      00000F                        174 _count_data::
+      00000F                        175 	.ds 2
+      000011                        176 _data::
+      000011                        177 	.ds 4
+      000015                        178 _data2::
+      000015                        179 	.ds 4
+      000019                        180 _sta::
+      000019                        181 	.ds 2
+      00001B                        182 _UART_printNum_PARM_1:
+      00001B                        183 	.ds 4
+      00001F                        184 _UART_printNum_sloc0_1_0:
+      00001F                        185 	.ds 1
+      000020                        186 _UART_printNum_sloc1_1_0:
+      000020                        187 	.ds 4
+      000024                        188 _main_dis_65536_52:
+      000024                        189 	.ds 7
+      00002B                        190 _interrupt_sloc2_1_0:
+      00002B                        191 	.ds 2
+      00002D                        192 _interrupt_sloc3_1_0:
+      00002D                        193 	.ds 2
+      00002F                        194 _interrupt_sloc4_1_0:
+      00002F                        195 	.ds 2
+      000031                        196 _interrupt_sloc5_1_0:
+      000031                        197 	.ds 4
+                                    198 ;--------------------------------------------------------
+                                    199 ; overlayable items in ram
+                                    200 ;--------------------------------------------------------
+                                    201 ;--------------------------------------------------------
+                                    202 ; Stack segment in internal ram
+                                    203 ;--------------------------------------------------------
+                                    204 	.area	SSEG
+      000000                        205 __start__stack:
+      000000                        206 	.ds	1
+                                    207 
+                                    208 ;--------------------------------------------------------
+                                    209 ; absolute external ram data
+                                    210 ;--------------------------------------------------------
+                                    211 	.area DABS (ABS)
+                                    212 ;--------------------------------------------------------
+                                    213 ; interrupt vector
+                                    214 ;--------------------------------------------------------
+                                    215 	.area HOME
+      000000                        216 __interrupt_vect:
+                                    217 	.area	HEADER (ABS)
+      000020                        218 	.org	 0x0020
+      000020r3Ar61                  219 	goto	_interrupt
+                                    220 ;--------------------------------------------------------
+                                    221 ; global & static initialisations
+                                    222 ;--------------------------------------------------------
+                                    223 	.area HOME
+                                    224 	.area GSINIT
+                                    225 	.area GSFINAL
+                                    226 	.area GSINIT
+                                    227 	.area	PREG (ABS)
+      000000                        228 	.org 0x00
+      000000                        229 p::
+      000000                        230 	.ds 2
+                                    231 	.area	HEADER (ABS)
+      000000                        232 	.org 0x0000
+      000000 00 00                  233 	nop
+      000002r01r26                  234 	clear	p+1
+      000004r00r57                  235 	mov	a, #s_OSEG
+      000006r01r50                  236 	add	a, #l_OSEG + 1
+      000008 FE 54                  237 	and	a, #0xfe
+      00000A 02 01                  238 	mov.io	sp, a
+      00000Cr2Er70                  239 	call	__sdcc_external_startup
+      00000Er00r60                  240 	goto	s_GSINIT
+                                    241 	.area GSINIT
+      000000                        242 __sdcc_init_data:
+      000000r00r57                  243 	mov	a, #s_DATA
+      000002r00r17                  244 	mov	p, a
+      000004r0Er60                  245 	goto	00002$
+      000006                        246 00001$:
+      000006 00 57                  247 	mov	a, #0x00
+      000008r00r07                  248 	idxm	p, a
+      00000Ar00r24                  249 	inc	p
+      00000Cr00r57                  250 	mov	a, #s_DATA
+      00000E                        251 00002$:
+      00000Er00r50                  252 	add	a, #l_DATA
+      000010r00r2E                  253 	ceqsn	a, p
+      000012r06r60                  254 	goto	00001$
+                                    255 ;	pdk_Led_Ty_Gia.c: 25: int sta = 0;
+      000014r19r26                  256 	clear	_sta+0
+      000016r1Ar26                  257 	clear	_sta+1
+                                    258 	.area GSFINAL
+      000000r00r60                  259 	goto	__sdcc_program_startup
+                                    260 ;--------------------------------------------------------
+                                    261 ; Home
+                                    262 ;--------------------------------------------------------
+                                    263 	.area HOME
+                                    264 	.area HOME
+      000000                        265 __sdcc_program_startup:
+      000000rC8r60                  266 	goto	_main
+                                    267 ;	return from main will return to caller
+                                    268 ;--------------------------------------------------------
+                                    269 ; code
+                                    270 ;--------------------------------------------------------
+                                    271 	.area CODE
+                                    272 ;	delay.h: 34: void _delay_loop_8(uint8_t loop_ctr) {
+                                    273 ;	-----------------------------------------
+                                    274 ;	 function _delay_loop_8
+                                    275 ;	-----------------------------------------
+      000000                        276 __delay_loop_8:
+                                    277 ;	delay.h: 44: __endasm;
+      000000                        278 	00001$:
+                                    279 ; 4 cycles per loop
+      000000r00r23                  280 	dzsn	__delay_loop_8_PARM_1 ; 1 cycle + 1 cycle for final skip
+      000002r00r60                  281 	goto	00001$ ; 2 cycles
+      000004                        282 00101$:
+                                    283 ;	delay.h: 45: }
+      000004 7A 00                  284 	ret
+                                    285 ;	delay.h: 48: void _delay_loop_16(uint16_t loop_ctr) {
+                                    286 ;	-----------------------------------------
+                                    287 ;	 function _delay_loop_16
+                                    288 ;	-----------------------------------------
+      000006                        289 __delay_loop_16:
+                                    290 ;	delay.h: 65: __endasm;
+      000006                        291 	00001$:
+                                    292 ; 8 cycles per loop
+      000006 00 00                  293 	nop	; 1 cycle
+      000008r01r25                  294 	dec	__delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Ar02r21                  295 	subc	__delay_loop_16_PARM_1+1 ; 1 cycle
+      00000Cr01r1F                  296 	mov	a, __delay_loop_16_PARM_1+0 ; 1 cycle
+      00000Er02r1D                  297 	or	a, __delay_loop_16_PARM_1+1 ; 1 cycle
+      000010 00 34                  298 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      000012r06r60                  299 	goto	00001$ ; 2 cycles
+      000014                        300 00101$:
+                                    301 ;	delay.h: 66: }
+      000014 7A 00                  302 	ret
+                                    303 ;	delay.h: 69: void _delay_loop_32(uint32_t loop_ctr) {
+                                    304 ;	-----------------------------------------
+                                    305 ;	 function _delay_loop_32
+                                    306 ;	-----------------------------------------
+      000016                        307 __delay_loop_32:
+                                    308 ;	delay.h: 94: __endasm;
+      000016                        309 	00001$:
+                                    310 ; 12 cycles per loop
+      000016 00 00                  311 	nop	; 1 cycle
+      000018r03r25                  312 	dec	__delay_loop_32_PARM_1+0 ; 1 cycle
+      00001Ar04r21                  313 	subc	__delay_loop_32_PARM_1+1 ; 1 cycle
+      00001Cr05r21                  314 	subc	__delay_loop_32_PARM_1+2 ; 1 cycle
+      00001Er06r21                  315 	subc	__delay_loop_32_PARM_1+3 ; 1 cycle
+      000020r03r1F                  316 	mov	a, __delay_loop_32_PARM_1+0 ; 1 cycle
+      000022r04r1D                  317 	or	a, __delay_loop_32_PARM_1+1 ; 1 cycle
+      000024r05r1D                  318 	or	a, __delay_loop_32_PARM_1+2 ; 1 cycle
+      000026r06r1D                  319 	or	a, __delay_loop_32_PARM_1+3 ; 1 cycle
+      000028 00 34                  320 	t1sn	f, z ; 1 cycle + 1 cycle for final skip
+      00002Ar16r60                  321 	goto	00001$ ; 2 cycles
+      00002C                        322 00101$:
+                                    323 ;	delay.h: 95: }
+      00002C 7A 00                  324 	ret
+                                    325 ;	pdk_Led_Ty_Gia.c: 19: uint8_t _sdcc_external_startup(void)
+                                    326 ;	-----------------------------------------
+                                    327 ;	 function _sdcc_external_startup
+                                    328 ;	-----------------------------------------
+      00002E                        329 __sdcc_external_startup:
+                                    330 ;	pdk_Led_Ty_Gia.c: 21: EASY_PDK_INIT_SYSCLOCK_8MHZ();		  // use 8MHz sysclock
+      00002E 34 57                  331 	mov	a, #0x34
+      000030 03 01                  332 	mov.io	__clkmd, a
+                                    333 ;	pdk_Led_Ty_Gia.c: 22: EASY_PDK_CALIBRATE_IHRC(F_CPU, 4000); // tune SYSCLK to 8MHz @ 4.000V
+      000032 52 54                  334 	and	a, #'R'                        
+      000034 43 54                  335 	and	a, #'C'                        
+      000036 01 54                  336 	and	a, #((1))          
+      000038 00 54                  337 	and	a, #((8000000))     
+      00003A 12 54                  338 	and	a, #((8000000)>>8)  
+      00003C 7A 54                  339 	and	a, #((8000000)>>16) 
+      00003E 00 54                  340 	and	a, #((8000000)>>24) 
+      000040 A0 54                  341 	and	a, #((4000))     
+      000042 0F 54                  342 	and	a, #((4000)>>8)  
+      000044 0B 54                  343 	and	a, #((0x0B))           
+                                    344 ;	pdk_Led_Ty_Gia.c: 23: return 0;							  // perform normal initialization
+                                    345 ;	pdk_Led_Ty_Gia.c: 24: }
+      000046 00 02                  346 	ret	#0x00
+                                    347 ;	pdk_Led_Ty_Gia.c: 27: void UART_printNum(uint32_t num)
+                                    348 ;	-----------------------------------------
+                                    349 ;	 function UART_printNum
+                                    350 ;	-----------------------------------------
+      000048                        351 _UART_printNum:
+                                    352 ;	pdk_Led_Ty_Gia.c: 30: putchar('0');
+      000048 30 57                  353 	mov	a, #0x30
+      00004Ar00r17                  354 	mov	_putchar_PARM_1+0, a
+      00004Cr01r26                  355 	clear	_putchar_PARM_1+1
+      00004Er00r70                  356 	call	_putchar
+                                    357 ;	pdk_Led_Ty_Gia.c: 31: putchar('x');
+      000050 78 57                  358 	mov	a, #0x78
+      000052r00r17                  359 	mov	_putchar_PARM_1+0, a
+      000054r01r26                  360 	clear	_putchar_PARM_1+1
+      000056r00r70                  361 	call	_putchar
+                                    362 ;	pdk_Led_Ty_Gia.c: 32: for (uint8_t i = 0; i < 8; i++)
+      000058r1Fr26                  363 	clear	_UART_printNum_sloc0_1_0+0
+      00005A                        364 00108$:
+      00005Ar1Fr1F                  365 	mov	a, _UART_printNum_sloc0_1_0+0
+      00005C 08 51                  366 	sub	a, #0x08
+      00005E 80 34                  367 	t1sn.io	f, c
+      000060rBEr60                  368 	goto	00106$
+                                    369 ;	pdk_Led_Ty_Gia.c: 34: temp = (uint8_t)((num >> (4 * (7 - i))) & 0x0000000F);
+      000062 07 57                  370 	mov	a, #0x07
+      000064r1Fr19                  371 	sub	a, _UART_printNum_sloc0_1_0+0
+      000066r00r17                  372 	mov	p, a
+      000068r00r2B                  373 	sl	p
+      00006Ar00r2B                  374 	sl	p
+      00006Cr1Br1F                  375 	mov	a, _UART_printNum_PARM_1+0
+      00006Er20r17                  376 	mov	_UART_printNum_sloc1_1_0+0, a
+      000070r1Cr1F                  377 	mov	a, _UART_printNum_PARM_1+1
+      000072r21r17                  378 	mov	_UART_printNum_sloc1_1_0+1, a
+      000074r1Dr1F                  379 	mov	a, _UART_printNum_PARM_1+2
+      000076r22r17                  380 	mov	_UART_printNum_sloc1_1_0+2, a
+      000078r1Er1F                  381 	mov	a, _UART_printNum_PARM_1+3
+      00007Ar23r17                  382 	mov	_UART_printNum_sloc1_1_0+3, a
+      00007Cr00r1F                  383 	mov	a, p
+      00007E                        384 00129$:
+      00007E 01 51                  385 	sub	a, #1
+      000080 80 30                  386 	t0sn.io	f, c
+      000082r8Er60                  387 	goto	00130$
+      000084r23r2A                  388 	sr	_UART_printNum_sloc1_1_0+3
+      000086r22r2C                  389 	src	_UART_printNum_sloc1_1_0+2
+      000088r21r2C                  390 	src	_UART_printNum_sloc1_1_0+1
+      00008Ar20r2C                  391 	src	_UART_printNum_sloc1_1_0+0
+      00008Cr7Er60                  392 	goto	00129$
+      00008E                        393 00130$:
+      00008Er20r1F                  394 	mov	a, _UART_printNum_sloc1_1_0+0
+      000090 0F 54                  395 	and	a, #0x0f
+                                    396 ;	pdk_Led_Ty_Gia.c: 35: if (temp <= 9)
+      000092 0A 52                  397 	ceqsn	a, #0x0a
+      000094 80 34                  398 	t1sn.io	f, c
+      000096rA6r60                  399 	goto	00104$
+                                    400 ;	pdk_Led_Ty_Gia.c: 36: putchar(temp + 48);
+      000098 30 50                  401 	add	a, #0x30
+      00009Ar00r17                  402 	mov	_putchar_PARM_1+0, a
+      00009C 00 57                  403 	mov	a, #0x00
+      00009E 60 00                  404 	addc	a
+      0000A0r01r17                  405 	mov	_putchar_PARM_1+1, a
+      0000A2r00r70                  406 	call	_putchar
+      0000A4rBAr60                  407 	goto	00109$
+      0000A6                        408 00104$:
+                                    409 ;	pdk_Led_Ty_Gia.c: 37: else if (temp > 9)
+      0000A6 0A 52                  410 	ceqsn	a, #0x0a
+      0000A8 00 00                  411 	nop
+      0000AA 80 30                  412 	t0sn.io	f, c
+      0000ACrBAr60                  413 	goto	00109$
+                                    414 ;	pdk_Led_Ty_Gia.c: 38: putchar(temp + 55);
+      0000AE 37 50                  415 	add	a, #0x37
+      0000B0r00r17                  416 	mov	_putchar_PARM_1+0, a
+      0000B2 00 57                  417 	mov	a, #0x00
+      0000B4 60 00                  418 	addc	a
+      0000B6r01r17                  419 	mov	_putchar_PARM_1+1, a
+      0000B8r00r70                  420 	call	_putchar
+      0000BA                        421 00109$:
+                                    422 ;	pdk_Led_Ty_Gia.c: 32: for (uint8_t i = 0; i < 8; i++)
+      0000BAr1Fr24                  423 	inc	_UART_printNum_sloc0_1_0+0
+      0000BCr5Ar60                  424 	goto	00108$
+      0000BE                        425 00106$:
+                                    426 ;	pdk_Led_Ty_Gia.c: 40: putchar('\n');
+      0000BE 0A 57                  427 	mov	a, #0x0a
+      0000C0r00r17                  428 	mov	_putchar_PARM_1+0, a
+      0000C2r01r26                  429 	clear	_putchar_PARM_1+1
+      0000C4r00r60                  430 	goto	_putchar
+                                    431 ;	pdk_Led_Ty_Gia.c: 41: }
+      0000C6 7A 00                  432 	ret
+                                    433 ;	pdk_Led_Ty_Gia.c: 43: int main(void)
+                                    434 ;	-----------------------------------------
+                                    435 ;	 function main
+                                    436 ;	-----------------------------------------
+      0000C8                        437 _main:
+                                    438 ;	pdk_Led_Ty_Gia.c: 45: char dis[] = "asdasd";
+      0000C8 61 57                  439 	mov	a, #0x61
+      0000CAr24r17                  440 	mov	_main_dis_65536_52+0, a
+      0000CC 73 57                  441 	mov	a, #0x73
+      0000CEr25r17                  442 	mov	_main_dis_65536_52+1, a
+      0000D0 64 57                  443 	mov	a, #0x64
+      0000D2r26r17                  444 	mov	_main_dis_65536_52+2, a
+      0000D4 61 57                  445 	mov	a, #0x61
+      0000D6r27r17                  446 	mov	_main_dis_65536_52+3, a
+      0000D8 73 57                  447 	mov	a, #0x73
+      0000DAr28r17                  448 	mov	_main_dis_65536_52+4, a
+      0000DC 64 57                  449 	mov	a, #0x64
+      0000DEr29r17                  450 	mov	_main_dis_65536_52+5, a
+      0000E0r2Ar26                  451 	clear	_main_dis_65536_52+6
+                                    452 ;	pdk_Led_Ty_Gia.c: 47: UART_begin(); // Initialize UART engine
+      0000E2r00r70                  453 	call	_UART_begin
+                                    454 ;	pdk_Led_Ty_Gia.c: 50: TM3C = TM3C_CLK_IHRC;							 // Use IHRC -> 16 Mhz
+      0000E4 20 57                  455 	mov	a, #0x20
+      0000E6 34 01                  456 	mov.io	__tm3c, a
+                                    457 ;	pdk_Led_Ty_Gia.c: 51: TM3S = TM3S_PRESCALE_NONE | TM3S_PRESCALE_DIV64; // No prescale, scale 64 ~> 0.25MHz
+      0000E8 60 57                  458 	mov	a, #0x60
+      0000EA 36 01                  459 	mov.io	__tm3s, a
+                                    460 ;	pdk_Led_Ty_Gia.c: 52: TM3B = 125;										 // Divide by 125 ~> 2000 Hz 0.5ms
+      0000EC 7D 57                  461 	mov	a, #0x7d
+      0000EE 37 01                  462 	mov.io	__tm3b, a
+                                    463 ;	pdk_Led_Ty_Gia.c: 54: INTEN |= INTEN_TM3; // Enable TM2 interrupt, send out initial stop bits and autobaud char
+      0000F0 84 3F                  464 	set1.io	__inten, #7
+                                    465 ;	pdk_Led_Ty_Gia.c: 56: ROP = ROP_INT_SRC_PB5;
+      0000F2 02 57                  466 	mov	a, #0x02
+      0000F4 67 01                  467 	mov.io	__rop, a
+                                    468 ;	pdk_Led_Ty_Gia.c: 57: setb(PBDIER, 5);
+      0000F6 8E 3E                  469 	set1.io	__pbdier, #5
+                                    470 ;	pdk_Led_Ty_Gia.c: 58: setb(PBPH, 5);
+      0000F8 95 3E                  471 	set1.io	__pbph, #5
+                                    472 ;	pdk_Led_Ty_Gia.c: 59: INTEGS = INTEGS_PB5_FALLING;
+      0000FA 02 57                  473 	mov	a, #0x02
+      0000FC 0C 01                  474 	mov.io	__integs, a
+                                    475 ;	pdk_Led_Ty_Gia.c: 60: INTEN |= INTEN_PB5;
+      0000FE 04 3C                  476 	set1.io	__inten, #0
+                                    477 ;	pdk_Led_Ty_Gia.c: 64: sei(); // Enable global interrupts
+      000100 78 00                  478 	engint
+                                    479 ;	pdk_Led_Ty_Gia.c: 65: while (1)
+      000102                        480 00107$:
+                                    481 ;	pdk_Led_Ty_Gia.c: 67: if (sta == 0)
+      000102r19r1F                  482 	mov	a, _sta+0
+      000104r1Ar1D                  483 	or	a, _sta+1
+      000106 00 53                  484 	cneqsn	a, #0x00
+      000108r2Cr61                  485 	goto	00105$
+                                    486 ;	pdk_Led_Ty_Gia.c: 71: else if (sta == 1)
+      00010Ar19r1F                  487 	mov	a, _sta+0
+      00010C 01 52                  488 	ceqsn	a, #0x01
+      00010Er2Cr61                  489 	goto	00105$
+      000110r1Ar1F                  490 	mov	a, _sta+1
+      000112 00 52                  491 	ceqsn	a, #0x00
+      000114r2Cr61                  492 	goto	00105$
+                                    493 ;	pdk_Led_Ty_Gia.c: 73: UART_printNum(data2);
+      000116r15r1F                  494 	mov	a, _data2+0
+      000118r1Br17                  495 	mov	_UART_printNum_PARM_1+0, a
+      00011Ar16r1F                  496 	mov	a, _data2+1
+      00011Cr1Cr17                  497 	mov	_UART_printNum_PARM_1+1, a
+      00011Er17r1F                  498 	mov	a, _data2+2
+      000120r1Dr17                  499 	mov	_UART_printNum_PARM_1+2, a
+      000122r18r1F                  500 	mov	a, _data2+3
+      000124r1Er17                  501 	mov	_UART_printNum_PARM_1+3, a
+      000126r48r70                  502 	call	_UART_printNum
+                                    503 ;	pdk_Led_Ty_Gia.c: 74: sta = 0;
+      000128r19r26                  504 	clear	_sta+0
+      00012Ar1Ar26                  505 	clear	_sta+1
+      00012C                        506 00105$:
+                                    507 ;	pdk_Led_Ty_Gia.c: 76: _delay_ms(1);
+      00012C E6 57                  508 	mov	a, #0xe6
+      00012Er01r17                  509 	mov	__delay_loop_16_PARM_1+0, a
+      000130 03 57                  510 	mov	a, #0x03
+      000132r02r17                  511 	mov	__delay_loop_16_PARM_1+1, a
+      000134r06r70                  512 	call	__delay_loop_16
+      000136r02r61                  513 	goto	00107$
+                                    514 ;	pdk_Led_Ty_Gia.c: 78: }
+      000138 7A 00                  515 	ret
+                                    516 ;	pdk_Led_Ty_Gia.c: 81: void interrupt(void) __interrupt(0)
+                                    517 ;	-----------------------------------------
+                                    518 ;	 function interrupt
+                                    519 ;	-----------------------------------------
+      00013A                        520 _interrupt:
+      00013A 72 00                  521 	push	af
+      00013Cr00r1F                  522 	mov	a, p
+      00013E 72 00                  523 	push	af
+                                    524 ;	pdk_Led_Ty_Gia.c: 84: if (INTRQ & INTRQ_TM2)
+      000140 85 01                  525 	mov.io	a, __intrq
+      000142 40 54                  526 	and	a, #0x40
+      000144 00 53                  527 	cneqsn	a, #0x00
+      000146r4Cr61                  528 	goto	00102$
+                                    529 ;	pdk_Led_Ty_Gia.c: 86: INTRQ &= ~INTRQ_TM2; // Mark TM2 interrupt request processed
+      000148 05 3B                  530 	set0.io	__intrq, #6
+                                    531 ;	pdk_Led_Ty_Gia.c: 87: TIM2_interrupt();
+      00014Ar00r70                  532 	call	_TIM2_interrupt
+      00014C                        533 00102$:
+                                    534 ;	pdk_Led_Ty_Gia.c: 90: if (INTRQ & INTRQ_TM3)
+      00014C 85 01                  535 	mov.io	a, __intrq
+      00014E 80 54                  536 	and	a, #0x80
+      000150 00 53                  537 	cneqsn	a, #0x00
+      000152r6Er61                  538 	goto	00106$
+                                    539 ;	pdk_Led_Ty_Gia.c: 92: INTRQ &= ~INTRQ_TM3; // Mark TM3 interrupt request processed
+      000154 85 3B                  540 	set0.io	__intrq, #7
+                                    541 ;	pdk_Led_Ty_Gia.c: 95: count_ms++;
+      000156r09r24                  542 	inc	_count_ms+0
+      000158r0Ar20                  543 	addc	_count_ms+1
+                                    544 ;	pdk_Led_Ty_Gia.c: 96: if (count_ms == 50)
+      00015Ar0Ar1F                  545 	mov	a, _count_ms+1
+      00015Cr00r17                  546 	mov	p, a
+      00015Er09r1F                  547 	mov	a, _count_ms+0
+      000160 32 52                  548 	ceqsn	a, #0x32
+      000162r6Er61                  549 	goto	00106$
+      000164r00r1F                  550 	mov	a, p
+      000166 00 52                  551 	ceqsn	a, #0x00
+      000168r6Er61                  552 	goto	00106$
+                                    553 ;	pdk_Led_Ty_Gia.c: 97: count_ms = 0;
+      00016Ar09r26                  554 	clear	_count_ms+0
+      00016Cr0Ar26                  555 	clear	_count_ms+1
+      00016E                        556 00106$:
+                                    557 ;	pdk_Led_Ty_Gia.c: 100: if (INTRQ & INTRQ_PB5)
+      00016E 85 01                  558 	mov.io	a, __intrq
+      000170 01 54                  559 	and	a, #0x01
+      000172 00 53                  560 	cneqsn	a, #0x00
+      000174rF2r62                  561 	goto	00134$
+                                    562 ;	pdk_Led_Ty_Gia.c: 102: INTRQ &= ~INTRQ_PB5; // Mark PB5 interrupt request processed
+      000176 05 38                  563 	set0.io	__intrq, #0
+                                    564 ;	pdk_Led_Ty_Gia.c: 107: count_ms1 = count_ms;
+      000178r09r1F                  565 	mov	a, _count_ms+0
+      00017Ar0Br17                  566 	mov	_count_ms1+0, a
+      00017Cr0Ar1F                  567 	mov	a, _count_ms+1
+      00017Er0Cr17                  568 	mov	_count_ms1+1, a
+                                    569 ;	pdk_Led_Ty_Gia.c: 108: count_ms = 0;
+      000180r09r26                  570 	clear	_count_ms+0
+      000182r0Ar26                  571 	clear	_count_ms+1
+                                    572 ;	pdk_Led_Ty_Gia.c: 109: count_data++;
+      000184r0Fr24                  573 	inc	_count_data+0
+      000186r10r20                  574 	addc	_count_data+1
+                                    575 ;	pdk_Led_Ty_Gia.c: 111: if (((count_ms1) >= 25) && ((count_ms1) <= 28)) // 10s-14ms
+      000188r0Br1F                  576 	mov	a, _count_ms1+0
+      00018Ar2Br17                  577 	mov	_interrupt_sloc2_1_0+0, a
+      00018Cr0Cr1F                  578 	mov	a, _count_ms1+1
+      00018Er2Cr17                  579 	mov	_interrupt_sloc2_1_0+1, a
+      000190r2Br1F                  580 	mov	a, _interrupt_sloc2_1_0+0
+      000192 19 51                  581 	sub	a, #0x19
+      000194r2Cr1F                  582 	mov	a, _interrupt_sloc2_1_0+1
+      000196 61 00                  583 	subc	a
+      000198 80 30                  584 	t0sn.io	f, c
+      00019ArBCr61                  585 	goto	00127$
+      00019C 1C 57                  586 	mov	a, #0x1c
+      00019Er2Br19                  587 	sub	a, _interrupt_sloc2_1_0+0
+      0001A0 00 57                  588 	mov	a, #0x00
+      0001A2r2Cr1B                  589 	subc	a, _interrupt_sloc2_1_0+1
+      0001A4 80 30                  590 	t0sn.io	f, c
+      0001A6rBCr61                  591 	goto	00127$
+                                    592 ;	pdk_Led_Ty_Gia.c: 113: count_data = -1;
+      0001A8 FF 57                  593 	mov	a, #0xff
+      0001AAr0Fr17                  594 	mov	_count_data+0, a
+      0001AC FF 57                  595 	mov	a, #0xff
+      0001AEr10r17                  596 	mov	_count_data+1, a
+                                    597 ;	pdk_Led_Ty_Gia.c: 114: start_status = 1;
+      0001B0 01 57                  598 	mov	a, #0x01
+      0001B2r0Dr17                  599 	mov	_start_status+0, a
+      0001B4r0Er26                  600 	clear	_start_status+1
+                                    601 ;	pdk_Led_Ty_Gia.c: 115: count_ms1 = 0;
+      0001B6r0Br26                  602 	clear	_count_ms1+0
+      0001B8r0Cr26                  603 	clear	_count_ms1+1
+      0001BArB8r62                  604 	goto	00128$
+      0001BC                        605 00127$:
+                                    606 ;	pdk_Led_Ty_Gia.c: 117: else if (((count_ms1) >= 20) && ((count_ms1) <= 24)) // 10s-14ms
+      0001BCr2Br1F                  607 	mov	a, _interrupt_sloc2_1_0+0
+      0001BE 14 51                  608 	sub	a, #0x14
+      0001C0r2Cr1F                  609 	mov	a, _interrupt_sloc2_1_0+1
+      0001C2 61 00                  610 	subc	a
+      0001C4 80 30                  611 	t0sn.io	f, c
+      0001C6rDCr61                  612 	goto	00123$
+      0001C8 18 57                  613 	mov	a, #0x18
+      0001CAr2Br19                  614 	sub	a, _interrupt_sloc2_1_0+0
+      0001CC 00 57                  615 	mov	a, #0x00
+      0001CEr2Cr1B                  616 	subc	a, _interrupt_sloc2_1_0+1
+      0001D0 80 30                  617 	t0sn.io	f, c
+      0001D2rDCr61                  618 	goto	00123$
+                                    619 ;	pdk_Led_Ty_Gia.c: 119: sta = 1;
+      0001D4 01 57                  620 	mov	a, #0x01
+      0001D6r19r17                  621 	mov	_sta+0, a
+      0001D8r1Ar26                  622 	clear	_sta+1
+      0001DArB8r62                  623 	goto	00128$
+      0001DC                        624 00123$:
+                                    625 ;	pdk_Led_Ty_Gia.c: 123: else if ((start_status == 1) && (count_data >= 0) && (count_data <= 31))
+      0001DCr0Er1F                  626 	mov	a, _start_status+1
+      0001DEr00r17                  627 	mov	p, a
+      0001E0r0Dr1F                  628 	mov	a, _start_status+0
+      0001E2 01 52                  629 	ceqsn	a, #0x01
+      0001E4r90r62                  630 	goto	00118$
+      0001E6r00r1F                  631 	mov	a, p
+      0001E8 00 52                  632 	ceqsn	a, #0x00
+      0001EAr90r62                  633 	goto	00118$
+      0001ECr0Fr1F                  634 	mov	a, _count_data+0
+      0001EEr2Dr17                  635 	mov	_interrupt_sloc3_1_0+0, a
+      0001F0r10r1F                  636 	mov	a, _count_data+1
+      0001F2r2Er17                  637 	mov	_interrupt_sloc3_1_0+1, a
+      0001F4 80 52                  638 	ceqsn	a, #0x80
+      0001F6 80 34                  639 	t1sn.io	f, c
+      0001F8r90r62                  640 	goto	00118$
+      0001FA 1F 57                  641 	mov	a, #0x1f
+      0001FCr2Dr19                  642 	sub	a, _interrupt_sloc3_1_0+0
+      0001FE 00 57                  643 	mov	a, #0x00
+      000200r2Er1B                  644 	subc	a, _interrupt_sloc3_1_0+1
+      000202 80 31                  645 	t0sn.io	f, ov
+      000204 80 56                  646 	xor	a, #0x80
+      000206 6B 00                  647 	sl	a
+      000208 80 30                  648 	t0sn.io	f, c
+      00020Ar90r62                  649 	goto	00118$
+                                    650 ;	pdk_Led_Ty_Gia.c: 125: if ((count_ms1 >= 4) && (count_ms1 <= 6)) // 2ms->3ms //detect logic 1.
+      00020Cr2Br1F                  651 	mov	a, _interrupt_sloc2_1_0+0
+      00020E 04 51                  652 	sub	a, #0x04
+      000210r2Cr1F                  653 	mov	a, _interrupt_sloc2_1_0+1
+      000212 61 00                  654 	subc	a
+      000214 80 30                  655 	t0sn.io	f, c
+      000216r68r62                  656 	goto	00111$
+      000218 06 57                  657 	mov	a, #0x06
+      00021Ar2Br19                  658 	sub	a, _interrupt_sloc2_1_0+0
+      00021C 00 57                  659 	mov	a, #0x00
+      00021Er2Cr1B                  660 	subc	a, _interrupt_sloc2_1_0+1
+      000220 80 30                  661 	t0sn.io	f, c
+      000222r68r62                  662 	goto	00111$
+                                    663 ;	pdk_Led_Ty_Gia.c: 127: data |= 1 << (31 - count_data);
+      000224r0Fr1F                  664 	mov	a, _count_data+0
+      000226 69 00                  665 	neg	a
+      000228 1F 50                  666 	add	a, #0x1f
+      00022A 72 00                  667 	push	af
+      00022C 01 57                  668 	mov	a, #0x01
+      00022Er2Fr17                  669 	mov	_interrupt_sloc4_1_0+0, a
+      000230 73 00                  670 	pop	af
+      000232r30r26                  671 	clear	_interrupt_sloc4_1_0+1
+      000234                        672 00204$:
+      000234 01 51                  673 	sub	a, #1
+      000236 80 30                  674 	t0sn.io	f, c
+      000238r40r62                  675 	goto	00205$
+      00023Ar2Fr2B                  676 	sl	_interrupt_sloc4_1_0+0
+      00023Cr30r2D                  677 	slc	_interrupt_sloc4_1_0+1
+      00023Er34r62                  678 	goto	00204$
+      000240                        679 00205$:
+      000240r2Fr1F                  680 	mov	a, _interrupt_sloc4_1_0+0
+      000242r31r17                  681 	mov	_interrupt_sloc5_1_0+0, a
+      000244r30r1F                  682 	mov	a, _interrupt_sloc4_1_0+1
+      000246r32r17                  683 	mov	_interrupt_sloc5_1_0+1, a
+      000248 6B 00                  684 	sl	a
+      00024A 00 57                  685 	mov	a, #0x00
+      00024C 61 00                  686 	subc	a
+      00024Er33r17                  687 	mov	_interrupt_sloc5_1_0+2, a
+      000250r34r17                  688 	mov	_interrupt_sloc5_1_0+3, a
+      000252r31r1F                  689 	mov	a, _interrupt_sloc5_1_0+0
+      000254r11r15                  690 	or	_data+0, a
+      000256r32r1F                  691 	mov	a, _interrupt_sloc5_1_0+1
+      000258r12r15                  692 	or	_data+1, a
+      00025Ar33r1F                  693 	mov	a, _interrupt_sloc5_1_0+2
+      00025Cr13r15                  694 	or	_data+2, a
+      00025Er34r1F                  695 	mov	a, _interrupt_sloc5_1_0+3
+      000260r14r15                  696 	or	_data+3, a
+                                    697 ;	pdk_Led_Ty_Gia.c: 128: count_ms1 = 0;
+      000262r0Br26                  698 	clear	_count_ms1+0
+      000264r0Cr26                  699 	clear	_count_ms1+1
+      000266rB8r62                  700 	goto	00128$
+      000268                        701 00111$:
+                                    702 ;	pdk_Led_Ty_Gia.c: 130: else if (count_ms1 < 4) // nho hon <2ms //detect logic 0.
+      000268r2Br1F                  703 	mov	a, _interrupt_sloc2_1_0+0
+      00026A 04 51                  704 	sub	a, #0x04
+      00026Cr2Cr1F                  705 	mov	a, _interrupt_sloc2_1_0+1
+      00026E 61 00                  706 	subc	a
+      000270 80 34                  707 	t1sn.io	f, c
+      000272r7Ar62                  708 	goto	00108$
+                                    709 ;	pdk_Led_Ty_Gia.c: 132: count_ms1 = 0;
+      000274r0Br26                  710 	clear	_count_ms1+0
+      000276r0Cr26                  711 	clear	_count_ms1+1
+      000278rB8r62                  712 	goto	00128$
+      00027A                        713 00108$:
+                                    714 ;	pdk_Led_Ty_Gia.c: 136: count_ms1 = 0;
+      00027Ar0Br26                  715 	clear	_count_ms1+0
+      00027Cr0Cr26                  716 	clear	_count_ms1+1
+                                    717 ;	pdk_Led_Ty_Gia.c: 137: start_status = 0;
+      00027Er0Dr26                  718 	clear	_start_status+0
+      000280r0Er26                  719 	clear	_start_status+1
+                                    720 ;	pdk_Led_Ty_Gia.c: 138: count_data = 0;
+      000282r0Fr26                  721 	clear	_count_data+0
+      000284r10r26                  722 	clear	_count_data+1
+                                    723 ;	pdk_Led_Ty_Gia.c: 139: data = 0;
+      000286r11r26                  724 	clear	_data+0
+      000288r12r26                  725 	clear	_data+1
+      00028Ar13r26                  726 	clear	_data+2
+      00028Cr14r26                  727 	clear	_data+3
+      00028ErB8r62                  728 	goto	00128$
+      000290                        729 00118$:
+                                    730 ;	pdk_Led_Ty_Gia.c: 143: else if ((start_status == 0) && ((count_ms1) > 28)) /// error detect xung start
+      000290r0Dr1F                  731 	mov	a, _start_status+0
+      000292r0Er1D                  732 	or	a, _start_status+1
+      000294 00 52                  733 	ceqsn	a, #0x00
+      000296rB8r62                  734 	goto	00128$
+      000298 1C 57                  735 	mov	a, #0x1c
+      00029Ar2Br19                  736 	sub	a, _interrupt_sloc2_1_0+0
+      00029C 00 57                  737 	mov	a, #0x00
+      00029Er2Cr1B                  738 	subc	a, _interrupt_sloc2_1_0+1
+      0002A0 80 34                  739 	t1sn.io	f, c
+      0002A2rB8r62                  740 	goto	00128$
+                                    741 ;	pdk_Led_Ty_Gia.c: 145: count_ms1 = 0;
+      0002A4r0Br26                  742 	clear	_count_ms1+0
+      0002A6r0Cr26                  743 	clear	_count_ms1+1
+                                    744 ;	pdk_Led_Ty_Gia.c: 146: start_status = 0;
+      0002A8r0Dr26                  745 	clear	_start_status+0
+      0002AAr0Er26                  746 	clear	_start_status+1
+                                    747 ;	pdk_Led_Ty_Gia.c: 147: count_data = 0;
+      0002ACr0Fr26                  748 	clear	_count_data+0
+      0002AEr10r26                  749 	clear	_count_data+1
+                                    750 ;	pdk_Led_Ty_Gia.c: 148: data = 0;
+      0002B0r11r26                  751 	clear	_data+0
+      0002B2r12r26                  752 	clear	_data+1
+      0002B4r13r26                  753 	clear	_data+2
+      0002B6r14r26                  754 	clear	_data+3
+      0002B8                        755 00128$:
+                                    756 ;	pdk_Led_Ty_Gia.c: 151: if (count_data == 32) // reset sau khi detect 32 bit data
+      0002B8r10r1F                  757 	mov	a, _count_data+1
+      0002BAr00r17                  758 	mov	p, a
+      0002BCr0Fr1F                  759 	mov	a, _count_data+0
+      0002BE 20 52                  760 	ceqsn	a, #0x20
+      0002C0rF2r62                  761 	goto	00134$
+      0002C2r00r1F                  762 	mov	a, p
+      0002C4 00 52                  763 	ceqsn	a, #0x00
+      0002C6rF2r62                  764 	goto	00134$
+                                    765 ;	pdk_Led_Ty_Gia.c: 153: sta = 1;
+      0002C8 01 57                  766 	mov	a, #0x01
+      0002CAr19r17                  767 	mov	_sta+0, a
+      0002CCr1Ar26                  768 	clear	_sta+1
+                                    769 ;	pdk_Led_Ty_Gia.c: 154: data2 = data;
+      0002CEr11r1F                  770 	mov	a, _data+0
+      0002D0r15r17                  771 	mov	_data2+0, a
+      0002D2r12r1F                  772 	mov	a, _data+1
+      0002D4r16r17                  773 	mov	_data2+1, a
+      0002D6r13r1F                  774 	mov	a, _data+2
+      0002D8r17r17                  775 	mov	_data2+2, a
+      0002DAr14r1F                  776 	mov	a, _data+3
+      0002DCr18r17                  777 	mov	_data2+3, a
+                                    778 ;	pdk_Led_Ty_Gia.c: 156: count_data = 0;
+      0002DEr0Fr26                  779 	clear	_count_data+0
+      0002E0r10r26                  780 	clear	_count_data+1
+                                    781 ;	pdk_Led_Ty_Gia.c: 157: data = 0;
+      0002E2r11r26                  782 	clear	_data+0
+      0002E4r12r26                  783 	clear	_data+1
+      0002E6r13r26                  784 	clear	_data+2
+      0002E8r14r26                  785 	clear	_data+3
+                                    786 ;	pdk_Led_Ty_Gia.c: 158: start_status = 0;
+      0002EAr0Dr26                  787 	clear	_start_status+0
+      0002ECr0Er26                  788 	clear	_start_status+1
+                                    789 ;	pdk_Led_Ty_Gia.c: 159: count_ms1 = 0;
+      0002EEr0Br26                  790 	clear	_count_ms1+0
+      0002F0r0Cr26                  791 	clear	_count_ms1+1
+      0002F2                        792 00134$:
+                                    793 ;	pdk_Led_Ty_Gia.c: 163: }
+      0002F2 73 00                  794 	pop	af
+      0002F4r00r17                  795 	mov	p, a
+      0002F6 73 00                  796 	pop	af
+      0002F8 7B 00                  797 	reti
+                                    798 	.area CODE
+                                    799 	.area CONST
+                                    800 	.area CABS (ABS)

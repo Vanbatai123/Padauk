@@ -1,0 +1,630 @@
+﻿/*
+ * PMS150_W2812_IR_2.c
+ * Created: 2023/09/10
+ * Author: taivb
+ */
+
+#include	"extern.h"
+
+//#define DEBUG // IR device address
+
+#define uint8_t		int
+#define uint16_t	WORD
+#define uint24_t	EWORD
+#define uint32_t	DWORD
+
+// Delay
+#define _delay_ms(x) .delay x*System_Clock/1000
+#define _delay_us(x) .delay x*System_Clock/1000000
+
+// Pin definitions
+#define PIN_NEO 	PA.3	// Pin for neopixels
+#define PIN_IR 		PA.4	// Pin for IR receiver
+#define PIN_BTN 	PA.6 	// Pin for button
+
+// NeoPixel parameter
+#define NEO_GRB		  // type of pixel: NEO_GRB, NEO_RGB or NEO_RGBW
+#define NEO_PIXELS 24 // number of pixels in the string (max 255)
+
+// IR codes
+#define IR_ADDR 0x00 // IR device address
+
+// #define IR_SPEED      0x03    // IR code for animation speed
+#define IR_FAIL 0xF1 // IR fail code
+
+#ifdef DEBUG
+// TAI's COMANDOS CONTROL STANDARD
+#define BIR_1 		0x30
+#define BIR_2 		0x18
+#define BIR_3 		0x7A
+#define BIR_4 		0x10
+#define BIR_5 		0x38
+#define BIR_6 		0x5A
+#define BIR_7 		0x42
+#define BIR_8 		0x4A
+#define BIR_9 		0x52
+#define BIR_AST 	0xE2 	// MENU
+#define BIR_0 		0x68
+#define BIR_GATO 	0xC2 	// RETURN
+#define BIR_IZQ 	0xA8  	// PLAY
+#define BIR_DER 	0x02  	// +
+#define BIR_ARR 	0x98  	// -
+#define BIR_ABA 	0x90  	// RIGHT
+#define BIR_OK 		0xA2	// PWR
+#else
+// COMANDOS CONTROL STANDARD
+#define BIR_1 		0x45
+#define BIR_2 		0x46
+#define BIR_3 		0x47
+#define BIR_4 		0x44
+#define BIR_5 		0x40
+#define BIR_6 		0x43
+#define BIR_7 		0x07
+#define BIR_8 		0x15
+#define BIR_9 		0x09
+#define BIR_AST 	0x16
+#define BIR_0 		0x19
+#define BIR_GATO 	0x0D
+#define BIR_IZQ 	0x08
+#define BIR_DER 	0x5A
+#define BIR_ARR 	0x18
+#define BIR_ABA 	0x52
+#define BIR_OK 		0x1C
+#endif
+// Global variables
+// uint8_t NEO_brightness = 2;   // 0..2
+BIT button_value;
+BIT button_flag;
+BIT running_flag;
+
+//uint8_t button_press = 0;
+
+uint8_t light_mode = 0,red,green,blue;
+BIT light_mode_flag;
+uint8_t command;
+//uint8_t mode_counter = 0;
+/// constant
+//uint8_t mode_delay[4] = {220, 150, 150, 100};
+
+//uint8_t mode[11] = {0x45, 0x46, 0x47, 0x44, 0x40, 0x43, 0x07, 0x08, 0x5A, 0x18, 0x52};
+
+uint8_t rv[4] = {0, 253, 216, 239};
+uint8_t gv[4] = {228, 84, 0, 0};
+uint8_t bv[4] = {255, 2, 235, 11};
+//uint8_t rsv[8] = {0, 255, 55, 253, 255, 255, 239};
+//uint8_t gsv[8] = {117, 0, 235, 84, 255, 242, 0};
+//uint8_t bsv[8] = {216, 100, 0, 2, 255, 0, 11};
+rfv EQU 0;
+gfv EQU 255;
+uint8_t bfv[6] = {255, 200, 155, 100, 55, 0};
+///
+uint8_t hue = 0;
+uint8_t hue1 = 0;
+uint8_t huef = 0;
+
+uint8_t lm = 0;
+uint8_t IR_val = 0;
+uint8_t count_ms, count_ms1;
+
+// pointer
+uint16_t ptt_r, ptt_g, ptt_b;
+
+void changeColor(int r, int g, int b);
+void switchColor(void);
+void fadeColor(void);
+// ===================================================================================
+// Neopixel Implementation for 8 MHz MCU Clock and 800 kHz Pixels
+// ===================================================================================
+
+// NeoPixel parameter and macros
+#define NEO_init() $ PIN_NEO Out, Low // set pixel DATA pin as output
+
+void BUTTON_init(void)
+{
+	$ PIN_BTN In, Pull;
+}
+
+// #define NEO_latch()   _delay_us(281)           // delay to show shifted colors
+// Send a byte to the pixels string
+
+void LED__SendZero_()
+{
+	PIN_NEO = 1;
+	nop;
+	nop;
+	PIN_NEO = 0;
+	nop;
+	nop;
+	nop;
+	nop;
+}
+void LED__SendOne_()
+{
+	PIN_NEO = 1;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	nop;
+	PIN_NEO = 0;
+}
+void NEO_sendByte(uint8_t dat)
+{
+	if (dat & 0x80)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x40)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x20)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x10)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x08)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x04)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x02)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+	if (dat & 0x01)
+		LED__SendOne_();
+	else
+		LED__SendZero_();
+}
+
+// Write color to a single pixel
+void NEO_writeColor(uint8_t r, uint8_t g, uint8_t b)
+{
+#if defined(NEO_GRB)
+	NEO_sendByte(g);
+	NEO_sendByte(r);
+	NEO_sendByte(b);
+#elif defined(NEO_RGB)
+	NEO_sendByte(r);
+	NEO_sendByte(g);
+	NEO_sendByte(b);
+#elif defined(NEO_RGBW)
+	NEO_sendByte(r);
+	NEO_sendByte(g);
+	NEO_sendByte(b);
+	NEO_sendByte(0);
+#else
+#error Wrong or missing NeoPixel type definition!
+#endif
+}
+
+// Switch off all pixels
+/*
+void NEO_clear(void) {
+  cli();
+  for(uint8_t i = NEO_PIXELS; i; i--) NEO_writeColor(0, 0, 0);
+  sei();
+}
+*/
+
+// Write hue value (0..191) to a single pixel
+/*
+void NEO_writeHue(uint8_t hue) {
+  uint8_t phase = hue >> 6;
+  uint8_t step  = (hue & 63) << 2;
+  uint8_t nstep = (63 << 2) - step;
+  switch(phase) {
+	case 0:   NEO_writeColor(nstep,  step,     0); break;
+	case 1:   NEO_writeColor(    0, nstep,  step); break;
+	case 2:   NEO_writeColor( step,     0, nstep); break;
+	default:  break;
+  }
+}
+*/
+
+// ===================================================================================
+// IR Receiver Implementation (NEC Protocol) using Timer0
+// ===================================================================================
+
+// IR receiver definitions and macros
+#define IR_available() 	PIN_IR					  			  // return 1 if IR line is low
+#define IR_PRESCALER 	1024								  // prescaler of the timer
+#define IR_time(t) ((F_CPU / 1000) * t) / IR_PRESCALER / 1000 // convert us to counts
+#define IR_TOP IR_time(12000UL)								  // TOP value of timer (timeout)
+
+// IR initialize the receiver
+void IR_init(void)
+{
+	$  PIN_IR     In, Pull;       	// IR pin input and Pull High
+
+	$  T16M   SYSCLK, /4, BIT8;		// timer clock=8MHz/4/2^9 => 0.256ms
+	$  intEN T16;					// enable timer 16bit
+	intRQ = 0;
+}
+
+// uint8_t arr[33];
+// IR read data according to NEC protocol
+void IR_read(void)
+{
+	IR_val = IR_FAIL;
+	uint32_t data = 0x00000000; // variable for received data
+	// uint8_t addr = 0x00;		// variable for received address
+	//ptt = arr;
+	count_ms = 0;
+	count_ms1 = 0;
+	uint8_t i = 0;
+	while (i < 33) // receive 32 bits
+	{
+		data = data << 1;
+		while (PA.4 == 0 && count_ms != 100)
+		{};
+		while (PA.4 == 1 && count_ms != 100)
+		{};
+		count_ms1 = count_ms;
+		if (count_ms1 == 100)
+		{
+			return;
+		}
+		if (i == 0 && (count_ms1 < 50 || count_ms1 > 60)) // first bit is not a Start bit
+		{
+			return;
+		}
+		if (i == 1 && (count_ms1 > 50 && count_ms1 < 60)) // first bit is not a Start bit
+		{
+			continue;
+		}
+		else if (7 < count_ms1 && count_ms1 < 11)
+		{
+			data |= 0x00000001;
+		}
+		//arr[i] = count_ms1;
+		//*ptt = count_ms1;
+		//ptt++;
+		count_ms = 0;
+		i++;
+	}
+
+	// uint8_t addr1 = data >> 24; // get first  address byte
+	// uint8_t addr2 = data >> 16; // get second address byte
+	uint8_t cmd1 = data >> 8; // get first  command byte
+	uint8_t check = data + cmd1;	  // get second command byte
+	if (check != 0xFF)
+		return; // if second command byte is not the inverse of the first
+	// if (((uint16_t)addr1 + (uint16_t)addr1) == 255)
+	// 	addr = addr1; // check if it's extended NEC-protocol ...
+	// else
+	// 	addr = data; // ... and get the correct address
+	// if(addr != IR_ADDR) return IR_FAIL;         // wrong address
+	IR_val = cmd1; // return command code
+}
+
+// ===================================================================================
+// Standby Implementation
+// ===================================================================================
+
+// Go to standby mode
+
+void standby(void)
+{
+	//  NEO_clear();                                // turn off NeoPixels
+	changeColor(0, 0, 0);
+	while (1)
+	{
+		// PCICR |= (1 << PCIF0); // clear any outstanding interrupts
+		//  sleep_mode();                             // sleep until IR interrupt
+		if (IR_available() == 0)
+		{
+			IR_read();
+			if (IR_val == BIR_OK)
+			{
+				break; // exit on power button
+			}
+		}
+	}
+}
+
+// ===================================================================================
+// Color and Light Mode Setting Function
+// ===================================================================================
+
+void changeColor(int r, int g, int b)
+{
+	DISGint;
+	uint8_t i = 0;
+	while(i < NEO_PIXELS)
+	{
+		i = i + 1;
+		NEO_writeColor(r, g, b);
+	}
+	ENGint;
+}
+void switchColor(void)
+{
+	ptt_r = rv + hue;
+	ptt_g = gv + hue;
+	ptt_b = bv + hue;
+	changeColor(*ptt_r, *ptt_g, *ptt_b);
+	hue++;
+	if (hue == 4)
+		hue = 0;
+	_delay_ms(1);
+	/*
+	 changeColor(0, 228, 255);
+	 _delay_ms();
+	 changeColor(253, 84, 2);
+	 _delay_ms();
+	 changeColor(216, 0, 235);
+	 _delay_ms();
+	 changeColor(239, 0, 11);
+	 _delay_ms();
+	 */
+}
+
+void fadeColor(void)
+{
+	ptt_r = bfv + hue1;
+	//changeColor(0, gfv, bfv[hue1]);
+	changeColor(0, gfv, *ptt_r);
+
+	if (hue1 == 0)
+		huef = 0;
+	if (hue1 == 6)
+		huef = 1;
+	if (huef == 1)
+		hue1--;
+	if (huef == 0)
+		hue1++;
+	_delay_ms(1);
+	//  changeColor(55, 235); //verde
+	/*
+	while(1){
+	  changeColor(55-change1, 235, 0+change2); //verde
+	  _delay_ms(50);
+	  if (flag==0){
+	  change1+=2;
+	  change2+=5;
+	  }
+	  if (flag==1){
+	  change1-=2;
+	  change2-=5;
+	  }
+	  if(change2>=250) flag=0;
+	  if(change2<=0) flag=1;
+	}//changeColor(0, 228, 255); //aqua
+  */
+}
+// ===================================================================================
+// Main Function
+// ===================================================================================
+void	FPPA0 (void)
+{
+	.ADJUST_IC	SYSCLK=IHRC/2		//	SYSCLK=IHRC/4
+
+	//init variant
+	light_mode = 0;
+	light_mode_flag = 0;
+	lm = 0;
+	uint16_t i = 0;
+	running_flag = 0;
+
+	// Setup
+	NEO_init();	   // init Neopixels
+	IR_init();	   // init IR receiver
+	BUTTON_init(); // init Button
+	
+	while(i<250)
+	{
+		i = i + 1;
+		NEO_writeColor(0,0, 0);
+	}
+	_delay_ms(1);
+
+	ENGint;		   // enable global interrupts
+	// Loop
+	while (1)
+	{
+		// Set the NeoPixels
+		/*
+		for(uint8_t i = NEO_PIXELS; i; i--) {
+		  cli();
+		  NEO_writeHue(current);
+		  sei();
+		  current += 2;
+		  if(current >= 192) current -= 192;
+		}*/
+
+		if (light_mode <= 6)
+		{
+//			changeColor(rsv[light_mode], gsv[light_mode], bsv[light_mode]);
+			switch(light_mode)
+			{
+			case 0:
+				red=0; green=117; blue=216;
+				break;
+			case 1:
+				red=255; green=0; blue=100;
+				break;
+			case 2:
+				red=55; green=235; blue=0;
+				break;
+			case 3:
+				red=253; green=84; blue=2;
+				break;
+			case 4:
+				red=255; green=255; blue=255;
+				break;
+			case 5:
+				red=255; green=242; blue=0;
+				break;
+			case 6:
+				red=239; green=0; blue=11;
+				break;
+			default:
+				break;
+			}
+			if (light_mode_flag == 0)
+			{
+				changeColor(red, green, blue);
+				light_mode_flag = 1;
+			}
+		}
+
+		if (light_mode == 7 || light_mode == 8)
+		{
+			running_flag = 1;
+			switchColor();
+		}
+
+		if (light_mode == 9)
+		{
+			fadeColor();
+		}
+
+		// Check IR receiver and change parameters; delay 80ms
+		i = 0;
+		while(i < 8000)
+		{
+			
+			// Button mode change
+	//		button_value = PA.3; // get value of button pin
+			button_value = 1;
+			if(PIN_BTN == 0)
+			{
+				button_value = 0;
+				
+				light_mode_flag = 0;
+			}
+
+			if (button_value == 1 && !button_flag)
+			{
+				button_flag = 1;
+			}
+			if (button_value == 0 && button_flag)
+			{
+				button_flag = 0;
+
+				light_mode++;
+				if (light_mode == 10)
+				{
+					light_mode = 0;
+				}
+				/*if(lm) {
+				  light_mode=0;
+				  lm=0;
+				}*/
+				// button_press=!button_press;
+				// if(button_press){
+				// lm+=1;
+				// if(lm==10) lm=0;
+				// light_mode=lm;
+				//}
+			}
+
+			if (IR_available() == 0 && button_value == 1)
+			{ //! button_press){
+				IR_read();
+				command = IR_val;
+				light_mode_flag = 0;
+
+				// command = IR_read();
+				// if(button_press==true) {command=BIR_1; button_press=false;}
+				//switch(command) {
+				if (command == BIR_1)
+				{
+					light_mode = 0;
+				} // red=0; green=117; blue=216; light_mode=0;}
+				else if (command == BIR_2)
+				{
+					light_mode = 1;
+				} // red=216; green=0; blue=235; light_mode=0;}
+				else if (command == BIR_3)
+				{
+					light_mode = 2;
+				} // red=55; green=235; blue=0; light_mode=0;}
+				else if (command == BIR_4)
+				{
+					light_mode = 3;
+				} // red=253; green=84; blue=2; light_mode=0;}
+				else if (command == BIR_5)
+				{
+					light_mode = 4;
+				} // red=255; green=255; blue=255; light_mode=0;}
+				else if (command == BIR_6)
+				{
+					light_mode = 5;
+				} // red=255; green=242; blue=0; light_mode=0;}
+				else if (command == BIR_7)
+				{
+					light_mode = 6;
+				} // red=129; green=228; blue=254; light_mode=0;}
+				// if(command==BIR_8){light_mode=7;}//red=239; green=0; blue=11; light_mode=0;}
+				else if (command == BIR_IZQ)
+				{
+					light_mode = 7;
+				}
+				else if (command == BIR_DER)
+				{
+					light_mode = 8;
+				}
+				else if (command == BIR_ARR)
+				{
+					light_mode = 9;
+				}
+				// if(command==BIR_ABA){ light_mode=10;}
+				else if (command == BIR_OK)
+				{
+					standby();
+				}
+				// case BIR_1:    red=0; green=117; blue=216; light_mode=0; break;//changeColor(0, 117, 216); break;
+				// case BIR_2:    red=216; green=0; blue=235; light_mode=0; break;//changeColor(216, 0, 235); break;
+				// case BIR_3:    red=55; green=235; blue=0; light_mode=0; break;//changeColor(55, 235, 0); break;
+				// case BIR_4:    red=253; green=84; blue=2; light_mode=0; break;//changeColor(253, 84, 2); break;
+				// case BIR_5:    red=255; green=255; blue=255; light_mode=0; break;//changeColor(255, 255, 255); break;
+				// case BIR_6:    red=255; green=242; blue=0; light_mode=0; break;  //changeColor(255, 242, 0); break;
+				// case BIR_7:    red=129; green=228; blue=254; light_mode=0; break; //changeColor(129, 228, 254); break;
+				// case BIR_8:    red=55; green=28; blue=254; light_mode=0; break;  //changeColor(55, 28, 254); break;
+				// case BIR_9:    red=239; green=0; blue=11; light_mode=0; break;  //changeColor(55, 28, 254); break;
+				// case BIR_IZQ:  light_mode=1; mode_delay=500; break; //switchColor(DELAY_1); break;
+				// case BIR_DER:  light_mode=2; mode_delay=200; break; //switchColor(DELAY_2); break;
+				// case BIR_ARR:  light_mode=3; break; //fadeColor(1); break;
+				// case BIR_ABA:  light_mode=4; break; //fadeColor(2); break;
+				// case BIR_OK:   standby(); break;
+				// case BIR_ARR:  command++; break;//if(++NEO_brightness > 2) NEO_brightness = 0; break;
+				// case BIR_ABA:  command--; break;//if(--NEO_brightness <= 0) NEO_brightness = 2; break;
+				// case IR_SPEED:    speed <<= 1; if(++speed > 7) speed = 0; break;
+				// default:          break;
+			}
+			// button_press=false;
+			_delay_us(10);
+			i++;
+		}
+	}
+}
+
+void	interrupt (void)
+{
+	pushaf;
+
+	if (intrq.T16)
+	{	//	T16 Trig
+		//	User can add code
+		count_ms++;
+		if (count_ms >= 100)
+		{
+			count_ms = 100;
+		}
+		intrq.T16	=	0;
+		//...
+	}
+
+	popaf;
+}

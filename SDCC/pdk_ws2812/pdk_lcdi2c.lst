@@ -1,0 +1,623 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_lcdi2c
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl _I2C_endTransmission
+                                     17 	.globl _I2C_write
+                                     18 	.globl _I2C_beginTransmission
+                                     19 	.globl _I2C_begin
+                                     20 	.globl __delay_loop_32
+                                     21 	.globl __delay_loop_16
+                                     22 	.globl __delay_loop_8
+                                     23 	.globl __t16c
+                                     24 	.globl __rop
+                                     25 	.globl __bgtr
+                                     26 	.globl __ilrcr
+                                     27 	.globl __pwmg2dtl
+                                     28 	.globl __pwmg2dth
+                                     29 	.globl __pwmg2c
+                                     30 	.globl __pwmg1dtl
+                                     31 	.globl __pwmg1dth
+                                     32 	.globl __pwmg1c
+                                     33 	.globl __pwmgcubl
+                                     34 	.globl __pwmgcubh
+                                     35 	.globl __pwmg0dtl
+                                     36 	.globl __pwmg0dth
+                                     37 	.globl __pwmgclk
+                                     38 	.globl __pwmg0c
+                                     39 	.globl __tm3b
+                                     40 	.globl __tm3s
+                                     41 	.globl __tm3ct
+                                     42 	.globl __tm3c
+                                     43 	.globl __tm2b
+                                     44 	.globl __tm2s
+                                     45 	.globl __tm2ct
+                                     46 	.globl __tm2c
+                                     47 	.globl __gpcs
+                                     48 	.globl __gpcc
+                                     49 	.globl __misclvr
+                                     50 	.globl __misc2
+                                     51 	.globl __misc
+                                     52 	.globl __adcrgc
+                                     53 	.globl __adcr
+                                     54 	.globl __adcm
+                                     55 	.globl __adcc
+                                     56 	.globl __pcpl
+                                     57 	.globl __pbpl
+                                     58 	.globl __pcph
+                                     59 	.globl __pcc
+                                     60 	.globl __pc
+                                     61 	.globl __pbph
+                                     62 	.globl __pbc
+                                     63 	.globl __pb
+                                     64 	.globl __paph
+                                     65 	.globl __pac
+                                     66 	.globl __pa
+                                     67 	.globl __pcdier
+                                     68 	.globl __pbdier
+                                     69 	.globl __padier
+                                     70 	.globl __integs
+                                     71 	.globl __ihrcr
+                                     72 	.globl __eoscr
+                                     73 	.globl __t16m
+                                     74 	.globl __intrq
+                                     75 	.globl __inten
+                                     76 	.globl __clkmd
+                                     77 	.globl __sp
+                                     78 	.globl __flag
+                                     79 	.globl _LCDI2C_blackLight_PARM_1
+                                     80 	.globl _LCDI2C_print_PARM_1
+                                     81 	.globl _LCDI2C_putC_PARM_1
+                                     82 	.globl _LCDI2C_goTo_PARM_2
+                                     83 	.globl _LCDI2C_goTo_PARM_1
+                                     84 	.globl _LCDI2C_writeData_PARM_1
+                                     85 	.globl _LCDI2C_writeCommand_PARM_1
+                                     86 	.globl _LCDI2C_write8_PARM_1
+                                     87 	.globl _lcdReg
+                                     88 	.globl _LCDI2C_config
+                                     89 	.globl _LCDI2C_write8
+                                     90 	.globl _LCDI2C_writeCommand
+                                     91 	.globl _LCDI2C_writeData
+                                     92 	.globl _LCDI2C_goTo
+                                     93 	.globl _LCDI2C_putC
+                                     94 	.globl _LCDI2C_print
+                                     95 	.globl _LCDI2C_blackLight
+                                     96 ;--------------------------------------------------------
+                                     97 ; special function registers
+                                     98 ;--------------------------------------------------------
+                                     99 	.area RSEG (ABS)
+      000000                        100 	.org 0x0000
+                           000000   101 __flag	=	0x0000
+                           000002   102 __sp	=	0x0002
+                           000003   103 __clkmd	=	0x0003
+                           000004   104 __inten	=	0x0004
+                           000005   105 __intrq	=	0x0005
+                           000006   106 __t16m	=	0x0006
+                           00000A   107 __eoscr	=	0x000a
+                           00000B   108 __ihrcr	=	0x000b
+                           00000C   109 __integs	=	0x000c
+                           00000D   110 __padier	=	0x000d
+                           00000E   111 __pbdier	=	0x000e
+                           00000F   112 __pcdier	=	0x000f
+                           000010   113 __pa	=	0x0010
+                           000011   114 __pac	=	0x0011
+                           000012   115 __paph	=	0x0012
+                           000013   116 __pb	=	0x0013
+                           000014   117 __pbc	=	0x0014
+                           000015   118 __pbph	=	0x0015
+                           000016   119 __pc	=	0x0016
+                           000017   120 __pcc	=	0x0017
+                           000018   121 __pcph	=	0x0018
+                           000019   122 __pbpl	=	0x0019
+                           00001A   123 __pcpl	=	0x001a
+                           000020   124 __adcc	=	0x0020
+                           000021   125 __adcm	=	0x0021
+                           000022   126 __adcr	=	0x0022
+                           000024   127 __adcrgc	=	0x0024
+                           000026   128 __misc	=	0x0026
+                           000027   129 __misc2	=	0x0027
+                           000028   130 __misclvr	=	0x0028
+                           00002B   131 __gpcc	=	0x002b
+                           00002C   132 __gpcs	=	0x002c
+                           000030   133 __tm2c	=	0x0030
+                           000031   134 __tm2ct	=	0x0031
+                           000032   135 __tm2s	=	0x0032
+                           000033   136 __tm2b	=	0x0033
+                           000034   137 __tm3c	=	0x0034
+                           000035   138 __tm3ct	=	0x0035
+                           000036   139 __tm3s	=	0x0036
+                           000037   140 __tm3b	=	0x0037
+                           000040   141 __pwmg0c	=	0x0040
+                           000041   142 __pwmgclk	=	0x0041
+                           000042   143 __pwmg0dth	=	0x0042
+                           000043   144 __pwmg0dtl	=	0x0043
+                           000044   145 __pwmgcubh	=	0x0044
+                           000045   146 __pwmgcubl	=	0x0045
+                           000046   147 __pwmg1c	=	0x0046
+                           000048   148 __pwmg1dth	=	0x0048
+                           000049   149 __pwmg1dtl	=	0x0049
+                           00004C   150 __pwmg2c	=	0x004c
+                           00004E   151 __pwmg2dth	=	0x004e
+                           00004F   152 __pwmg2dtl	=	0x004f
+                           000062   153 __ilrcr	=	0x0062
+                           000063   154 __bgtr	=	0x0063
+                           000067   155 __rop	=	0x0067
+      000000                        156 __t16c::
+      000000                        157 	.ds 2
+                                    158 ;--------------------------------------------------------
+                                    159 ; ram data
+                                    160 ;--------------------------------------------------------
+                                    161 	.area DATA
+      000000                        162 _lcdReg::
+      000000                        163 	.ds 1
+      000001                        164 _LCDI2C_write8_PARM_1:
+      000001                        165 	.ds 1
+      000002                        166 _LCDI2C_writeCommand_PARM_1:
+      000002                        167 	.ds 1
+      000003                        168 _LCDI2C_writeCommand_sloc0_1_0:
+      000003                        169 	.ds 1
+      000004                        170 _LCDI2C_writeCommand_sloc1_1_0:
+      000004                        171 	.ds 1
+      000005                        172 _LCDI2C_writeData_PARM_1:
+      000005                        173 	.ds 1
+      000006                        174 _LCDI2C_writeData_sloc2_1_0:
+      000006                        175 	.ds 1
+      000007                        176 _LCDI2C_writeData_sloc3_1_0:
+      000007                        177 	.ds 1
+      000008                        178 _LCDI2C_goTo_PARM_1:
+      000008                        179 	.ds 1
+      000009                        180 _LCDI2C_goTo_PARM_2:
+      000009                        181 	.ds 1
+      00000A                        182 _LCDI2C_goTo_sloc4_1_0:
+      00000A                        183 	.ds 1
+      00000B                        184 _LCDI2C_putC_PARM_1:
+      00000B                        185 	.ds 1
+      00000C                        186 _LCDI2C_print_PARM_1:
+      00000C                        187 	.ds 2
+      00000E                        188 _LCDI2C_print_sloc5_1_0:
+      00000E                        189 	.ds 2
+      000010                        190 _LCDI2C_blackLight_PARM_1:
+      000010                        191 	.ds 1
+                                    192 ;--------------------------------------------------------
+                                    193 ; overlayable items in ram
+                                    194 ;--------------------------------------------------------
+                                    195 ;--------------------------------------------------------
+                                    196 ; absolute external ram data
+                                    197 ;--------------------------------------------------------
+                                    198 	.area DABS (ABS)
+                                    199 ;--------------------------------------------------------
+                                    200 ; global & static initialisations
+                                    201 ;--------------------------------------------------------
+                                    202 	.area HOME
+                                    203 	.area GSINIT
+                                    204 	.area GSFINAL
+                                    205 	.area GSINIT
+                                    206 ;	pdk_lcdi2c.c: 13: uint8_t lcdReg = 0;
+      000000r00r26                  207 	clear	_lcdReg+0
+                                    208 ;--------------------------------------------------------
+                                    209 ; Home
+                                    210 ;--------------------------------------------------------
+                                    211 	.area HOME
+                                    212 	.area HOME
+                                    213 ;--------------------------------------------------------
+                                    214 ; code
+                                    215 ;--------------------------------------------------------
+                                    216 	.area CODE
+                                    217 ;	pdk_lcdi2c.c: 15: void LCDI2C_config(void)
+                                    218 ;	-----------------------------------------
+                                    219 ;	 function LCDI2C_config
+                                    220 ;	-----------------------------------------
+      000000                        221 _LCDI2C_config:
+                                    222 ;	pdk_lcdi2c.c: 17: _delay_ms(100);
+      000000 69 57                  223 	mov	a, #0x69
+      000002r00r17                  224 	mov	__delay_loop_32_PARM_1+0, a
+      000004 04 57                  225 	mov	a, #0x04
+      000006r01r17                  226 	mov	__delay_loop_32_PARM_1+1, a
+      000008 01 57                  227 	mov	a, #0x01
+      00000Ar02r17                  228 	mov	__delay_loop_32_PARM_1+2, a
+      00000Cr03r26                  229 	clear	__delay_loop_32_PARM_1+3
+      00000Er00r70                  230 	call	__delay_loop_32
+                                    231 ;	pdk_lcdi2c.c: 18: lcdReg = 0;
+      000010r00r26                  232 	clear	_lcdReg+0
+                                    233 ;	pdk_lcdi2c.c: 19: I2C_begin();
+      000012r00r70                  234 	call	_I2C_begin
+                                    235 ;	pdk_lcdi2c.c: 21: LCDI2C_write8(0x00);
+      000014r01r26                  236 	clear	_LCDI2C_write8_PARM_1+0
+      000016rDEr70                  237 	call	_LCDI2C_write8
+                                    238 ;	pdk_lcdi2c.c: 22: _delay_ms(1);
+      000018 E6 57                  239 	mov	a, #0xe6
+      00001Ar00r17                  240 	mov	__delay_loop_16_PARM_1+0, a
+      00001C 03 57                  241 	mov	a, #0x03
+      00001Er01r17                  242 	mov	__delay_loop_16_PARM_1+1, a
+      000020r00r70                  243 	call	__delay_loop_16
+                                    244 ;	pdk_lcdi2c.c: 23: LCDI2C_write8(0x04);
+      000022 04 57                  245 	mov	a, #0x04
+      000024r01r17                  246 	mov	_LCDI2C_write8_PARM_1+0, a
+      000026rDEr70                  247 	call	_LCDI2C_write8
+                                    248 ;	pdk_lcdi2c.c: 24: _delay_ms(1);
+      000028 E6 57                  249 	mov	a, #0xe6
+      00002Ar00r17                  250 	mov	__delay_loop_16_PARM_1+0, a
+      00002C 03 57                  251 	mov	a, #0x03
+      00002Er01r17                  252 	mov	__delay_loop_16_PARM_1+1, a
+      000030r00r70                  253 	call	__delay_loop_16
+                                    254 ;	pdk_lcdi2c.c: 25: LCDI2C_write8(0x00);
+      000032r01r26                  255 	clear	_LCDI2C_write8_PARM_1+0
+      000034rDEr70                  256 	call	_LCDI2C_write8
+                                    257 ;	pdk_lcdi2c.c: 26: _delay_ms(1);
+      000036 E6 57                  258 	mov	a, #0xe6
+      000038r00r17                  259 	mov	__delay_loop_16_PARM_1+0, a
+      00003A 03 57                  260 	mov	a, #0x03
+      00003Cr01r17                  261 	mov	__delay_loop_16_PARM_1+1, a
+      00003Er00r70                  262 	call	__delay_loop_16
+                                    263 ;	pdk_lcdi2c.c: 27: LCDI2C_write8(0x04);
+      000040 04 57                  264 	mov	a, #0x04
+      000042r01r17                  265 	mov	_LCDI2C_write8_PARM_1+0, a
+      000044rDEr70                  266 	call	_LCDI2C_write8
+                                    267 ;	pdk_lcdi2c.c: 28: _delay_ms(1);
+      000046 E6 57                  268 	mov	a, #0xe6
+      000048r00r17                  269 	mov	__delay_loop_16_PARM_1+0, a
+      00004A 03 57                  270 	mov	a, #0x03
+      00004Cr01r17                  271 	mov	__delay_loop_16_PARM_1+1, a
+      00004Er00r70                  272 	call	__delay_loop_16
+                                    273 ;	pdk_lcdi2c.c: 29: LCDI2C_write8(0x00);
+      000050r01r26                  274 	clear	_LCDI2C_write8_PARM_1+0
+      000052rDEr70                  275 	call	_LCDI2C_write8
+                                    276 ;	pdk_lcdi2c.c: 30: _delay_ms(1);
+      000054 E6 57                  277 	mov	a, #0xe6
+      000056r00r17                  278 	mov	__delay_loop_16_PARM_1+0, a
+      000058 03 57                  279 	mov	a, #0x03
+      00005Ar01r17                  280 	mov	__delay_loop_16_PARM_1+1, a
+      00005Cr00r70                  281 	call	__delay_loop_16
+                                    282 ;	pdk_lcdi2c.c: 31: LCDI2C_write8(0x04);
+      00005E 04 57                  283 	mov	a, #0x04
+      000060r01r17                  284 	mov	_LCDI2C_write8_PARM_1+0, a
+      000062rDEr70                  285 	call	_LCDI2C_write8
+                                    286 ;	pdk_lcdi2c.c: 32: _delay_ms(1);
+      000064 E6 57                  287 	mov	a, #0xe6
+      000066r00r17                  288 	mov	__delay_loop_16_PARM_1+0, a
+      000068 03 57                  289 	mov	a, #0x03
+      00006Ar01r17                  290 	mov	__delay_loop_16_PARM_1+1, a
+      00006Cr00r70                  291 	call	__delay_loop_16
+                                    292 ;	pdk_lcdi2c.c: 33: LCDI2C_write8(0x00);
+      00006Er01r26                  293 	clear	_LCDI2C_write8_PARM_1+0
+      000070rDEr70                  294 	call	_LCDI2C_write8
+                                    295 ;	pdk_lcdi2c.c: 34: _delay_ms(1);
+      000072 E6 57                  296 	mov	a, #0xe6
+      000074r00r17                  297 	mov	__delay_loop_16_PARM_1+0, a
+      000076 03 57                  298 	mov	a, #0x03
+      000078r01r17                  299 	mov	__delay_loop_16_PARM_1+1, a
+      00007Ar00r70                  300 	call	__delay_loop_16
+                                    301 ;	pdk_lcdi2c.c: 36: LCDI2C_write8(0x20);// function set// 4 bit mode, 2 line, 5x8 font
+      00007C 20 57                  302 	mov	a, #0x20
+      00007Er01r17                  303 	mov	_LCDI2C_write8_PARM_1+0, a
+      000080rDEr70                  304 	call	_LCDI2C_write8
+                                    305 ;	pdk_lcdi2c.c: 37: _delay_ms(1);
+      000082 E6 57                  306 	mov	a, #0xe6
+      000084r00r17                  307 	mov	__delay_loop_16_PARM_1+0, a
+      000086 03 57                  308 	mov	a, #0x03
+      000088r01r17                  309 	mov	__delay_loop_16_PARM_1+1, a
+      00008Ar00r70                  310 	call	__delay_loop_16
+                                    311 ;	pdk_lcdi2c.c: 38: LCDI2C_write8(0x24);
+      00008C 24 57                  312 	mov	a, #0x24
+      00008Er01r17                  313 	mov	_LCDI2C_write8_PARM_1+0, a
+      000090rDEr70                  314 	call	_LCDI2C_write8
+                                    315 ;	pdk_lcdi2c.c: 39: _delay_ms(1);
+      000092 E6 57                  316 	mov	a, #0xe6
+      000094r00r17                  317 	mov	__delay_loop_16_PARM_1+0, a
+      000096 03 57                  318 	mov	a, #0x03
+      000098r01r17                  319 	mov	__delay_loop_16_PARM_1+1, a
+      00009Ar00r70                  320 	call	__delay_loop_16
+                                    321 ;	pdk_lcdi2c.c: 40: LCDI2C_write8(0x20);
+      00009C 20 57                  322 	mov	a, #0x20
+      00009Er01r17                  323 	mov	_LCDI2C_write8_PARM_1+0, a
+      0000A0rDEr70                  324 	call	_LCDI2C_write8
+                                    325 ;	pdk_lcdi2c.c: 41: _delay_ms(1);
+      0000A2 E6 57                  326 	mov	a, #0xe6
+      0000A4r00r17                  327 	mov	__delay_loop_16_PARM_1+0, a
+      0000A6 03 57                  328 	mov	a, #0x03
+      0000A8r01r17                  329 	mov	__delay_loop_16_PARM_1+1, a
+      0000AAr00r70                  330 	call	__delay_loop_16
+                                    331 ;	pdk_lcdi2c.c: 43: LCDI2C_writeCommand(LCD_DISPLAYCONTROL | LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF);// Display control
+      0000AC 0C 57                  332 	mov	a, #0x0c
+      0000AEr02r17                  333 	mov	_LCDI2C_writeCommand_PARM_1+0, a
+      0000B0rF4r70                  334 	call	_LCDI2C_writeCommand
+                                    335 ;	pdk_lcdi2c.c: 44: _delay_ms(1);
+      0000B2 E6 57                  336 	mov	a, #0xe6
+      0000B4r00r17                  337 	mov	__delay_loop_16_PARM_1+0, a
+      0000B6 03 57                  338 	mov	a, #0x03
+      0000B8r01r17                  339 	mov	__delay_loop_16_PARM_1+1, a
+      0000BAr00r70                  340 	call	__delay_loop_16
+                                    341 ;	pdk_lcdi2c.c: 45: LCDI2C_writeCommand(LCD_ENTRYMODESET | LCD_ENTRYLEFT);// Enter mode set
+      0000BC 06 57                  342 	mov	a, #0x06
+      0000BEr02r17                  343 	mov	_LCDI2C_writeCommand_PARM_1+0, a
+      0000C0rF4r70                  344 	call	_LCDI2C_writeCommand
+                                    345 ;	pdk_lcdi2c.c: 46: _delay_ms(1);
+      0000C2 E6 57                  346 	mov	a, #0xe6
+      0000C4r00r17                  347 	mov	__delay_loop_16_PARM_1+0, a
+      0000C6 03 57                  348 	mov	a, #0x03
+      0000C8r01r17                  349 	mov	__delay_loop_16_PARM_1+1, a
+      0000CAr00r70                  350 	call	__delay_loop_16
+                                    351 ;	pdk_lcdi2c.c: 49: LCDI2C_writeCommand(LCD_CLEARDISPLAY);
+      0000CC 01 57                  352 	mov	a, #0x01
+      0000CEr02r17                  353 	mov	_LCDI2C_writeCommand_PARM_1+0, a
+      0000D0rF4r70                  354 	call	_LCDI2C_writeCommand
+                                    355 ;	pdk_lcdi2c.c: 50: _delay_ms(1);
+      0000D2 E6 57                  356 	mov	a, #0xe6
+      0000D4r00r17                  357 	mov	__delay_loop_16_PARM_1+0, a
+      0000D6 03 57                  358 	mov	a, #0x03
+      0000D8r01r17                  359 	mov	__delay_loop_16_PARM_1+1, a
+      0000DAr00r60                  360 	goto	__delay_loop_16
+                                    361 ;	pdk_lcdi2c.c: 51: }
+      0000DC 7A 00                  362 	ret
+                                    363 ;	pdk_lcdi2c.c: 53: void LCDI2C_write8(uint8_t cmd)
+                                    364 ;	-----------------------------------------
+                                    365 ;	 function LCDI2C_write8
+                                    366 ;	-----------------------------------------
+      0000DE                        367 _LCDI2C_write8:
+                                    368 ;	pdk_lcdi2c.c: 55: I2C_beginTransmission(LCDI2C_ADDRESS);
+      0000DE 27 57                  369 	mov	a, #0x27
+      0000E0r00r17                  370 	mov	_I2C_beginTransmission_PARM_1+0, a
+      0000E2r00r70                  371 	call	_I2C_beginTransmission
+                                    372 ;	pdk_lcdi2c.c: 56: I2C_write(cmd);
+      0000E4r01r1F                  373 	mov	a, _LCDI2C_write8_PARM_1+0
+      0000E6r00r17                  374 	mov	_I2C_write_PARM_1+0, a
+      0000E8r00r70                  375 	call	_I2C_write
+                                    376 ;	pdk_lcdi2c.c: 57: I2C_endTransmission();	
+      0000EAr00r70                  377 	call	_I2C_endTransmission
+                                    378 ;	pdk_lcdi2c.c: 58: _delay_us(20);
+      0000EC 33 57                  379 	mov	a, #0x33
+      0000EEr00r17                  380 	mov	__delay_loop_8_PARM_1+0, a
+      0000F0r00r60                  381 	goto	__delay_loop_8
+                                    382 ;	pdk_lcdi2c.c: 59: }
+      0000F2 7A 00                  383 	ret
+                                    384 ;	pdk_lcdi2c.c: 61: void LCDI2C_writeCommand(uint8_t cmd)// cmd = 0, data = 1
+                                    385 ;	-----------------------------------------
+                                    386 ;	 function LCDI2C_writeCommand
+                                    387 ;	-----------------------------------------
+      0000F4                        388 _LCDI2C_writeCommand:
+                                    389 ;	pdk_lcdi2c.c: 64: temp = lcdReg & 0x0F;
+      0000F4r00r1F                  390 	mov	a, _lcdReg+0
+      0000F6 0F 54                  391 	and	a, #0x0f
+                                    392 ;	pdk_lcdi2c.c: 66: temp &= ~LCDI2C_RS;
+      0000F8 FE 54                  393 	and	a, #0xfe
+      0000FAr03r17                  394 	mov	_LCDI2C_writeCommand_sloc0_1_0+0, a
+                                    395 ;	pdk_lcdi2c.c: 68: HNib = cmd & 0xF0;
+      0000FCr02r1F                  396 	mov	a, _LCDI2C_writeCommand_PARM_1+0
+      0000FE 72 00                  397 	push	af
+      000100 F0 54                  398 	and	a, #0xf0
+      000102r00r17                  399 	mov	p, a
+      000104 73 00                  400 	pop	af
+                                    401 ;	pdk_lcdi2c.c: 69: LNib = (cmd<<4) & 0xF0;
+      000106 6E 00                  402 	swap	a
+      000108 F0 54                  403 	and	a, #0xf0
+      00010A F0 54                  404 	and	a, #0xf0
+      00010Cr04r17                  405 	mov	_LCDI2C_writeCommand_sloc1_1_0+0, a
+                                    406 ;	pdk_lcdi2c.c: 71: lcdReg = HNib | temp;
+      00010Er00r1F                  407 	mov	a, p
+      000110r03r1D                  408 	or	a, _LCDI2C_writeCommand_sloc0_1_0+0
+                                    409 ;	pdk_lcdi2c.c: 72: LCDI2C_write8(lcdReg);
+      000112r00r17                  410 	mov	_lcdReg+0, a
+      000114r01r17                  411 	mov	_LCDI2C_write8_PARM_1+0, a
+      000116rDEr70                  412 	call	_LCDI2C_write8
+                                    413 ;	pdk_lcdi2c.c: 73: lcdReg |= LCDI2C_EN;
+      000118 04 57                  414 	mov	a, #0x04
+      00011Ar00r15                  415 	or	_lcdReg+0, a
+                                    416 ;	pdk_lcdi2c.c: 74: LCDI2C_write8(lcdReg);
+      00011Cr00r1F                  417 	mov	a, _lcdReg+0
+      00011Er01r17                  418 	mov	_LCDI2C_write8_PARM_1+0, a
+      000120rDEr70                  419 	call	_LCDI2C_write8
+                                    420 ;	pdk_lcdi2c.c: 75: lcdReg &= ~LCDI2C_EN;
+      000122 FB 57                  421 	mov	a, #0xfb
+      000124r00r14                  422 	and	_lcdReg+0, a
+                                    423 ;	pdk_lcdi2c.c: 76: LCDI2C_write8(lcdReg);
+      000126r00r1F                  424 	mov	a, _lcdReg+0
+      000128r01r17                  425 	mov	_LCDI2C_write8_PARM_1+0, a
+      00012ArDEr70                  426 	call	_LCDI2C_write8
+                                    427 ;	pdk_lcdi2c.c: 78: lcdReg = LNib | temp;
+      00012Cr04r1F                  428 	mov	a, _LCDI2C_writeCommand_sloc1_1_0+0
+      00012Er03r1D                  429 	or	a, _LCDI2C_writeCommand_sloc0_1_0+0
+                                    430 ;	pdk_lcdi2c.c: 79: LCDI2C_write8(lcdReg);
+      000130r00r17                  431 	mov	_lcdReg+0, a
+      000132r01r17                  432 	mov	_LCDI2C_write8_PARM_1+0, a
+      000134rDEr70                  433 	call	_LCDI2C_write8
+                                    434 ;	pdk_lcdi2c.c: 80: lcdReg |= LCDI2C_EN;
+      000136 04 57                  435 	mov	a, #0x04
+      000138r00r15                  436 	or	_lcdReg+0, a
+                                    437 ;	pdk_lcdi2c.c: 81: LCDI2C_write8(lcdReg);
+      00013Ar00r1F                  438 	mov	a, _lcdReg+0
+      00013Cr01r17                  439 	mov	_LCDI2C_write8_PARM_1+0, a
+      00013ErDEr70                  440 	call	_LCDI2C_write8
+                                    441 ;	pdk_lcdi2c.c: 82: lcdReg &= ~LCDI2C_EN;
+      000140 FB 57                  442 	mov	a, #0xfb
+      000142r00r14                  443 	and	_lcdReg+0, a
+                                    444 ;	pdk_lcdi2c.c: 83: LCDI2C_write8(lcdReg);
+      000144r00r1F                  445 	mov	a, _lcdReg+0
+      000146r01r17                  446 	mov	_LCDI2C_write8_PARM_1+0, a
+      000148rDEr60                  447 	goto	_LCDI2C_write8
+                                    448 ;	pdk_lcdi2c.c: 84: }
+      00014A 7A 00                  449 	ret
+                                    450 ;	pdk_lcdi2c.c: 86: void LCDI2C_writeData(uint8_t data)// cmd = 0, data = 1
+                                    451 ;	-----------------------------------------
+                                    452 ;	 function LCDI2C_writeData
+                                    453 ;	-----------------------------------------
+      00014C                        454 _LCDI2C_writeData:
+                                    455 ;	pdk_lcdi2c.c: 89: temp = lcdReg & 0x0F;
+      00014Cr00r1F                  456 	mov	a, _lcdReg+0
+      00014E 0F 54                  457 	and	a, #0x0f
+                                    458 ;	pdk_lcdi2c.c: 90: temp |= LCDI2C_RS;
+      000150 01 55                  459 	or	a, #0x01
+      000152r06r17                  460 	mov	_LCDI2C_writeData_sloc2_1_0+0, a
+                                    461 ;	pdk_lcdi2c.c: 92: HNib = data & 0xF0;
+      000154r05r1F                  462 	mov	a, _LCDI2C_writeData_PARM_1+0
+      000156 72 00                  463 	push	af
+      000158 F0 54                  464 	and	a, #0xf0
+      00015Ar00r17                  465 	mov	p, a
+      00015C 73 00                  466 	pop	af
+                                    467 ;	pdk_lcdi2c.c: 93: LNib = (data<<4) & 0xF0;
+      00015E 6E 00                  468 	swap	a
+      000160 F0 54                  469 	and	a, #0xf0
+      000162 F0 54                  470 	and	a, #0xf0
+      000164r07r17                  471 	mov	_LCDI2C_writeData_sloc3_1_0+0, a
+                                    472 ;	pdk_lcdi2c.c: 95: lcdReg = HNib | temp;
+      000166r00r1F                  473 	mov	a, p
+      000168r06r1D                  474 	or	a, _LCDI2C_writeData_sloc2_1_0+0
+                                    475 ;	pdk_lcdi2c.c: 96: LCDI2C_write8(lcdReg);
+      00016Ar00r17                  476 	mov	_lcdReg+0, a
+      00016Cr01r17                  477 	mov	_LCDI2C_write8_PARM_1+0, a
+      00016ErDEr70                  478 	call	_LCDI2C_write8
+                                    479 ;	pdk_lcdi2c.c: 97: lcdReg |= LCDI2C_EN;
+      000170 04 57                  480 	mov	a, #0x04
+      000172r00r15                  481 	or	_lcdReg+0, a
+                                    482 ;	pdk_lcdi2c.c: 98: LCDI2C_write8(lcdReg);
+      000174r00r1F                  483 	mov	a, _lcdReg+0
+      000176r01r17                  484 	mov	_LCDI2C_write8_PARM_1+0, a
+      000178rDEr70                  485 	call	_LCDI2C_write8
+                                    486 ;	pdk_lcdi2c.c: 99: lcdReg &= ~LCDI2C_EN;
+      00017A FB 57                  487 	mov	a, #0xfb
+      00017Cr00r14                  488 	and	_lcdReg+0, a
+                                    489 ;	pdk_lcdi2c.c: 100: LCDI2C_write8(lcdReg);
+      00017Er00r1F                  490 	mov	a, _lcdReg+0
+      000180r01r17                  491 	mov	_LCDI2C_write8_PARM_1+0, a
+      000182rDEr70                  492 	call	_LCDI2C_write8
+                                    493 ;	pdk_lcdi2c.c: 102: lcdReg = LNib | temp;
+      000184r07r1F                  494 	mov	a, _LCDI2C_writeData_sloc3_1_0+0
+      000186r06r1D                  495 	or	a, _LCDI2C_writeData_sloc2_1_0+0
+                                    496 ;	pdk_lcdi2c.c: 103: LCDI2C_write8(lcdReg);
+      000188r00r17                  497 	mov	_lcdReg+0, a
+      00018Ar01r17                  498 	mov	_LCDI2C_write8_PARM_1+0, a
+      00018CrDEr70                  499 	call	_LCDI2C_write8
+                                    500 ;	pdk_lcdi2c.c: 104: lcdReg |= LCDI2C_EN;
+      00018E 04 57                  501 	mov	a, #0x04
+      000190r00r15                  502 	or	_lcdReg+0, a
+                                    503 ;	pdk_lcdi2c.c: 105: LCDI2C_write8(lcdReg);
+      000192r00r1F                  504 	mov	a, _lcdReg+0
+      000194r01r17                  505 	mov	_LCDI2C_write8_PARM_1+0, a
+      000196rDEr70                  506 	call	_LCDI2C_write8
+                                    507 ;	pdk_lcdi2c.c: 106: lcdReg &= ~LCDI2C_EN;
+      000198 FB 57                  508 	mov	a, #0xfb
+      00019Ar00r14                  509 	and	_lcdReg+0, a
+                                    510 ;	pdk_lcdi2c.c: 107: LCDI2C_write8(lcdReg);
+      00019Cr00r1F                  511 	mov	a, _lcdReg+0
+      00019Er01r17                  512 	mov	_LCDI2C_write8_PARM_1+0, a
+      0001A0rDEr60                  513 	goto	_LCDI2C_write8
+                                    514 ;	pdk_lcdi2c.c: 108: }
+      0001A2 7A 00                  515 	ret
+                                    516 ;	pdk_lcdi2c.c: 110: void LCDI2C_goTo(uint8_t y, uint8_t x)
+                                    517 ;	-----------------------------------------
+                                    518 ;	 function LCDI2C_goTo
+                                    519 ;	-----------------------------------------
+      0001A4                        520 _LCDI2C_goTo:
+                                    521 ;	pdk_lcdi2c.c: 113: if (y > 2)// row 3,4 of 20x4 LCD
+      0001A4 02 57                  522 	mov	a, #0x02
+      0001A6r08r19                  523 	sub	a, _LCDI2C_goTo_PARM_1+0
+      0001A8 80 34                  524 	t1sn.io	f, c
+      0001AArC2r61                  525 	goto	00102$
+                                    526 ;	pdk_lcdi2c.c: 114: ddram = 0x40 * (y-3) + (x-1) + 0x14 + LCD_SETDDRAMADDR;// calculate ddram address
+      0001ACr08r1F                  527 	mov	a, _LCDI2C_goTo_PARM_1+0
+      0001AE 03 51                  528 	sub	a, #0x03
+      0001B0r0Ar17                  529 	mov	_LCDI2C_goTo_sloc4_1_0+0, a
+      0001B2 06 57                  530 	mov	a, #6
+      0001B4                        531 00110$:
+      0001B4r0Ar2B                  532 	sl	_LCDI2C_goTo_sloc4_1_0+0
+      0001B6 63 00                  533 	dzsn	a
+      0001B8rB4r61                  534 	goto	00110$
+      0001BAr09r1F                  535 	mov	a, _LCDI2C_goTo_PARM_2+0
+      0001BC 93 50                  536 	add	a, #0x93
+      0001BEr0Ar18                  537 	add	a, _LCDI2C_goTo_sloc4_1_0+0
+      0001C0rD2r61                  538 	goto	00103$
+      0001C2                        539 00102$:
+                                    540 ;	pdk_lcdi2c.c: 116: ddram = 0x40 * (y-1) + (x-1) + LCD_SETDDRAMADDR; // calculate ddram address
+      0001C2r08r1F                  541 	mov	a, _LCDI2C_goTo_PARM_1+0
+      0001C4 01 51                  542 	sub	a, #0x01
+      0001C6 6E 00                  543 	swap	a
+      0001C8 F0 54                  544 	and	a, #0xf0
+      0001CA 6B 00                  545 	sl	a
+      0001CC 6B 00                  546 	sl	a
+      0001CE 7F 50                  547 	add	a, #0x7f
+      0001D0r09r18                  548 	add	a, _LCDI2C_goTo_PARM_2+0
+      0001D2                        549 00103$:
+                                    550 ;	pdk_lcdi2c.c: 118: LCDI2C_writeCommand(ddram);
+      0001D2r02r17                  551 	mov	_LCDI2C_writeCommand_PARM_1+0, a
+      0001D4rF4r70                  552 	call	_LCDI2C_writeCommand
+                                    553 ;	pdk_lcdi2c.c: 119: _delay_us(100);
+      0001D6 62 57                  554 	mov	a, #0x62
+      0001D8r00r17                  555 	mov	__delay_loop_16_PARM_1+0, a
+      0001DAr01r26                  556 	clear	__delay_loop_16_PARM_1+1
+      0001DCr00r60                  557 	goto	__delay_loop_16
+                                    558 ;	pdk_lcdi2c.c: 120: }
+      0001DE 7A 00                  559 	ret
+                                    560 ;	pdk_lcdi2c.c: 122: void LCDI2C_putC(uint8_t chr)
+                                    561 ;	-----------------------------------------
+                                    562 ;	 function LCDI2C_putC
+                                    563 ;	-----------------------------------------
+      0001E0                        564 _LCDI2C_putC:
+                                    565 ;	pdk_lcdi2c.c: 124: LCDI2C_writeData(chr);
+      0001E0r0Br1F                  566 	mov	a, _LCDI2C_putC_PARM_1+0
+      0001E2r05r17                  567 	mov	_LCDI2C_writeData_PARM_1+0, a
+      0001E4r4Cr61                  568 	goto	_LCDI2C_writeData
+                                    569 ;	pdk_lcdi2c.c: 125: }
+      0001E6 7A 00                  570 	ret
+                                    571 ;	pdk_lcdi2c.c: 126: void LCDI2C_print(char* str)
+                                    572 ;	-----------------------------------------
+                                    573 ;	 function LCDI2C_print
+                                    574 ;	-----------------------------------------
+      0001E8                        575 _LCDI2C_print:
+                                    576 ;	pdk_lcdi2c.c: 128: while (*str)// loop through entire string
+      0001E8r0Cr1F                  577 	mov	a, _LCDI2C_print_PARM_1+0
+      0001EAr0Er17                  578 	mov	_LCDI2C_print_sloc5_1_0+0, a
+      0001ECr0Dr1F                  579 	mov	a, _LCDI2C_print_PARM_1+1
+      0001EEr0Fr17                  580 	mov	_LCDI2C_print_sloc5_1_0+1, a
+      0001F0                        581 00101$:
+      0001F0r0Er1F                  582 	mov	a, _LCDI2C_print_sloc5_1_0+0
+      0001F2r00r17                  583 	mov	p, a
+      0001F4r0Fr1F                  584 	mov	a, _LCDI2C_print_sloc5_1_0+1
+      0001F6r00r70                  585 	call	__gptrget
+      0001F8 00 53                  586 	cneqsn	a, #0x00
+      0001FAr06r62                  587 	goto	00104$
+                                    588 ;	pdk_lcdi2c.c: 130: LCDI2C_putC(*str);
+      0001FCr0Br17                  589 	mov	_LCDI2C_putC_PARM_1+0, a
+      0001FErE0r71                  590 	call	_LCDI2C_putC
+                                    591 ;	pdk_lcdi2c.c: 131: str++;
+      000200r0Er24                  592 	inc	_LCDI2C_print_sloc5_1_0+0
+      000202r0Fr20                  593 	addc	_LCDI2C_print_sloc5_1_0+1
+      000204rF0r61                  594 	goto	00101$
+      000206                        595 00104$:
+                                    596 ;	pdk_lcdi2c.c: 133: }
+      000206 7A 00                  597 	ret
+                                    598 ;	pdk_lcdi2c.c: 135: void LCDI2C_blackLight(uint8_t stt)
+                                    599 ;	-----------------------------------------
+                                    600 ;	 function LCDI2C_blackLight
+                                    601 ;	-----------------------------------------
+      000208                        602 _LCDI2C_blackLight:
+                                    603 ;	pdk_lcdi2c.c: 137: if (stt) lcdReg |= LCD_BACKLIGHT;
+      000208r10r1F                  604 	mov	a, _LCDI2C_blackLight_PARM_1+0
+      00020A 00 53                  605 	cneqsn	a, #0x00
+      00020Cr14r62                  606 	goto	00102$
+      00020E 08 57                  607 	mov	a, #0x08
+      000210r00r15                  608 	or	_lcdReg+0, a
+      000212r18r62                  609 	goto	00103$
+      000214                        610 00102$:
+                                    611 ;	pdk_lcdi2c.c: 138: else lcdReg &= ~LCD_BACKLIGHT;
+      000214 F7 57                  612 	mov	a, #0xf7
+      000216r00r14                  613 	and	_lcdReg+0, a
+      000218                        614 00103$:
+                                    615 ;	pdk_lcdi2c.c: 139: LCDI2C_write8(lcdReg);
+      000218r00r1F                  616 	mov	a, _lcdReg+0
+      00021Ar01r17                  617 	mov	_LCDI2C_write8_PARM_1+0, a
+      00021CrDEr60                  618 	goto	_LCDI2C_write8
+                                    619 ;	pdk_lcdi2c.c: 140: }
+      00021E 7A 00                  620 	ret
+                                    621 	.area CODE
+                                    622 	.area CONST
+                                    623 	.area CABS (ABS)

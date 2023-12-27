@@ -1,0 +1,66 @@
+﻿
+#include	"extern.h"
+
+#define uint8_t		BYTE
+#define uint16_t	WORD
+#define uint24_t	EWORD
+#define uint32_t	DWORD
+//Labe1:      DC  1234h, 5678h, 0xABCD, 0xFFFF, -1;
+uint8_t button_value;
+uint8_t button_flag = 0;
+uint8_t button_press = 0;
+
+uint8_t light_mode = 0;
+uint8_t command;
+uint8_t mode_counter = 0;
+
+uint8_t mode_delay[4] = {220, 150, 150, 100};
+
+//uint8_t mode[11] = {0x45, 0x46, 0x47, 0x44, 0x40, 0x43, 0x07, 0x08, 0x5A, 0x18, 0x52};
+
+uint8_t rv[4] = {0, 253, 216, 239};
+uint8_t gv[4] = {228, 84, 0, 0};
+uint8_t bv[4] = {255, 2, 235, 11};
+uint8_t rsv[8] = {0, 255, 55, 253, 255, 255, 239};
+uint8_t gsv[8] = {117, 0, 235, 84, 255, 242, 0};
+uint8_t bsv[8] = {216, 100, 0, 2, 255, 0, 11};
+rfv EQU 0;
+uint8_t gfv = 255;
+uint8_t bfv[6] = {255, 200, 155, 100, 55, 0};
+uint8_t hue = 0;
+uint8_t hue1 = 0;
+uint8_t huef = 0;
+
+uint8_t lm = 0;
+uint16_t count_ms, count_ms1;
+void	FPPA0 (void)
+{
+	.ADJUST_IC	SYSCLK=IHRC/4		//	SYSCLK=IHRC/4
+
+	//	Insert Initial Code
+
+	while (1)
+	{
+		bfv[1]=1;
+		gfv=0;
+//		...
+//		wdreset;
+
+
+	}
+}
+
+
+void	Interrupt (void)
+{
+	pushaf;
+
+	if (Intrq.T16)
+	{	//	T16 Trig
+		//	User can add code
+		Intrq.T16	=	0;
+		//...
+	}
+
+	popaf;
+}

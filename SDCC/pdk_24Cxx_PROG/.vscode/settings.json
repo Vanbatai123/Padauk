@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "pdk_i2c.h": "c",
+        "pdk_uart.h": "c",
+        "include.h": "c",
+        "delay.h": "c",
+        "pfs173.h": "c"
+    }
+}

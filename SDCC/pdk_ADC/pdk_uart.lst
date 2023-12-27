@@ -1,0 +1,480 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.2.0 #13081 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module pdk_uart
+                                      6 	.optsdcc -mpdk15
+                                      7 	
+                                      8 
+                                      9 ; default segment ordering in RAM for linker
+                                     10 	.area DATA
+                                     11 	.area OSEG (OVR,DATA)
+                                     12 
+                                     13 ;--------------------------------------------------------
+                                     14 ; Public variables in this module
+                                     15 ;--------------------------------------------------------
+                                     16 	.globl __t16c
+                                     17 	.globl __rop
+                                     18 	.globl __bgtr
+                                     19 	.globl __ilrcr
+                                     20 	.globl __pwmg2dtl
+                                     21 	.globl __pwmg2dth
+                                     22 	.globl __pwmg2c
+                                     23 	.globl __pwmg1dtl
+                                     24 	.globl __pwmg1dth
+                                     25 	.globl __pwmg1c
+                                     26 	.globl __pwmgcubl
+                                     27 	.globl __pwmgcubh
+                                     28 	.globl __pwmg0dtl
+                                     29 	.globl __pwmg0dth
+                                     30 	.globl __pwmgclk
+                                     31 	.globl __pwmg0c
+                                     32 	.globl __tm3b
+                                     33 	.globl __tm3s
+                                     34 	.globl __tm3ct
+                                     35 	.globl __tm3c
+                                     36 	.globl __tm2b
+                                     37 	.globl __tm2s
+                                     38 	.globl __tm2ct
+                                     39 	.globl __tm2c
+                                     40 	.globl __gpcs
+                                     41 	.globl __gpcc
+                                     42 	.globl __misclvr
+                                     43 	.globl __misc2
+                                     44 	.globl __misc
+                                     45 	.globl __adcrgc
+                                     46 	.globl __adcr
+                                     47 	.globl __adcm
+                                     48 	.globl __adcc
+                                     49 	.globl __pcpl
+                                     50 	.globl __pbpl
+                                     51 	.globl __pcph
+                                     52 	.globl __pcc
+                                     53 	.globl __pc
+                                     54 	.globl __pbph
+                                     55 	.globl __pbc
+                                     56 	.globl __pb
+                                     57 	.globl __paph
+                                     58 	.globl __pac
+                                     59 	.globl __pa
+                                     60 	.globl __pcdier
+                                     61 	.globl __pbdier
+                                     62 	.globl __padier
+                                     63 	.globl __integs
+                                     64 	.globl __ihrcr
+                                     65 	.globl __eoscr
+                                     66 	.globl __t16m
+                                     67 	.globl __intrq
+                                     68 	.globl __inten
+                                     69 	.globl __clkmd
+                                     70 	.globl __sp
+                                     71 	.globl __flag
+                                     72 	.globl _UART_printNum_PARM_1
+                                     73 	.globl _UART_print_PARM_1
+                                     74 	.globl _putchar_PARM_1
+                                     75 	.globl _UART_begin
+                                     76 	.globl _TIM2_interrupt
+                                     77 	.globl _putchar
+                                     78 	.globl _UART_print
+                                     79 	.globl _UART_printNum
+                                     80 ;--------------------------------------------------------
+                                     81 ; special function registers
+                                     82 ;--------------------------------------------------------
+                                     83 	.area RSEG (ABS)
+      000000                         84 	.org 0x0000
+                           000000    85 __flag	=	0x0000
+                           000002    86 __sp	=	0x0002
+                           000003    87 __clkmd	=	0x0003
+                           000004    88 __inten	=	0x0004
+                           000005    89 __intrq	=	0x0005
+                           000006    90 __t16m	=	0x0006
+                           00000A    91 __eoscr	=	0x000a
+                           00000B    92 __ihrcr	=	0x000b
+                           00000C    93 __integs	=	0x000c
+                           00000D    94 __padier	=	0x000d
+                           00000E    95 __pbdier	=	0x000e
+                           00000F    96 __pcdier	=	0x000f
+                           000010    97 __pa	=	0x0010
+                           000011    98 __pac	=	0x0011
+                           000012    99 __paph	=	0x0012
+                           000013   100 __pb	=	0x0013
+                           000014   101 __pbc	=	0x0014
+                           000015   102 __pbph	=	0x0015
+                           000016   103 __pc	=	0x0016
+                           000017   104 __pcc	=	0x0017
+                           000018   105 __pcph	=	0x0018
+                           000019   106 __pbpl	=	0x0019
+                           00001A   107 __pcpl	=	0x001a
+                           000020   108 __adcc	=	0x0020
+                           000021   109 __adcm	=	0x0021
+                           000022   110 __adcr	=	0x0022
+                           000024   111 __adcrgc	=	0x0024
+                           000026   112 __misc	=	0x0026
+                           000027   113 __misc2	=	0x0027
+                           000028   114 __misclvr	=	0x0028
+                           00002B   115 __gpcc	=	0x002b
+                           00002C   116 __gpcs	=	0x002c
+                           000030   117 __tm2c	=	0x0030
+                           000031   118 __tm2ct	=	0x0031
+                           000032   119 __tm2s	=	0x0032
+                           000033   120 __tm2b	=	0x0033
+                           000034   121 __tm3c	=	0x0034
+                           000035   122 __tm3ct	=	0x0035
+                           000036   123 __tm3s	=	0x0036
+                           000037   124 __tm3b	=	0x0037
+                           000040   125 __pwmg0c	=	0x0040
+                           000041   126 __pwmgclk	=	0x0041
+                           000042   127 __pwmg0dth	=	0x0042
+                           000043   128 __pwmg0dtl	=	0x0043
+                           000044   129 __pwmgcubh	=	0x0044
+                           000045   130 __pwmgcubl	=	0x0045
+                           000046   131 __pwmg1c	=	0x0046
+                           000048   132 __pwmg1dth	=	0x0048
+                           000049   133 __pwmg1dtl	=	0x0049
+                           00004C   134 __pwmg2c	=	0x004c
+                           00004E   135 __pwmg2dth	=	0x004e
+                           00004F   136 __pwmg2dtl	=	0x004f
+                           000062   137 __ilrcr	=	0x0062
+                           000063   138 __bgtr	=	0x0063
+                           000067   139 __rop	=	0x0067
+      000000                        140 __t16c::
+      000000                        141 	.ds 2
+                                    142 ;--------------------------------------------------------
+                                    143 ; ram data
+                                    144 ;--------------------------------------------------------
+                                    145 	.area DATA
+      000000                        146 _putchar_PARM_1:
+      000000                        147 	.ds 2
+      000002                        148 _UART_print_PARM_1:
+      000002                        149 	.ds 2
+      000004                        150 _UART_print_sloc0_1_0:
+      000004                        151 	.ds 1
+      000005                        152 _UART_printNum_PARM_1:
+      000005                        153 	.ds 2
+      000007                        154 _UART_printNum_dis_65536_22:
+      000007                        155 	.ds 5
+                                    156 ;--------------------------------------------------------
+                                    157 ; overlayable items in ram
+                                    158 ;--------------------------------------------------------
+                                    159 ;--------------------------------------------------------
+                                    160 ; absolute external ram data
+                                    161 ;--------------------------------------------------------
+                                    162 	.area DABS (ABS)
+                                    163 ;--------------------------------------------------------
+                                    164 ; global & static initialisations
+                                    165 ;--------------------------------------------------------
+                                    166 	.area HOME
+                                    167 	.area GSINIT
+                                    168 	.area GSFINAL
+                                    169 	.area GSINIT
+                                    170 ;--------------------------------------------------------
+                                    171 ; Home
+                                    172 ;--------------------------------------------------------
+                                    173 	.area HOME
+                                    174 	.area HOME
+                                    175 ;--------------------------------------------------------
+                                    176 ; code
+                                    177 ;--------------------------------------------------------
+                                    178 	.area CODE
+                                    179 ;	pdk_uart.c: 6: void UART_begin()
+                                    180 ;	-----------------------------------------
+                                    181 ;	 function UART_begin
+                                    182 ;	-----------------------------------------
+      000000                        183 _UART_begin:
+                                    184 ;	pdk_uart.c: 9: TM2C = TM2C_CLK_IHRC;						 // Use IHRC -> 16 Mhz
+      000000 20 57                  185 	mov	a, #0x20
+      000002 30 01                  186 	mov.io	__tm2c, a
+                                    187 ;	pdk_uart.c: 10: TM2S = TM2S_PRESCALE_NONE | TM2S_SCALE_DIV2; // No prescale, scale 2 ~> 8MHz
+      000004 01 57                  188 	mov	a, #0x01
+      000006 32 01                  189 	mov.io	__tm2s, a
+                                    190 ;	pdk_uart.c: 11: TM2B = 69;									 // Divide by 69 ~> 115942 Hz (apx. 115200)
+      000008 45 57                  191 	mov	a, #0x45
+      00000A 33 01                  192 	mov.io	__tm2b, a
+                                    193 ;	pdk_uart.c: 13: PAC |= (1 << UART_TX_PIN); // Enable TX Pin as output
+      00000C 91 3F                  194 	set1.io	__pac, #7
+                                    195 ;	pdk_uart.c: 15: txdata = 0xD55F;	// Setup 2 stop bits, 0x55 char for autobaud, 1 start bit, 5 stop bits
+      00000E 5F 57                  196 	mov	a, #0x5f
+      000010r00r17                  197 	mov	_txdata+0, a
+      000012 D5 57                  198 	mov	a, #0xd5
+      000014r01r17                  199 	mov	_txdata+1, a
+                                    200 ;	pdk_uart.c: 16: INTEN |= INTEN_TM2; // Enable TM2 interrupt, send out initial stop bits and autobaud char
+      000016 04 3F                  201 	set1.io	__inten, #6
+                                    202 ;	pdk_uart.c: 17: }
+      000018 7A 00                  203 	ret
+                                    204 ;	pdk_uart.c: 20: void TIM2_interrupt()
+                                    205 ;	-----------------------------------------
+                                    206 ;	 function TIM2_interrupt
+                                    207 ;	-----------------------------------------
+      00001A                        208 _TIM2_interrupt:
+                                    209 ;	pdk_uart.c: 22: if (txdata)
+      00001Ar00r1F                  210 	mov	a, _txdata+0
+      00001Cr01r1D                  211 	or	a, _txdata+1
+      00001E 00 53                  212 	cneqsn	a, #0x00
+      000020r38r60                  213 	goto	00106$
+                                    214 ;	pdk_uart.c: 24: if (txdata & 0x01)			 // Check bit (1/0) for sending
+      000022r01r1F                  215 	mov	a, _txdata+1
+      000024r00r17                  216 	mov	p, a
+      000026r00r1F                  217 	mov	a, _txdata+0
+      000028 01 54                  218 	and	a, #0x01
+      00002A 00 53                  219 	cneqsn	a, #0x00
+      00002Cr32r60                  220 	goto	00102$
+                                    221 ;	pdk_uart.c: 25: setb(PA, UART_TX_PIN); // Send 1 on TX Pin
+      00002E 90 3F                  222 	set1.io	__pa, #7
+      000030r34r60                  223 	goto	00103$
+      000032                        224 00102$:
+                                    225 ;	pdk_uart.c: 27: clrb(PA, UART_TX_PIN); // Send 0 on TX Pin
+      000032 90 3B                  226 	set0.io	__pa, #7
+      000034                        227 00103$:
+                                    228 ;	pdk_uart.c: 28: txdata >>= 1;				 // Shift txdata
+      000034r01r2A                  229 	sr	_txdata+1
+      000036r00r2C                  230 	src	_txdata+0
+      000038                        231 00106$:
+                                    232 ;	pdk_uart.c: 30: }
+      000038 7A 00                  233 	ret
+                                    234 ;	pdk_uart.c: 32: int putchar(int c)
+                                    235 ;	-----------------------------------------
+                                    236 ;	 function putchar
+                                    237 ;	-----------------------------------------
+      00003A                        238 _putchar:
+                                    239 ;	pdk_uart.c: 34: while (txdata)
+      00003A                        240 00101$:
+      00003Ar00r1F                  241 	mov	a, _txdata+0
+      00003Cr01r1D                  242 	or	a, _txdata+1
+      00003E 00 52                  243 	ceqsn	a, #0x00
+      000040r3Ar60                  244 	goto	00101$
+                                    245 ;	pdk_uart.c: 36: INTEN &= ~INTEN_TM2;	   // Disable TM2 (setup of 16 bit value txdata is non atomic)
+      000042 04 3B                  246 	set0.io	__inten, #6
+                                    247 ;	pdk_uart.c: 37: txdata = (c << 1) | 0x200; // Setup txdata with start and stop bit
+      000044r01r1F                  248 	mov	a, _putchar_PARM_1+1
+      000046r00r17                  249 	mov	p, a
+      000048r00r1F                  250 	mov	a, _putchar_PARM_1+0
+      00004A 6B 00                  251 	sl	a
+      00004Cr00r2D                  252 	slc	p
+      00004Er80r4C                  253 	set1	p, #1
+      000050r00r17                  254 	mov	_txdata+0, a
+      000052r00r1F                  255 	mov	a, p
+      000054r01r17                  256 	mov	_txdata+1, a
+                                    257 ;	pdk_uart.c: 38: INTEN |= INTEN_TM2;		   // Enable TM2
+      000056 04 3F                  258 	set1.io	__inten, #6
+                                    259 ;	pdk_uart.c: 39: return (c);
+      000058r01r1F                  260 	mov	a, _putchar_PARM_1+1
+      00005Ar00r17                  261 	mov	p, a
+      00005Cr00r1F                  262 	mov	a, _putchar_PARM_1+0
+                                    263 ;	pdk_uart.c: 40: }
+      00005E 7A 00                  264 	ret
+                                    265 ;	pdk_uart.c: 42: void UART_print(char* str)
+                                    266 ;	-----------------------------------------
+                                    267 ;	 function UART_print
+                                    268 ;	-----------------------------------------
+      000060                        269 _UART_print:
+                                    270 ;	pdk_uart.c: 45: while(str[i]!='\0')
+      000060r04r26                  271 	clear	_UART_print_sloc0_1_0+0
+      000062                        272 00101$:
+      000062r02r1F                  273 	mov	a, _UART_print_PARM_1+0
+      000064r04r18                  274 	add	a, _UART_print_sloc0_1_0+0
+      000066r00r17                  275 	mov	p, a
+      000068r03r1F                  276 	mov	a, _UART_print_PARM_1+1
+      00006A 60 00                  277 	addc	a
+      00006Cr00r70                  278 	call	__gptrget
+      00006E 00 53                  279 	cneqsn	a, #0x00
+      000070r88r60                  280 	goto	00104$
+                                    281 ;	pdk_uart.c: 46: putchar(str[i++]);
+      000072r02r1F                  282 	mov	a, _UART_print_PARM_1+0
+      000074r04r18                  283 	add	a, _UART_print_sloc0_1_0+0
+      000076r00r17                  284 	mov	p, a
+      000078r03r1F                  285 	mov	a, _UART_print_PARM_1+1
+      00007A 60 00                  286 	addc	a
+      00007Cr04r24                  287 	inc	_UART_print_sloc0_1_0+0
+      00007Er00r70                  288 	call	__gptrget
+      000080r00r17                  289 	mov	_putchar_PARM_1+0, a
+      000082r01r26                  290 	clear	_putchar_PARM_1+1
+      000084r3Ar70                  291 	call	_putchar
+      000086r62r60                  292 	goto	00101$
+      000088                        293 00104$:
+                                    294 ;	pdk_uart.c: 47: }
+      000088 7A 00                  295 	ret
+                                    296 ;	pdk_uart.c: 48: void UART_printNum(int num)
+                                    297 ;	-----------------------------------------
+                                    298 ;	 function UART_printNum
+                                    299 ;	-----------------------------------------
+      00008A                        300 _UART_printNum:
+                                    301 ;	pdk_uart.c: 51: if (num > 999)
+      00008A E7 57                  302 	mov	a, #0xe7
+      00008Cr05r19                  303 	sub	a, _UART_printNum_PARM_1+0
+      00008E 03 57                  304 	mov	a, #0x03
+      000090r06r1B                  305 	subc	a, _UART_printNum_PARM_1+1
+      000092 80 31                  306 	t0sn.io	f, ov
+      000094 80 56                  307 	xor	a, #0x80
+      000096 6B 00                  308 	sl	a
+      000098 80 34                  309 	t1sn.io	f, c
+      00009Ar0Er61                  310 	goto	00108$
+                                    311 ;	pdk_uart.c: 53: dis[0] = num / 1000 + 48;
+      00009Cr05r1F                  312 	mov	a, _UART_printNum_PARM_1+0
+      00009Er00r17                  313 	mov	__divsint_PARM_1+0, a
+      0000A0r06r1F                  314 	mov	a, _UART_printNum_PARM_1+1
+      0000A2r01r17                  315 	mov	__divsint_PARM_1+1, a
+      0000A4 E8 57                  316 	mov	a, #0xe8
+      0000A6r00r17                  317 	mov	__divsint_PARM_2+0, a
+      0000A8 03 57                  318 	mov	a, #0x03
+      0000AAr01r17                  319 	mov	__divsint_PARM_2+1, a
+      0000ACr00r70                  320 	call	__divsint
+      0000AE 30 50                  321 	add	a, #0x30
+      0000B0r07r17                  322 	mov	_UART_printNum_dis_65536_22+0, a
+                                    323 ;	pdk_uart.c: 54: dis[1] = (num / 100) % 10 + 48;
+      0000B2r05r1F                  324 	mov	a, _UART_printNum_PARM_1+0
+      0000B4r00r17                  325 	mov	__divsint_PARM_1+0, a
+      0000B6r06r1F                  326 	mov	a, _UART_printNum_PARM_1+1
+      0000B8r01r17                  327 	mov	__divsint_PARM_1+1, a
+      0000BA 64 57                  328 	mov	a, #0x64
+      0000BCr00r17                  329 	mov	__divsint_PARM_2+0, a
+      0000BEr01r26                  330 	clear	__divsint_PARM_2+1
+      0000C0r00r70                  331 	call	__divsint
+      0000C2r00r17                  332 	mov	__modsint_PARM_1+0, a
+      0000C4r00r1F                  333 	mov	a, p
+      0000C6r01r17                  334 	mov	__modsint_PARM_1+1, a
+      0000C8 0A 57                  335 	mov	a, #0x0a
+      0000CAr00r17                  336 	mov	__modsint_PARM_2+0, a
+      0000CCr01r26                  337 	clear	__modsint_PARM_2+1
+      0000CEr00r70                  338 	call	__modsint
+      0000D0 30 50                  339 	add	a, #0x30
+      0000D2r08r17                  340 	mov	_UART_printNum_dis_65536_22+1, a
+                                    341 ;	pdk_uart.c: 55: dis[2] = (num / 10) % 10 + 48;
+      0000D4r05r1F                  342 	mov	a, _UART_printNum_PARM_1+0
+      0000D6r00r17                  343 	mov	__divsint_PARM_1+0, a
+      0000D8r06r1F                  344 	mov	a, _UART_printNum_PARM_1+1
+      0000DAr01r17                  345 	mov	__divsint_PARM_1+1, a
+      0000DC 0A 57                  346 	mov	a, #0x0a
+      0000DEr00r17                  347 	mov	__divsint_PARM_2+0, a
+      0000E0r01r26                  348 	clear	__divsint_PARM_2+1
+      0000E2r00r70                  349 	call	__divsint
+      0000E4r00r17                  350 	mov	__modsint_PARM_1+0, a
+      0000E6r00r1F                  351 	mov	a, p
+      0000E8r01r17                  352 	mov	__modsint_PARM_1+1, a
+      0000EA 0A 57                  353 	mov	a, #0x0a
+      0000ECr00r17                  354 	mov	__modsint_PARM_2+0, a
+      0000EEr01r26                  355 	clear	__modsint_PARM_2+1
+      0000F0r00r70                  356 	call	__modsint
+      0000F2 30 50                  357 	add	a, #0x30
+      0000F4r09r17                  358 	mov	_UART_printNum_dis_65536_22+2, a
+                                    359 ;	pdk_uart.c: 56: dis[3] = num % 10 + 48;
+      0000F6r05r1F                  360 	mov	a, _UART_printNum_PARM_1+0
+      0000F8r00r17                  361 	mov	__modsint_PARM_1+0, a
+      0000FAr06r1F                  362 	mov	a, _UART_printNum_PARM_1+1
+      0000FCr01r17                  363 	mov	__modsint_PARM_1+1, a
+      0000FE 0A 57                  364 	mov	a, #0x0a
+      000100r00r17                  365 	mov	__modsint_PARM_2+0, a
+      000102r01r26                  366 	clear	__modsint_PARM_2+1
+      000104r00r70                  367 	call	__modsint
+      000106 30 50                  368 	add	a, #0x30
+      000108r0Ar17                  369 	mov	_UART_printNum_dis_65536_22+3, a
+                                    370 ;	pdk_uart.c: 57: dis[4] = '\0';
+      00010Ar0Br26                  371 	clear	_UART_printNum_dis_65536_22+4
+      00010CrB4r61                  372 	goto	00109$
+      00010E                        373 00108$:
+                                    374 ;	pdk_uart.c: 59: else if (num > 99)
+      00010E 63 57                  375 	mov	a, #0x63
+      000110r05r19                  376 	sub	a, _UART_printNum_PARM_1+0
+      000112 00 57                  377 	mov	a, #0x00
+      000114r06r1B                  378 	subc	a, _UART_printNum_PARM_1+1
+      000116 80 31                  379 	t0sn.io	f, ov
+      000118 80 56                  380 	xor	a, #0x80
+      00011A 6B 00                  381 	sl	a
+      00011C 80 34                  382 	t1sn.io	f, c
+      00011Er6Er61                  383 	goto	00105$
+                                    384 ;	pdk_uart.c: 61: dis[0] = num / 100 + 48;
+      000120r05r1F                  385 	mov	a, _UART_printNum_PARM_1+0
+      000122r00r17                  386 	mov	__divsint_PARM_1+0, a
+      000124r06r1F                  387 	mov	a, _UART_printNum_PARM_1+1
+      000126r01r17                  388 	mov	__divsint_PARM_1+1, a
+      000128 64 57                  389 	mov	a, #0x64
+      00012Ar00r17                  390 	mov	__divsint_PARM_2+0, a
+      00012Cr01r26                  391 	clear	__divsint_PARM_2+1
+      00012Er00r70                  392 	call	__divsint
+      000130 30 50                  393 	add	a, #0x30
+      000132r07r17                  394 	mov	_UART_printNum_dis_65536_22+0, a
+                                    395 ;	pdk_uart.c: 62: dis[1] = (num / 10) % 10 + 48;
+      000134r05r1F                  396 	mov	a, _UART_printNum_PARM_1+0
+      000136r00r17                  397 	mov	__divsint_PARM_1+0, a
+      000138r06r1F                  398 	mov	a, _UART_printNum_PARM_1+1
+      00013Ar01r17                  399 	mov	__divsint_PARM_1+1, a
+      00013C 0A 57                  400 	mov	a, #0x0a
+      00013Er00r17                  401 	mov	__divsint_PARM_2+0, a
+      000140r01r26                  402 	clear	__divsint_PARM_2+1
+      000142r00r70                  403 	call	__divsint
+      000144r00r17                  404 	mov	__modsint_PARM_1+0, a
+      000146r00r1F                  405 	mov	a, p
+      000148r01r17                  406 	mov	__modsint_PARM_1+1, a
+      00014A 0A 57                  407 	mov	a, #0x0a
+      00014Cr00r17                  408 	mov	__modsint_PARM_2+0, a
+      00014Er01r26                  409 	clear	__modsint_PARM_2+1
+      000150r00r70                  410 	call	__modsint
+      000152 30 50                  411 	add	a, #0x30
+      000154r08r17                  412 	mov	_UART_printNum_dis_65536_22+1, a
+                                    413 ;	pdk_uart.c: 63: dis[2] = num % 10 + 48;
+      000156r05r1F                  414 	mov	a, _UART_printNum_PARM_1+0
+      000158r00r17                  415 	mov	__modsint_PARM_1+0, a
+      00015Ar06r1F                  416 	mov	a, _UART_printNum_PARM_1+1
+      00015Cr01r17                  417 	mov	__modsint_PARM_1+1, a
+      00015E 0A 57                  418 	mov	a, #0x0a
+      000160r00r17                  419 	mov	__modsint_PARM_2+0, a
+      000162r01r26                  420 	clear	__modsint_PARM_2+1
+      000164r00r70                  421 	call	__modsint
+      000166 30 50                  422 	add	a, #0x30
+      000168r09r17                  423 	mov	_UART_printNum_dis_65536_22+2, a
+                                    424 ;	pdk_uart.c: 64: dis[3] = '\0';
+      00016Ar0Ar26                  425 	clear	_UART_printNum_dis_65536_22+3
+      00016CrB4r61                  426 	goto	00109$
+      00016E                        427 00105$:
+                                    428 ;	pdk_uart.c: 66: else if (num > 9)
+      00016E 09 57                  429 	mov	a, #0x09
+      000170r05r19                  430 	sub	a, _UART_printNum_PARM_1+0
+      000172 00 57                  431 	mov	a, #0x00
+      000174r06r1B                  432 	subc	a, _UART_printNum_PARM_1+1
+      000176 80 31                  433 	t0sn.io	f, ov
+      000178 80 56                  434 	xor	a, #0x80
+      00017A 6B 00                  435 	sl	a
+      00017C 80 34                  436 	t1sn.io	f, c
+      00017ErACr61                  437 	goto	00102$
+                                    438 ;	pdk_uart.c: 68: dis[0] = num / 10 + 48;
+      000180r05r1F                  439 	mov	a, _UART_printNum_PARM_1+0
+      000182r00r17                  440 	mov	__divsint_PARM_1+0, a
+      000184r06r1F                  441 	mov	a, _UART_printNum_PARM_1+1
+      000186r01r17                  442 	mov	__divsint_PARM_1+1, a
+      000188 0A 57                  443 	mov	a, #0x0a
+      00018Ar00r17                  444 	mov	__divsint_PARM_2+0, a
+      00018Cr01r26                  445 	clear	__divsint_PARM_2+1
+      00018Er00r70                  446 	call	__divsint
+      000190 30 50                  447 	add	a, #0x30
+      000192r07r17                  448 	mov	_UART_printNum_dis_65536_22+0, a
+                                    449 ;	pdk_uart.c: 69: dis[1] = num % 10 + 48;
+      000194r05r1F                  450 	mov	a, _UART_printNum_PARM_1+0
+      000196r00r17                  451 	mov	__modsint_PARM_1+0, a
+      000198r06r1F                  452 	mov	a, _UART_printNum_PARM_1+1
+      00019Ar01r17                  453 	mov	__modsint_PARM_1+1, a
+      00019C 0A 57                  454 	mov	a, #0x0a
+      00019Er00r17                  455 	mov	__modsint_PARM_2+0, a
+      0001A0r01r26                  456 	clear	__modsint_PARM_2+1
+      0001A2r00r70                  457 	call	__modsint
+      0001A4 30 50                  458 	add	a, #0x30
+      0001A6r08r17                  459 	mov	_UART_printNum_dis_65536_22+1, a
+                                    460 ;	pdk_uart.c: 70: dis[2] = '\0';
+      0001A8r09r26                  461 	clear	_UART_printNum_dis_65536_22+2
+      0001AArB4r61                  462 	goto	00109$
+      0001AC                        463 00102$:
+                                    464 ;	pdk_uart.c: 74: dis[0] = num + 48;
+      0001ACr05r1F                  465 	mov	a, _UART_printNum_PARM_1+0
+      0001AE 30 50                  466 	add	a, #0x30
+      0001B0r07r17                  467 	mov	_UART_printNum_dis_65536_22+0, a
+                                    468 ;	pdk_uart.c: 75: dis[1] = '\0';
+      0001B2r08r26                  469 	clear	_UART_printNum_dis_65536_22+1
+      0001B4                        470 00109$:
+                                    471 ;	pdk_uart.c: 77: UART_print(dis);
+      0001B4r07r57                  472 	mov	a, #(_UART_printNum_dis_65536_22 + 0)
+      0001B6r02r17                  473 	mov	_UART_print_PARM_1+0, a
+      0001B8r03r26                  474 	clear	_UART_print_PARM_1+1
+      0001BAr60r60                  475 	goto	_UART_print
+                                    476 ;	pdk_uart.c: 78: }
+      0001BC 7A 00                  477 	ret
+                                    478 	.area CODE
+                                    479 	.area CONST
+                                    480 	.area CABS (ABS)

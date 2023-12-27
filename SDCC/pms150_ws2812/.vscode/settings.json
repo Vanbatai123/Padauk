@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "pdk_i2c.h": "c",
+        "pdk_uart.h": "c",
+        "include.h": "c",
+        "delay.h": "c",
+        "pfs173.h": "c",
+        "pdk_lcdi2c.h": "c",
+        "*.txt": "c",
+        "OutFile.C": "cpp",
+        "ADC_Get_VDD.C": "cpp",
+        "PMS150_W2812.C": "cpp",
+        "PMS150_W2812_IR_2.C": "cpp"
+    }
+}
