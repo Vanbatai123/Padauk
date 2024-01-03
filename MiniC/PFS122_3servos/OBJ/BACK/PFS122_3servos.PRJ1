@@ -1,0 +1,11 @@
+[INI]
+PROJECT=PRE_FILE
+[LINKS]
+~PFS122_3servos.C
+[HEAD]
+~extern.h
+[DEPEND]
+~PFS122_3servos.PRE
+[PRE]
+~PFS122_3servos.PRJ
+~PFS122_3servos.PRE
