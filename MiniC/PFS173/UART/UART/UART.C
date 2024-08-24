@@ -17,16 +17,16 @@ void UART_HandShake(void)
 	while(1)
 	{
 		UART_Receive();
-		A	=	A + 1;	//	UART_Data_In + 1;
+		A = A + 1; // UART_Data_In + 1;
 		UART_Send(A);
 	}
 }
 
 void FPPA0(void)
 {
-	.ADJUST_IC SYSCLK=IHRC/2		//	SYSCLK=IHRC/4
+	.ADJUST_IC SYSCLK=IHRC/2 // SYSCLK=IHRC/4
 
-	//	Insert Initial Code
+	// Insert Initial Code
 	UART_begin();
 	UART_HandShake();
 	

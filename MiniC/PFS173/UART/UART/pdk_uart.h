@@ -7,7 +7,7 @@
 Baud_Rate => 19200;
 
 UART_Out BIT PA.7;
-UART_In BIT PA.6;
+UART_In  BIT PA.6;
 
 /*
 	UART_Delay => (System_Clock / FPPA_Duty) / Baud_Rate;
@@ -31,8 +31,8 @@ UART_In BIT PA.6;
 X	so UART_Delay  = 500.000 / 57600 = 8.6805...  : fail
 */
 
-FPPA_Duty => _SYS(INC.FPPA_NUM);	// Single FPPA = 1, Mult FPPA = 2 or 4/8/...
-.errnz 		FPPA_Duty > 2			// Only for 1 /2 FPPA, not for more FPPAs
+FPPA_Duty => _SYS(INC.FPPA_NUM); // Single FPPA = 1, Mult FPPA = 2 or 4/8/...
+.errnz FPPA_Duty > 2             // Only for 1 /2 FPPA, not for more FPPAs
 
 UART_Delay => ((System_Clock / FPPA_Duty) + (Baud_Rate / 2)) / Baud_Rate;
 // + (Baud_Rate/2) : to round up or down
@@ -49,3 +49,4 @@ Test_V2 => System_Clock / 1000 * 1005;
 void UART_Send(uint8_t UART_Data_Out);
 void UART_Receive(void);
 void UART_begin(void);
+
